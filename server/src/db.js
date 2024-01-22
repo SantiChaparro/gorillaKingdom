@@ -28,16 +28,23 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Routine,Exercise,User,Payment } = sequelize.models;
+const { Routine,Exercise,User,Payment,DayOfWeek } = sequelize.models;
+
+const RoutineExercise = sequelize.models.RoutineExercise || sequelize.define('RoutineExercise', {});
 
 // Aca vendrian las relaciones
 
 Routine.belongsToMany(Exercise, { through: 'RoutineExercise' });
 Exercise.belongsToMany(Routine, { through: 'RoutineExercise' });
-User.belongsTo(Routine, {foreignKey: 'routineid'});
-User.belongsTo(Payment);
+User.belongsTo(Routine);
+Routine.hasMany(User);
+Payment.belongsTo(User); 
 User.hasMany(Payment);
-Payment.belongsTo(User);
+
+sequelize.models.RoutineExercise.belongsTo(DayOfWeek);
+DayOfWeek.hasMany(sequelize.models.RoutineExercise);
+
+
 
 
 // Product.hasMany(Reviews);
