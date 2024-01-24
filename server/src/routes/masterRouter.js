@@ -1,7 +1,7 @@
 const {Router} = require("express");
 
 //aca importo los handlers
-const { postUser , getUsers} = require('../handlers/masterHandlers');
+const { postUser , getUsers, getUserByName, getUserById,postPayment} = require('../handlers/masterHandlers');
 
 const masterRouter = Router();
 
@@ -9,5 +9,8 @@ const masterRouter = Router();
 
 masterRouter.post('/',postUser);
 masterRouter.get('/',getUsers)
+masterRouter.get('/search',getUserByName)
+masterRouter.get('/:dni',getUserById)
+masterRouter.post('/payment',postPayment)
 
 module.exports = masterRouter;

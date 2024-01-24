@@ -30,7 +30,7 @@ sequelize.models = Object.fromEntries(capsEntries);
 
 const { Routine,Exercise,User,Payment,DayOfWeek } = sequelize.models;
 
-const RoutineExercise = sequelize.models.RoutineExercise || sequelize.define('RoutineExercise', {});
+//const RoutineExercise = sequelize.models.RoutineExercise || sequelize.define('RoutineExercise', {});
 
 // Aca vendrian las relaciones
 
@@ -41,8 +41,13 @@ Routine.hasMany(User);
 Payment.belongsTo(User); 
 User.hasMany(Payment);
 
+DayOfWeek.hasMany(Exercise);
+Exercise.belongsTo(DayOfWeek);
+
+/*
 sequelize.models.RoutineExercise.belongsTo(DayOfWeek);
 DayOfWeek.hasMany(sequelize.models.RoutineExercise);
+*/
 
 
 
