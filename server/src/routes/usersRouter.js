@@ -5,7 +5,7 @@ const {getRoutineById} = require('../handlers/usersHandlers')
 
 const usersRouter = Router();
 
-usersRouter.get('/',getRoutineById)
+usersRouter.get('/routine',getRoutineById)
 
 
 

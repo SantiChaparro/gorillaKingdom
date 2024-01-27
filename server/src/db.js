@@ -34,17 +34,26 @@ const { Routine,Exercise,User,Payment,DayOfWeek } = sequelize.models;
 
 // Aca vendrian las relaciones
 
-Routine.belongsToMany(Exercise, { through: 'RoutineExercise' });
-Exercise.belongsToMany(Routine, { through: 'RoutineExercise' });
 User.belongsTo(Routine);
 Routine.hasMany(User);
+
+Routine.belongsToMany(DayOfWeek, { through: 'RoutineDayOfWeek' });
+DayOfWeek.belongsToMany(Routine, { through: 'RoutineDayOfWeek' });
+
+DayOfWeek.belongsToMany(Exercise, {through: 'ExerciseDayOfWeek'});
+Exercise.belongsToMany(DayOfWeek, {through: 'ExerciseDayOfWeek'});
+
 Payment.belongsTo(User); 
 User.hasMany(Payment);
 
-DayOfWeek.hasMany(Exercise);
-Exercise.belongsTo(DayOfWeek);
+
+
 
 /*
+Routine.belongsToMany(Exercise, { through: 'RoutineExercise' });
+Exercise.belongsToMany(Routine, { through: 'RoutineExercise' });
+DayOfWeek.hasMany(Exercise);
+Exercise.belongsTo(DayOfWeek);
 sequelize.models.RoutineExercise.belongsTo(DayOfWeek);
 DayOfWeek.hasMany(sequelize.models.RoutineExercise);
 */

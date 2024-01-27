@@ -1,5 +1,6 @@
 const { User } = require('../db');
-const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment} = require('../controllers/masterControllers');
+const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine} = require('../controllers/masterControllers');
+const Routine = require('../models/Routine');
 
 const postUser = async (req,res)=>{
 
@@ -109,7 +110,25 @@ const postPayment = async (req,res) => {
         res.status(500).send(error.message)
     }
 
-}
+};
+
+const postRoutine = async (req,res) => {
+
+    const {routineObj} = req.body;
+
+    try {
+        
+        const newRoutine = await createRoutine(routineObj);
+
+        res.status(200).json(newRoutine);
+
+    } catch (error) {
+        
+        res.status(500).send(error.message);
+
+    }
+
+};
 
 
-module.exports = {postUser,getUsers,getUserByName,getUserById,postPayment};
+module.exports = {postUser,getUsers,getUserByName,getUserById,postPayment,postRoutine};

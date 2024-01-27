@@ -1,4 +1,4 @@
-const { User,Payment,Routine } = require('../db');
+const { User,Payment,Routine,DayOfWeek,Exercise } = require('../db');
 const {Op} = require('sequelize');
 
 const postNewUser = async (dni,nombre,fecha_nacimiento,mail,domicilio) => {
@@ -66,4 +66,45 @@ const newPayment = async (dni, fecha_pago , monto) => {
 
 };
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment};
+const createRoutine = async (routineObj) => {
+    const userId = routineObj.userId;
+    console.log(userId)
+    const user = await User.findByPk(userId);
+    console.log(user)
+ 
+    if (user) {
+       const newRoutine = await Routine.create();
+       console.log(newRoutine)
+ 
+       await user.setRoutine(newRoutine);
+ 
+       for (const day of routineObj.days) {
+          const dayId = day.dayId;
+          const foundDay = await DayOfWeek.findByPk(dayId);
+          console.log(foundDay)
+ 
+          if (foundDay) {
+             //console.log('desde el if:',foundDay)
+            await newRoutine.addDayOfWeek(foundDay)
+ 
+             const exerciseArray = day.exercisesId;
+ 
+             if (exerciseArray && exerciseArray.length > 0) {
+                for (const exerciseId of exerciseArray) {
+                   const foundExercise = await Exercise.findByPk(exerciseId);
+ 
+                   if (foundExercise) {
+                      await foundDay.addExercise(foundExercise);
+                   }
+                }
+             }
+          }
+       }
+       return newRoutine;
+    }
+    else{
+       throw new Error('Usuario no encontrado'); // Manejo de error si el usuario no se encuentra
+    }
+ };
+
+module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine};
