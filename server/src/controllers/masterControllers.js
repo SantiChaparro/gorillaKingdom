@@ -16,19 +16,37 @@ const getAllUsers = async () => {
 };
 
 const getUser = async (name) => {
-
     const user = await User.findOne({
         where: {
             nombre: {
                 [Op.iLike]: `%${name}%`,
             },
         },
+        include: [{
+            model: Routine,
+            attributes:['id'],
+            include: [
+                {
+                    model: DayOfWeek,
+                    attributes:['id'],
+                    through:{
+                        attributes:[]
+                    },
+                    include: [
+                       {
+                        model: Exercise,
+                        attributes:['nombre'],
+                        through:{
+                            attributes:[]
+                        }
+                       }
+                    ]
+                }
+            ]
+        }]
     });
 
-    return user; 
-    
-
-
+    return user;
 };
 
 const getUserByPk = async (dni) => {
