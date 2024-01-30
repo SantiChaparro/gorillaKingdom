@@ -1,5 +1,6 @@
 const { User,Payment,Routine,DayOfWeek,Exercise } = require('../db');
 const {Op} = require('sequelize');
+const { sequelize } = require('../db');
 
 const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio) => {
 
@@ -58,7 +59,7 @@ const getUserByPk = async (dni) => {
             }
         ]
     });
-
+    //console.log(user)
     return user;
 };
 
@@ -86,20 +87,20 @@ const newPayment = async (dni, fecha_pago , monto) => {
 
 const createRoutine = async (routineObj) => {
     const userId = routineObj.userId;
-    console.log(userId)
+   // console.log(userId)
     const user = await User.findByPk(userId);
-    console.log(user)
+   // console.log(user)
  
     if (user) {
        const newRoutine = await Routine.create();
-       console.log(newRoutine)
+    //   console.log(newRoutine)
  
        await user.setRoutine(newRoutine);
  
        for (const day of routineObj.days) {
           const dayId = day.dayId;
           const foundDay = await DayOfWeek.findByPk(dayId);
-          console.log(foundDay)
+        //  console.log(foundDay)
  
           if (foundDay) {
              //console.log('desde el if:',foundDay)
@@ -132,7 +133,7 @@ const createRoutine = async (routineObj) => {
     
     if(user){
         const updatedUser = await user.update(updatedData);
-        console.log(updatedUser)
+       // console.log(updatedUser)
         return updatedUser;
     }else{
         throw new Error('Usuario no encontrado');
@@ -140,4 +141,46 @@ const createRoutine = async (routineObj) => {
 
  };
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser};
+ 
+ const modifyRoutine = async (updateData) => {
+    const userId = updateData.userId;
+    const user = await User.findByPk(userId, {
+        include: {
+            model: Routine,
+            include: DayOfWeek // Incluye los días de la semana y los ejercicios asociados
+        }
+    });
+
+    if (user && user.Routine) {
+        const routineToUpdate = user.Routine;
+
+        // Eliminar todos los días de la semana existentes de la rutina
+        await routineToUpdate.removeDayOfWeeks();
+
+        // Recorre los días de la semana proporcionados en el objeto de rutina
+        for (const day of updateData.days) {
+            const dayId = day.dayId;
+            const foundDay = await DayOfWeek.findByPk(dayId);
+
+            if (foundDay) {
+                // Asocia el día de la semana a la rutina
+                await routineToUpdate.addDayOfWeek(foundDay);
+
+                const exerciseArray = day.exercisesId;
+
+                if (exerciseArray && exerciseArray.length > 0) {
+                    // Asocia los ejercicios al día de la semana
+                    await foundDay.setExercises(exerciseArray);
+                }
+            }
+        }
+
+        // Devuelve la rutina actualizada
+        return routineToUpdate;
+    } else {
+        throw new Error('Usuario no encontrado o sin rutina asociada');
+    }
+};
+
+
+module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine};

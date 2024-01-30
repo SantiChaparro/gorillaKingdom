@@ -1,5 +1,5 @@
 const { User } = require('../db');
-const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser} = require('../controllers/masterControllers');
+const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine} = require('../controllers/masterControllers');
 const Routine = require('../models/Routine');
 
 const postUser = async (req,res)=>{
@@ -92,8 +92,8 @@ const updateUser = async (req,res) => {
 
     const {dni} = req.params;
     const {updatedData} = req.body;
-    console.log(dni);
-    console.log(updatedData)
+   // console.log(dni);
+   // console.log(updatedData)
 
     try {
   
@@ -105,5 +105,23 @@ const updateUser = async (req,res) => {
     }
 };
 
+const updateRoutine = async(req,res) => {
 
-module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser};
+    //const {dni} = req.params;
+    const {updateData} = req.body;
+   // console.log(updateData.days)
+
+    try {
+        
+        const updatedRoutine = await modifyRoutine(updateData);
+        res.status(200).json(updatedRoutine);
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+
+
+};
+
+
+module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine};
