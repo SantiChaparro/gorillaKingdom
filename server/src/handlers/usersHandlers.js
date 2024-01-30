@@ -3,6 +3,7 @@ const {getRoutineByUserId} = require('../controllers/userControllers');
 const getRoutineById = async (req,res)=>{
 
     const {dni} = req.body;
+    console.log(dni)
 
     try {
         const routine = await getRoutineByUserId(dni);

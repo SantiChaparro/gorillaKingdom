@@ -1,9 +1,9 @@
 const { User,Payment,Routine,DayOfWeek,Exercise } = require('../db');
 const {Op} = require('sequelize');
 
-const postNewUser = async (dni,nombre,fecha_nacimiento,mail,domicilio) => {
+const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio) => {
 
-    const newUser = await User.create({dni,nombre,fecha_nacimiento,mail,domicilio});
+    const newUser = await User.create({dni,nombre,fecha_nacimiento,telefono,mail,domicilio});
 
     return newUser;
 };
@@ -16,50 +16,50 @@ const getAllUsers = async () => {
 };
 
 const getUser = async (name) => {
-    const user = await User.findOne({
+    const user = await User.findAll({
         where: {
             nombre: {
                 [Op.iLike]: `%${name}%`,
             },
         },
-        include: [{
-            model: Routine,
-            attributes:['id'],
-            include: [
-                {
-                    model: DayOfWeek,
-                    attributes:['id'],
-                    through:{
-                        attributes:[]
-                    },
-                    include: [
-                       {
-                        model: Exercise,
-                        attributes:['nombre'],
-                        through:{
-                            attributes:[]
-                        }
-                       }
-                    ]
-                }
-            ]
-        }]
     });
-
+    
     return user;
 };
 
 const getUserByPk = async (dni) => {
-
-    const user = await User.findByPk(dni,{
-        include:{
-            model: Payment,
-            attributes:['fecha_pago','monto']
-        }
+    const user = await User.findByPk(dni, {
+        include: [
+            {
+                model: Payment,
+                attributes: ['fecha_pago', 'monto']
+            },
+            {
+                model: Routine,
+                attributes: ['id'],
+                include: [
+                    {
+                        model: DayOfWeek,
+                        attributes: ['id'],
+                        through: {
+                            attributes: []
+                        },
+                        include: [
+                            {
+                                model: Exercise,
+                                attributes: ['nombre'],
+                                through: {
+                                    attributes: []
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     });
 
     return user;
-
 };
 
 const newPayment = async (dni, fecha_pago , monto) => {
@@ -125,4 +125,19 @@ const createRoutine = async (routineObj) => {
     }
  };
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine};
+ const modifyUser = async (updatedData,dni) => {
+
+    const user = await User.findByPk(dni);
+    console.log('desde el controller',user)
+    
+    if(user){
+        const updatedUser = await user.update(updatedData);
+        console.log(updatedUser)
+        return updatedUser;
+    }else{
+        throw new Error('Usuario no encontrado');
+    }
+
+ };
+
+module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser};

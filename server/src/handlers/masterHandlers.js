@@ -1,10 +1,10 @@
 const { User } = require('../db');
-const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine} = require('../controllers/masterControllers');
+const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser} = require('../controllers/masterControllers');
 const Routine = require('../models/Routine');
 
 const postUser = async (req,res)=>{
 
-    const {dni,nombre,fecha_nacimiento,mail,domicilio} = req.body;
+    const {dni,nombre,fecha_nacimiento,telefono,mail,domicilio} = req.body;
 
     const existingUser = await User.findByPk(dni);
     
@@ -15,7 +15,7 @@ const postUser = async (req,res)=>{
 
         try {
 
-            const newUser = await postNewUser(dni,nombre,fecha_nacimiento,mail,domicilio);
+            const newUser = await postNewUser(dni,nombre,fecha_nacimiento,telefono,mail,domicilio);
 
             res.status(200).json({ message: 'Usuario creado', newUser});
     
@@ -27,72 +27,30 @@ const postUser = async (req,res)=>{
 
 };
 
-const getUsers = async (req,res) => {
+
+const getUsers = async (req, res) => {
+    const { name } = req.query;
+    const { dni } = req.params;
 
     try {
+        let user;
 
-        const users = await getAllUsers();
+        if (name) {
+            user = await getUser(name);
+        } else if (dni) {
+            user = await getUserByPk(dni);
+        } else {
+            user = await getAllUsers();
+        }
 
-        res.status(200).json(users);
-
-    } catch (error) {
-        
-        res.status(500).send(error.message)
-    }
-
-    
-
-};
-
-const getUserByName = async (req,res) => {
-
-    const {name} = req.query;
-    console.log(name)
-
-    try {
-        
-        const user = await getUser(name);
-
-        if(user){
-
+        if (user !== null && (Array.isArray(user) ? user.length > 0 : true)) {
             res.status(200).json(user);
+        } else {
+            res.status(404).send('Usuario no encontrado');
         }
-        else{
-            res.send('Usuario no encontrado')
-        }
-
-        
-      
-
     } catch (error) {
-
-        res.status(500).send(error.message)
+        res.status(500).send(error.message);
     }
-
-};
-
-const getUserById = async (req,res) => {
-
-    const {dni} = req.params;
-    console.log (req.params)
-
-    try {
-        
-        const user = await getUserByPk(dni);
-
-        if(user){
-            res.status(200).json(user);
-        }
-        else{
-            res.send('Usuario no encontrado');
-        }
-
-    } catch (error) {
-        
-        res.status(500).send(error.message)
-
-    }
-
 };
 
 const postPayment = async (req,res) => {
@@ -130,5 +88,22 @@ const postRoutine = async (req,res) => {
 
 };
 
+const updateUser = async (req,res) => {
 
-module.exports = {postUser,getUsers,getUserByName,getUserById,postPayment,postRoutine};
+    const {dni} = req.params;
+    const {updatedData} = req.body;
+    console.log(dni);
+    console.log(updatedData)
+
+    try {
+  
+            const updatedUser = await modifyUser(updatedData,dni);
+            res.status(200).json(updatedUser);
+        
+    } catch (error) {
+            res.status(500).send(error.message);
+    }
+};
+
+
+module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser};
