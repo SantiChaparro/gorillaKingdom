@@ -1,6 +1,6 @@
 const { User,Payment,Routine,DayOfWeek,Exercise } = require('../db');
 const {Op} = require('sequelize');
-const { sequelize } = require('../db');
+
 
 const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio) => {
 
@@ -182,5 +182,34 @@ const createRoutine = async (routineObj) => {
     }
 };
 
+const getAllPayments = async (month) => {
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine};
+    const selectedMonth = Number(month);
+    const primerDiaMes = new Date(new Date().getFullYear(), selectedMonth - 1, 1); // Restamos 1 al mes para que sea 0-indexed (enero es 0)
+    const ultimoDiaMes = new Date(new Date().getFullYear(), selectedMonth, 0);
+
+    
+
+
+
+    const paymentsByMonth = await Payment.findAll({
+        where:{
+            fecha_pago:{
+                [Op.between]:[primerDiaMes,ultimoDiaMes]
+                
+            }
+        }
+    });
+
+    if(paymentsByMonth){
+        return paymentsByMonth
+    }else{
+        throw new Error('No hay pagos registrados ')
+    }
+
+    
+
+};
+
+
+module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments};

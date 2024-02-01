@@ -1,5 +1,5 @@
 const { User } = require('../db');
-const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine} = require('../controllers/masterControllers');
+const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments} = require('../controllers/masterControllers');
 const Routine = require('../models/Routine');
 
 const postUser = async (req,res)=>{
@@ -123,5 +123,19 @@ const updateRoutine = async(req,res) => {
 
 };
 
+const getPayments = async (req,res) => {
 
-module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine};
+    const {month} = req.params; 
+    console.log(month)
+
+    try {
+        const allPayments = await getAllPayments(month)
+        res.status(200).json(allPayments)
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+
+};
+
+
+module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine,getPayments};

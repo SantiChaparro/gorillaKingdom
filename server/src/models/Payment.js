@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
             autoIncrement: true,
         },
         fecha_pago:{
-            type: DataTypes.STRING,
+            type: DataTypes.DATE,
             allowNull: false,
         },
         monto:{
