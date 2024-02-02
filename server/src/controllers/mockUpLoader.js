@@ -11,7 +11,7 @@ const excersiceLoader = async() => {
         }
     
     });
-
+    
     
     const loadexercises = await Exercise.bulkCreate(excercise)
    

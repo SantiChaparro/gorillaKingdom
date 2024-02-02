@@ -1,5 +1,5 @@
 const { User } = require('../db');
-const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments} = require('../controllers/masterControllers');
+const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments,getAllExercises,postExercise} = require('../controllers/masterControllers');
 const Routine = require('../models/Routine');
 
 const postUser = async (req,res)=>{
@@ -31,6 +31,7 @@ const postUser = async (req,res)=>{
 const getUsers = async (req, res) => {
     const { name } = req.query;
     const { dni } = req.params;
+    
 
     try {
         let user;
@@ -137,5 +138,34 @@ const getPayments = async (req,res) => {
 
 };
 
+const getExercises = async (req,res) => {
 
-module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine,getPayments};
+    try {
+
+        const foundExercises = await getAllExercises();
+        res.status(200).json(foundExercises);
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+
+
+
+};
+
+const createExercise = async (req,res) => {
+    const {nombre,grupo_muscular} = req.body;
+
+    try {
+        
+        const newExercise = await postExercise(nombre,grupo_muscular);
+
+        res.status(200).json(newExercise);
+
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+
+module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine,getPayments,getExercises,createExercise};

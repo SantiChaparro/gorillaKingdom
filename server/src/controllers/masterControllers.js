@@ -211,5 +211,30 @@ const getAllPayments = async (month) => {
 
 };
 
+const getAllExercises = async () => {
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments};
+    const allExercises = await Exercise.findAll({
+        attributes:['id','nombre','grupo_muscular']
+    });
+
+    if(allExercises){
+        return allExercises;
+    }else{
+        throw new Error('Error al cargar los ejercicios')
+    }
+};
+
+const postExercise = async (nombre,grupo_muscular) => {
+
+    const newExercise = await Exercise.create({nombre,grupo_muscular})
+
+    if(newExercise){
+        return newExercise;
+    }else{
+        throw new Error('Error al crear el ejercicio');
+    }
+
+};
+
+
+module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments,getAllExercises,postExercise};
