@@ -1,9 +1,10 @@
 import './App.css';
+import Landing from './Pages/Landing';
 
 function App() {
   return (
     <div className="App">
-      <h1>gorillakingdom</h1>
+      <Landing/>
     </div>
   );
 }
