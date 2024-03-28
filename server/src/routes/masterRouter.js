@@ -14,7 +14,6 @@ const { postUser,
 
 const masterRouter = Router();
 
-// aca vienen las rutas
 masterRouter.get('/findExercises',getExercises);
 masterRouter.get('/findUsers',getUsers)
 masterRouter.get('/search',getUsers);
