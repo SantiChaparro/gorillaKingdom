@@ -4,11 +4,11 @@ import NavBar from "../Components/NavBar/NavBar";
 
 const Landing=()=>{
     return (
-        <div>
+    <div>
         <NavBar/>
         <Hero/>
         
-        </div>
+    </div>
     )
 }
 export default Landing;

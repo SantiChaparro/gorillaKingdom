@@ -1,0 +1,52 @@
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    padding:16px;
+    box-shadow: 0 1px 3px -2px black;
+    background-color: #ff41416c;
+    border-radius: 10px;
+}
+
+
+.logo{
+    margin: 0 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+
+}
+.logo p {
+    color: #171717;
+    font-size:25px ;
+    font-weight: 600;
+}
+.menu{
+display: flex;
+align-items: center;
+list-style: none;
+gap:20px;
+color: #626262;
+font-size: 20px;
+font-weight: 500;
+
+}
+.contentMenu{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.contentMenu button{
+    width: 157px;
+    height: 58px;
+    outline: none;
+    border: 1px solid #7a7a7a;
+    border-radius: 75px;
+    color: #FF4141;;
+    font-size: 20px;
+    font-weight: 500;
+    color:black;
+    cursor: pointer;
+}
+.contentMenu button:active{
+    background:#FF4141;
+}
