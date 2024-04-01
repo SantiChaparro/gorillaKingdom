@@ -1,0 +1,59 @@
+.promo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background:linear-gradient(180deg,#342abd, rgba(0, 0, 75, 0.048) 60%);
+    padding-left: 10%;
+    
+}
+
+.promo h1{
+    color:#171717;
+    font-size:40px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    
+}
+.left{
+display: flex;
+align-items: center;
+margin-right:auto;
+margin-top: 15%;
+}
+.left img{
+    width: 310px;
+    height: 290px;
+   
+}
+.btn{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 310px;
+    height: 70px;
+    background:#dd02026c;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+    border-radius: 75px;
+    margin-top: 28px;
+    cursor: pointer;
+}
+.btn:hover{
+    background: #4547c7;
+    box-shadow: 0 0 10px #5c51ff, 0 0 40px #4978f7, 0 0 80px #4437f7;
+    transition-delay: 0.1s;
+}
+.btnContainer{
+    display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20%;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 500;
+  border-radius: 5px;
+ 
+}

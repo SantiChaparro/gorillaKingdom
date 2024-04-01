@@ -14,19 +14,19 @@ const NavBar =()=>{
             <div className={style.contentMenu}>
                 <ul className={style.menu}>
                     <li>
-                        <a>Inicio</a>
+                        <a href="#" className={style.link}>Inicio</a>
                     </li>
                     <li>
-                        <a>Actividades</a>
+                        <a href="#" className={style.link}>Actividades</a>
                     </li>
                     <li>
-                        <a>Sedes</a>
+                        <a href="#" className={style.link}>Sedes</a>
                     </li>
                     <li>
-                        <a>Contacto</a>
+                        <a href="#" className={style.link}>Contacto</a>
                     </li>
                     <li>
-                        <a>Sobre Nosotros</a>
+                        <a href="#" className={style.link}>Sobre Nosotros</a>
                     </li>
                 </ul>
                 <button>Entrar</button>
