@@ -1,0 +1,19 @@
+.conteiner{
+   display: flex;
+   justify-content: center;
+    gap: 25px;
+    box-shadow: 0 1px 3px -2px black;
+    background-color: #dd020233;
+}
+.conteiner div{
+display: flex;
+align-items: center;
+gap:25px;
+}
+.conteiner img{
+margin-right: 5px;
+}
+.conteiner p{
+    font-size:25px ;
+    font-weight: 600;
+}
