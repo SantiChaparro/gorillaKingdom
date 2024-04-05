@@ -2,10 +2,10 @@ import React from "react";
 import style from "./Footer.module.css"
 import what from "../../assests/whatsapp_negro.png"
 import insta from "../../assests/insta_negro.png"
-import mono from "../../assests/mono1.png"
 import face from "../../assests/face_negro.png"
 import twitt from "../../assests/twitter.png"
 import you from "../../assests/youtube_negro.png"
+
 
 
 const Footer=()=>{
@@ -22,7 +22,9 @@ const Footer=()=>{
 
             </div>
 
-        </div>
+            </div>
+
+        
     )
 }
 export default Footer;
