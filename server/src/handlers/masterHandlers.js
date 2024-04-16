@@ -74,6 +74,7 @@ const postPayment = async (req,res) => {
 const postRoutine = async (req,res) => {
 
     const {routineObj} = req.body;
+    console.log(req.body)
 
     try {
         
@@ -83,7 +84,7 @@ const postRoutine = async (req,res) => {
 
     } catch (error) {
         
-        res.status(500).send(error.message);
+        res.status(500).json({error:error.message});
 
     }
 
