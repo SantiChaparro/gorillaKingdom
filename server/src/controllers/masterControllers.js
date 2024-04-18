@@ -1,10 +1,13 @@
 const { User,Payment,Routine,DayOfWeek,Exercise } = require('../db');
 const {Op} = require('sequelize');
+const {hashPassword} = require('../functions/hasPassword');
+
+const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password) => {
+
+    const hashedPassword = await hashPassword(password);
 
 
-const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio) => {
-
-    const newUser = await User.create({dni,nombre,fecha_nacimiento,telefono,mail,domicilio});
+    const newUser = await User.create({dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password:hashedPassword});
 
     return newUser;
 };
