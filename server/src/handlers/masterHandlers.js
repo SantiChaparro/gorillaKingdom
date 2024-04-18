@@ -2,9 +2,10 @@ const { User } = require('../db');
 const {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments,getAllExercises,postExercise} = require('../controllers/masterControllers');
 const Routine = require('../models/Routine');
 
+
 const postUser = async (req,res)=>{
 
-    const {dni,nombre,fecha_nacimiento,telefono,mail,domicilio} = req.body;
+    const {dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password} = req.body;
 
     const existingUser = await User.findByPk(dni);
     
@@ -15,12 +16,12 @@ const postUser = async (req,res)=>{
 
         try {
 
-            const newUser = await postNewUser(dni,nombre,fecha_nacimiento,telefono,mail,domicilio);
+            const newUser = await postNewUser(dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password);
 
             res.status(200).json({ message: 'Usuario creado', newUser});
     
         } catch (error) {
-            res.status(500).send(error.message);
+            res.status(500).json({error:error.message});
         }
 
     }
