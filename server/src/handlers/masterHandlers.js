@@ -4,9 +4,8 @@ const Routine = require('../models/Routine');
 
 
 const postUser = async (req,res)=>{
-
+    console.log(req.body);
     const {dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password} = req.body;
-
     const existingUser = await User.findByPk(dni);
     
     if(existingUser){
@@ -94,9 +93,8 @@ const postRoutine = async (req,res) => {
 const updateUser = async (req,res) => {
 
     const {dni} = req.params;
-    const {updatedData} = req.body;
-   // console.log(dni);
-   // console.log(updatedData)
+    const updatedData = req.body;
+    
 
     try {
   
