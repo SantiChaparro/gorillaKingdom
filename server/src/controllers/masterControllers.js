@@ -13,9 +13,10 @@ const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio,r
 };
 
 const getAllUsers = async () => {
-
-    const users = await User.findAll();
-
+    const users = await User.findAll({
+        order: [
+            ['nombre', 'ASC'] 
+    ]});
     return users;
 };
 
@@ -132,10 +133,14 @@ const createRoutine = async (routineObj) => {
  const modifyUser = async (updatedData,dni) => {
 
     const user = await User.findByPk(dni);
-    console.log('desde el controller',user)
+   // console.log('desde el controller',user)
+    console.log('desde el controller',updatedData)
+
+    const {values} = updatedData;
+    console.log('desde el controller destructurando',values);
     
     if(user){
-        const updatedUser = await user.update(updatedData);
+        const updatedUser = await user.update(values);
        // console.log(updatedUser)
         return updatedUser;
     }else{

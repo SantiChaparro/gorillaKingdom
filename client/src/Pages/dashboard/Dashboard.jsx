@@ -1,6 +1,8 @@
 
 import NewUserForm from "../users/newUserForm/NewUserForm";
 import Payments from "../payments/Payments";
+import EditUsers from "../users/allUsers/editUsers";
+import CreateRoutine from "../routines/createRoutine/CreateRoutine";
 import { Box, Drawer, Typography, ListItem, Button, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import { styled } from '@mui/system';
 import PersonSharpIcon from '@mui/icons-material/PersonSharp';
@@ -42,6 +44,10 @@ const Dashboard = () => {
         return <NewUserForm />;
       case 'Registrar Pago':
         return <Payments />;
+      case 'Editar Usuario':
+        return <EditUsers/>;
+      case 'Crear rutina':
+        return <CreateRoutine/>; 
       // Agrega más casos para otras opciones si es necesario
       default:
         return null;
@@ -77,13 +83,16 @@ const Dashboard = () => {
            <MenuItem onClick={() => {
               handleCloseMenu(setUsuariosAnchorEl);
              { setOpcionSeleccionada('Registrar Usuario');}
-            }}>
+              }}>
               <ListItemIcon>
                 <AddIcon />
               </ListItemIcon>
               <ListItemText primary="Registrar Usuario"/>
             </MenuItem>
-            <MenuItem onClick={() => handleCloseMenu(setUsuariosAnchorEl)}>
+            <MenuItem onClick={() => {
+              handleCloseMenu(setUsuariosAnchorEl);
+              {setOpcionSeleccionada('Editar Usuario');}
+             }}>
               <ListItemIcon>
                 <EditIcon />
               </ListItemIcon>
@@ -108,7 +117,10 @@ const Dashboard = () => {
             open={Boolean(rutinasAnchorEl)}
             onClose={() => handleCloseMenu(setRutinasAnchorEl)}
           >
-            <MenuItem onClick={() => handleCloseMenu(setRutinasAnchorEl)}>
+            <MenuItem onClick={() => {
+              handleCloseMenu(setRutinasAnchorEl)
+              setOpcionSeleccionada("Crear rutina" )
+              }}>
               <ListItemIcon>
                 <AddIcon />
               </ListItemIcon>
@@ -181,7 +193,7 @@ const Dashboard = () => {
         {/* Repite el mismo patrón para los otros elementos del menú */}
       </StyledDrawer>
       <Box sx={{ width: `calc(100% - ${drawerWidth}px)`,height:'100vh',marginLeft:`${drawerWidth}px`}}>
-      <h1>segundo box</h1>
+      
       {opcionSeleccionada && showContent(opcionSeleccionada)} 
       </Box>
       

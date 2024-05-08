@@ -1,0 +1,224 @@
+{
+  "users": [
+    {
+      "dni": 12345678,
+      "nombre": "Juan Perez",
+      "fecha_nacimiento": "1990-05-15",
+      "telefono": "1234567890",
+      "mail": "juanperez@example.com",
+      "domicilio": "Calle Falsa 123",
+      "rol": "Master",
+      "password": "contraseña123",
+      "activo": true
+    },
+    {
+      "dni": 23456789,
+      "nombre": "María García",
+      "fecha_nacimiento": "1985-10-25",
+      "telefono": "9876543210",
+      "mail": "maria.garcia@example.com",
+      "domicilio": "Avenida Principal 456",
+      "rol": "Cliente",
+      "password": "password456",
+      "activo": true
+    },
+    {
+      "dni": 34567890,
+      "nombre": "Luis González",
+      "fecha_nacimiento": "1995-03-08",
+      "telefono": "4567890123",
+      "mail": "luis.gonzalez@example.com",
+      "domicilio": "Calle Central 789",
+      "rol": "Master",
+      "password": "contraseña789",
+      "activo": true
+    },
+    {
+      "dni": 45678901,
+      "nombre": "Ana Martínez",
+      "fecha_nacimiento": "1988-12-01",
+      "telefono": "7890123456",
+      "mail": "ana.martinez@example.com",
+      "domicilio": "Avenida Secundaria 1011",
+      "rol": "Cliente",
+      "password": "password1011",
+      "activo": true
+    },
+    {
+      "dni": 56789012,
+      "nombre": "Pedro Sanchez",
+      "fecha_nacimiento": "1993-07-20",
+      "telefono": "6543210987",
+      "mail": "pedro.sanchez@example.com",
+      "domicilio": "Calle Nueva 1213",
+      "rol": "Master",
+      "password": "contraseña1213",
+      "activo": true
+    },
+    {
+      "dni": 67890123,
+      "nombre": "Laura Torres",
+      "fecha_nacimiento": "1998-09-10",
+      "telefono": "5432109876",
+      "mail": "laura.torres@example.com",
+      "domicilio": "Avenida Paralela 1415",
+      "rol": "Cliente",
+      "password": "password1415",
+      "activo": true
+    },
+    {
+      "dni": 78901234,
+      "nombre": "Carlos Rodríguez",
+      "fecha_nacimiento": "1987-04-05",
+      "telefono": "4321098765",
+      "mail": "carlos.rodriguez@example.com",
+      "domicilio": "Calle Principal 1617",
+      "rol": "Master",
+      "password": "contraseña1617",
+      "activo": true
+    },
+    {
+      "dni": 89012345,
+      "nombre": "Sofía Fernández",
+      "fecha_nacimiento": "1996-11-30",
+      "telefono": "3210987654",
+      "mail": "sofia.fernandez@example.com",
+      "domicilio": "Avenida Central 1819",
+      "rol": "Cliente",
+      "password": "password1819",
+      "activo": true
+    },
+    {
+      "dni": 90123456,
+      "nombre": "Diego López",
+      "fecha_nacimiento": "1991-08-17",
+      "telefono": "2109876543",
+      "mail": "diego.lopez@example.com",
+      "domicilio": "Calle del Sol 2021",
+      "rol": "Master",
+      "password": "contraseña2021",
+      "activo": true
+    },
+    {
+      "dni": 12345601,
+      "nombre": "Marta Ruiz",
+      "fecha_nacimiento": "1994-12-12",
+      "telefono": "1098765432",
+      "mail": "marta.ruiz@example.com",
+      "domicilio": "Avenida Nueva 2223",
+      "rol": "Cliente",
+      "password": "password2223",
+      "activo": true
+    },
+    {
+      "dni": 23456702,
+      "nombre": "Jorge Molina",
+      "fecha_nacimiento": "1989-06-25",
+      "telefono": "0987654321",
+      "mail": "jorge.molina@example.com",
+      "domicilio": "Calle de la Luna 2425",
+      "rol": "Master",
+      "password": "contraseña2425",
+      "activo": true
+    },
+    {
+      "dni": 34567803,
+      "nombre": "Elena Gómez",
+      "fecha_nacimiento": "1997-03-03",
+      "telefono": "9876543210",
+      "mail": "elena.gomez@example.com",
+      "domicilio": "Avenida del Río 2627",
+      "rol": "Cliente",
+      "password": "password2627",
+      "activo": true
+    },
+    {
+      "dni": 45678904,
+      "nombre": "Roberto Pérez",
+      "fecha_nacimiento": "1992-09-09",
+      "telefono": "8765432109",
+      "mail": "roberto.perez@example.com",
+      "domicilio": "Calle Mayor 2829",
+      "rol": "Master",
+      "password": "contraseña2829",
+      "activo": true
+    },
+    {
+      "dni": 56789005,
+      "nombre": "Carolina Sánchez",
+      "fecha_nacimiento": "1986-05-18",
+      "telefono": "7654321098",
+      "mail": "carolina.sanchez@example.com",
+      "domicilio": "Avenida Grande 3031",
+      "rol": "Cliente",
+      "password": "password3031",
+      "activo": true
+    },
+    {
+      "dni": 67890106,
+      "nombre": "Francisco Martínez",
+      "fecha_nacimiento": "1999-01-21",
+      "telefono": "6543210987",
+      "mail": "francisco.martinez@example.com",
+      "domicilio": "Calle Pequeña 3233",
+      "rol": "Master",
+      "password": "contraseña3233",
+      "activo": true
+    },
+    {
+      "dni": 78901207,
+      "nombre": "Paula López",
+      "fecha_nacimiento": "1988-08-02",
+      "telefono": "5432109876",
+      "mail": "paula.lopez@example.com",
+      "domicilio": "Avenida Larga 3435",
+      "rol": "Cliente",
+      "password": "password3435",
+      "activo": true
+    },
+    {
+      "dni": 89012308,
+      "nombre": "Andrés Pérez",
+      "fecha_nacimiento": "1993-02-28",
+      "telefono": "4321098765",
+      "mail": "andres.perez@example.com",
+      "domicilio": "Calle Nueva 3637",
+      "rol": "Master",
+      "password": "contraseña3637",
+      "activo": true
+    },
+    {
+      "dni": 90123409,
+      "nombre": "Carmen Rodríguez",
+      "fecha_nacimiento": "1985-06-09",
+      "telefono": "3210987654",
+      "mail": "carmen.rodriguez@example.com",
+      "domicilio": "Avenida Corta 3839",
+      "rol": "Cliente",
+      "password": "password3839",
+      "activo": true
+    },
+    {
+      "dni": 12345010,
+      "nombre": "Antonio Fernández",
+      "fecha_nacimiento": "1994-11-19",
+      "telefono": "2109876543",
+      "mail": "antonio.fernandez@example.com",
+      "domicilio": "Calle Ancha 4041",
+      "rol": "Master",
+      "password": "contraseña4041",
+      "activo": true
+    },
+    {
+      "dni": 23456111,
+      "nombre": "Isabel Gómez",
+      "fecha_nacimiento": "1987-07-27",
+      "telefono": "1098765432",
+      "mail": "isabel.gomez@example.com",
+      "domicilio": "Avenida Estrecha 4243",
+      "rol": "Cliente",
+      "password": "password4243",
+      "activo": true
+    }
+  ]
+}
