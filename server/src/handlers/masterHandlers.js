@@ -74,13 +74,20 @@ const postPayment = async (req,res) => {
 const postRoutine = async (req,res) => {
 
     const {routineObj} = req.body;
-    console.log(req.body)
+    console.log('desde handler',req.body)
+    console.log('desde el handler',routineObj);
 
     try {
         
         const newRoutine = await createRoutine(routineObj);
 
-        res.status(200).json(newRoutine);
+        if(newRoutine){
+            const successMessage = "Rutina creada con éxito"
+            res.status(200).json({successMessage,newRoutine})
+        }
+
+        console.log(newRoutine);
+        
 
     } catch (error) {
         
