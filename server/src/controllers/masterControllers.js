@@ -91,9 +91,9 @@ const newPayment = async (dni, fecha_pago , monto) => {
 
 const createRoutine = async (routineObj) => {
     const userId = routineObj.userId;
-   // console.log(userId)
+    console.log(userId)
     const user = await User.findByPk(userId);
-   // console.log(user)
+    console.log('desde controller',user) 
  
     if (user) {
        const newRoutine = await Routine.create();
