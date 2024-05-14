@@ -6,7 +6,7 @@ const getRoutineByUserId = async (id) => {
         const user = await User.findByPk(id, {
             include: [{
                 model: Routine,
-                attributes: ['id'],
+                attributes: ['id','routineDetail'],
                 include: [
                     {
                         model: DayOfWeek,
@@ -17,7 +17,7 @@ const getRoutineByUserId = async (id) => {
                         include: [
                             {
                                 model: Exercise,
-                                attributes: ['nombre'],
+                                attributes: ['nombre','id'],
                                 through: {
                                     attributes: [],
                                   }
@@ -26,7 +26,7 @@ const getRoutineByUserId = async (id) => {
                     }
                 ]
             }],
-            attributes: [] // Excluir todos los atributos del usuario
+            attributes: [] 
         });
 
         if (user) {

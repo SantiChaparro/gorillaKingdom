@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from "react";
-import { Box, Drawer, Typography, ListItem, Button, Menu, MenuItem, ListItemIcon, ListItemText, TextField } from "@mui/material";
+import { Box, Drawer, Typography, ListItem, Button, Menu, MenuItem, ListItemIcon, ListItemText, TextField, Alert , Snackbar, SnackbarContent} from "@mui/material";
 import { useExercisesStore } from "../../../store/useExercisesStore";
 import {useRoutinesStore} from "../../../store/useRoutinesStore";
 import { typography } from "@mui/system";
@@ -9,6 +9,7 @@ import RoutineNavBar from '../../../../src/Components/routineNavBar/RoutineNavBa
 
 const CreateRoutine = () => {
     const {exercises , fetchExercises} = useExercisesStore();
+    const {succesMessage , errorMessage, emptyMessages} = useRoutinesStore();
     const {postRoutine} = useRoutinesStore();
     const [routineObj , setRoutineObj] = useState({
         userId: "",
@@ -18,39 +19,79 @@ const CreateRoutine = () => {
     const [exercisesId , setExercisesId] = useState([]);
     const [userId , setUserId] =useState("");
     const [filteredExercises ,  setFilteredExercises] = useState([]);
+    const [detailValue , setDetailValue] = useState([]);
+    const [routineDetail , setRoutineDetail] = useState([]);
+    const [disable , setDisable] = useState(null)
+    const [message , setMessage] = useState("");
+    const [severity , setSeverity] = useState("");
+    const [alerSucces , setAlertSuccsess] = useState("")
+    const [alerError , setAlertError] = useState("")
    
-
-  
-    console.log(filteredExercises);
-    console.log(exercises);
- 
+    console.log('obj que se envia al back',routineObj);
+    console.log('mensaje de exito',succesMessage);
+    console.log('mensaje de error',errorMessage);
+    console.log(message);
 
     useEffect(()=>{
         fetchExercises();
-      
-    },[])
 
-    
+        setRoutineDetail(Object.values(detailValue))
+
+        handleMessage();
+      
+    },[detailValue,succesMessage,errorMessage])
+
+    const handleMessage = () => {
+        if(succesMessage){
+            //setAlertSuccsess(succesMessage)
+            setMessage(succesMessage);
+            setSeverity('success');
+        }
+
+        if(errorMessage){
+            //setAlertError(errorMessage)
+            setMessage(errorMessage);
+            setSeverity('error');
+        }
+
+
+    };
+
+    const handleCloseAlert = () => {
+        setMessage("");
+        emptyMessages();
+        
+    }
     const handleAddDay = () => {
 
         const dayObj = {
             dayId: dayValue,
-            exercisesId: exercisesId
+            exercisesId: exercisesId,
+            routineDetail: routineDetail
         };
         setRoutineObj(prevState =>({
             ...prevState,
             userId:userId,
             days:[...prevState.days,dayObj]
         }))
-        console.log(dayObj);
-
+      
         setDayValue("");
         setExercisesId([]);
+        setDetailValue([]);
+        setRoutineDetail([]);
+        setDisable(null);
 
     };
 
     const handleSaveRoutine = (routineObj) => {
         postRoutine(routineObj);
+        setRoutineObj({
+            userId: "",
+            days: []
+        });
+
+        setUserId("")
+        
     };
 
     const handleDayChange = (event) => {
@@ -64,17 +105,29 @@ const CreateRoutine = () => {
 
     };
 
-    const handleExerciseSelection = (event) => {
+    const handleExerciseSelection = (event,exercise) => {
 
         const exerciseId = parseInt(event.currentTarget.getAttribute("data-id"), 10);
         if(!exercisesId.includes(exerciseId)){
             setExercisesId(prevState => [...prevState, exerciseId]);
 
         }
+        setDisable(exerciseId)
         
         
     };
 
+    const handleDetail = (event, exerciseId) => {
+        console.log("se activo la funcion",event.target.value);
+        const {value}  = event.target;
+        console.log(value);
+        setDetailValue(prevState => ({
+            ...prevState,
+            [exerciseId]: { id: exerciseId,setsAndReps: value }
+        }));
+    };
+
+   
     const filterValues = (exercises) => {
 
         const musclesGroupSet = new Set();
@@ -93,6 +146,17 @@ const CreateRoutine = () => {
         const filter = exercises.filter(exercise => exercise.grupo_muscular === filterOption);
         setFilteredExercises(filter);
         
+    };
+
+    const handleRemove = (exerciseIdToRemove) => {
+        setExercisesId(prevState => prevState.filter(exerciseId => exerciseId !== exerciseIdToRemove));
+        setRoutineDetail(prevState => prevState.filter(detail => detail.id !== exerciseIdToRemove));
+    
+        setDetailValue(prevState => {
+            const cleanedDetail = { ...prevState };
+            delete cleanedDetail[exerciseIdToRemove];
+            return cleanedDetail;
+        });
     };
 
     return(
@@ -183,6 +247,7 @@ const CreateRoutine = () => {
                                     onClick={handleExerciseSelection}
                                     sx={{width:'100%'}}
                                     data-id={exercise.id}
+                                    
                                 >
                                     {exercise.nombre}
                                 </Typography>
@@ -209,6 +274,9 @@ const CreateRoutine = () => {
                                                 height: '1.7rem',
                                             },
                                         }}
+                                        disabled={disable !== exercise.id}
+                                        value={detailValue[exercise.id]?.setsAndReps || ''}
+                                        onChange={(event) => handleDetail(event, exercise.id)} 
                                     />
                                 ))
                             ) : (
@@ -227,6 +295,9 @@ const CreateRoutine = () => {
                                                 height: '1.7rem',
                                             },
                                         }}
+                                        disabled={disable !== exercise.id}
+                                        value={detailValue[exercise.id]?.setsAndReps || ''}
+                                        onChange={(event) => handleDetail(event, exercise.id)} 
                                     />
                                 ))
                             )}
@@ -244,14 +315,16 @@ const CreateRoutine = () => {
                             <Typography>{`Dia ${dayValue}`}</Typography>
                         ):null}
                     {exercisesId.length > 0 && (
-                            <div>
+                             <div>
                                 <Typography variant="h5">{`Dia ${dayValue}`}</Typography>
                                 {exercisesId.map((exerciseId, index) => (
-                                    <Typography key={index} component="div">
+                                    <Box key={index} sx={{border:'solid 1px black',margin:'1em', display:'flex', gap:'2em'}}>
                                         {/* Encuentra el nombre del ejercicio basado en el exerciseId */}
-                                        {exercises.find(exercise => exercise.id === exerciseId)?.nombre}
-                                        {console.log(exercises.find(exercise => exercise.id === exerciseId))}
-                                    </Typography>
+                                        <Typography>{exercises.find(exercise => exercise.id === exerciseId)?.nombre}</Typography>
+                                        {/* Encuentra el detalle correspondiente y muestra setsAndReps */}
+                                       { <Typography>{routineDetail.find(detail => detail.id === exerciseId)?.setsAndReps}</Typography>}
+                                       <Button onClick={() => handleRemove(exerciseId)}>QUITAR</Button>
+                                    </Box>
                                 ))}
                             </div>
                         )}
@@ -261,6 +334,13 @@ const CreateRoutine = () => {
                 </Box>
             </Box>
             <Button onClick={()=>{handleSaveRoutine(routineObj)}}>GRABAR RUTINA</Button>
+            {
+                message && (
+                    <Snackbar open={!!message} autoHideDuration={3000} onClose={handleCloseAlert}>
+                        <Alert severity={severity} variant="filled">{message}</Alert>
+                    </Snackbar>
+                )
+            }
         </>
         
     )
