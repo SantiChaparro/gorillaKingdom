@@ -17,6 +17,10 @@ module.exports = (sequelize) => {
         dias_por_semana:{
             type: DataTypes.INTEGER,
             allowNull:true,
+        },
+        routineDetail:{
+            type: DataTypes.ARRAY(DataTypes.JSONB),
+            allowNull: true
         }
        
     })

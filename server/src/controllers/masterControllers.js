@@ -90,45 +90,56 @@ const newPayment = async (dni, fecha_pago , monto) => {
 };
 
 const createRoutine = async (routineObj) => {
+    console.log('desde el controller', routineObj);
     const userId = routineObj.userId;
-    console.log(userId)
+    console.log(userId);
     const user = await User.findByPk(userId);
-    console.log('desde controller',user) 
- 
+    console.log('desde controller', user);
+
     if (user) {
-       const newRoutine = await Routine.create();
-    //   console.log(newRoutine)
- 
-       await user.setRoutine(newRoutine);
- 
-       for (const day of routineObj.days) {
-          const dayId = day.dayId;
-          const foundDay = await DayOfWeek.findByPk(dayId);
-        //  console.log(foundDay)
- 
-          if (foundDay) {
-             //console.log('desde el if:',foundDay)
-            await newRoutine.addDayOfWeek(foundDay)
- 
-             const exerciseArray = day.exercisesId;
- 
-             if (exerciseArray && exerciseArray.length > 0) {
-                for (const exerciseId of exerciseArray) {
-                   const foundExercise = await Exercise.findByPk(exerciseId);
- 
-                   if (foundExercise) {
-                      await foundDay.addExercise(foundExercise);
-                   }
+        const newRoutine = await Routine.create();
+        await user.setRoutine(newRoutine);
+
+        const allDetails = []; // Array para almacenar todos los detalles de la rutina
+
+        for (const day of routineObj.days) {
+            const dayId = day.dayId;
+            console.log(dayId);
+            const foundDay = await DayOfWeek.findByPk(dayId);
+
+            if (foundDay) {
+                await newRoutine.addDayOfWeek(foundDay);
+
+                const exerciseArray = day.exercisesId;
+                console.log(exerciseArray);
+                if (exerciseArray && exerciseArray.length > 0) {
+                    for (const exerciseId of exerciseArray) {
+                        const foundExercise = await Exercise.findByPk(exerciseId);
+
+                        if (foundExercise) {
+                            await foundDay.addExercise(foundExercise);
+                        }
+                    }
                 }
-             }
-          }
-       }
-       return newRoutine;
+
+                const detailArray = day.routineDetail;
+                console.log('desde controller ', detailArray)
+                if (detailArray && detailArray.length > 0) {
+                    allDetails.push(...detailArray); // Agregar los detalles al array allDetails
+                }
+            }
+        }
+
+        // Asignar el array de detalles al campo routineDetail de la nueva rutina
+        await newRoutine.update({
+            routineDetail: allDetails
+        });
+
+        return newRoutine;
+    } else {
+        throw new Error('Usuario no encontrado'); // Manejo de error si el usuario no se encuentra
     }
-    else{
-       throw new Error('Usuario no encontrado'); // Manejo de error si el usuario no se encuentra
-    }
- };
+};
 
  const modifyUser = async (updatedData,dni) => {
 
