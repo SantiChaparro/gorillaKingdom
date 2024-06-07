@@ -9,11 +9,15 @@ const { postUser,
         updateRoutine,
         getPayments,
         getExercises,
-        createExercise
+        createExercise,
+       
     } = require('../handlers/masterHandlers');
+    
+    const {getRoutineById} = require('../handlers/usersHandlers')
 
 const masterRouter = Router();
 
+masterRouter.get('/routine',getRoutineById)
 masterRouter.get('/findExercises',getExercises);
 masterRouter.get('/findUsers',getUsers)
 masterRouter.get('/search',getUsers);
