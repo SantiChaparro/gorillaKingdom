@@ -67,7 +67,7 @@ const CreateRoutine = () => {
         const dayObj = {
             dayId: dayValue,
             exercisesId: exercisesId,
-            routineDetail: routineDetail
+            routineDetail: routineDetail,
         };
         setRoutineObj(prevState =>({
             ...prevState,
@@ -123,7 +123,7 @@ const CreateRoutine = () => {
         console.log(value);
         setDetailValue(prevState => ({
             ...prevState,
-            [exerciseId]: { id: exerciseId,setsAndReps: value }
+            [exerciseId]: { id: exerciseId,setsAndReps: value, weights:{week1:"",week2:"",week3:"",week4:""} }
         }));
     };
 
@@ -172,15 +172,15 @@ const CreateRoutine = () => {
                     name="Dni usuario"
                     
                     sx={{
-                        width: '15%', // Establece el ancho al 100% del contenedor
-                        '& .MuiOutlinedInput-root': { // Aplica estilos al componente de entrada subyacente
-                          borderRadius: '8px', // Cambia el radio de los bordes
-                          backgroundColor: '#f0f0f0', // Cambia el color de fondo
-                          '& fieldset': { // Establece estilos para el borde del campo
-                            borderColor: '#aaa', // Cambia el color del borde
+                        width: '15%',
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '8px', 
+                          backgroundColor: '#f0f0f0', 
+                          '& fieldset': {
+                            borderColor: '#aaa', 
                           },
-                          '&:hover fieldset': { // Establece estilos al pasar el mouse sobre el campo
-                            borderColor: '#555', // Cambia el color del borde al pasar el mouse
+                          '&:hover fieldset': { 
+                            borderColor: '#555', 
                           },
                         },
                       }}

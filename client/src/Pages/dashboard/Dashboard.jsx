@@ -1,28 +1,54 @@
 
-import NewUserForm from "../users/newUserForm/NewUserForm";
-import Payments from "../payments/Payments";
-import EditUsers from "../users/allUsers/editUsers";
-import CreateRoutine from "../routines/createRoutine/CreateRoutine";
+// import NewUserForm from "../users/newUserForm/NewUserForm";
+// import Payments from "../payments/Payments";
+// import EditUsers from "../users/allUsers/editUsers";
+// import CreateRoutine from "../routines/createRoutine/CreateRoutine";
+// import UpdateRoutine from "../routines/updateRoutine/UpdateRoutine";
+// import PersonSharpIcon from '@mui/icons-material/PersonSharp';
+// import AddIcon from '@mui/icons-material/Add';
+// import EditIcon from '@mui/icons-material/Edit';
+
+
 import { Box, Drawer, Typography, ListItem, Button, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import { styled } from '@mui/system';
-import PersonSharpIcon from '@mui/icons-material/PersonSharp';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
+import UserNavBar from "../../Components/UserNavBar";
 
 import React, { useState } from "react";
 
-const drawerWidth = 240;
 
-const StyledDrawer = styled(Drawer)(({ theme }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  '& .MuiDrawer-paper': {
-    width: drawerWidth,
-  },
+
+const Dashboard = ({handleMasterDrawer,onClose,openMasterdrawere}) => {
+  
+
+  return(
+
+    <MainContainer>
+      <UserNavBar handleMasterDrawer={handleMasterDrawer}/>
+    </MainContainer>
+
+  )
+
+};
+
+export default Dashboard;
+
+const MainContainer = styled(Box)(({theme})=>({
+  width:'100vw',
+  height:'800px',
+  display:'flex',
+  backgroundColor:'black'
 }));
 
-const Dashboard = () => {
-  const [usuariosAnchorEl, setUsuariosAnchorEl] = useState(null);
+
+
+
+
+
+
+
+
+
+/* const [usuariosAnchorEl, setUsuariosAnchorEl] = useState(null);
   const [rutinasAnchorEl, setRutinasAnchorEl] = useState(null);
   const [ejerciciosAnchorEl, setEjerciciosAnchorEl] = useState(null);
   const [pagosAnchorEl, setPagosAnchorEl] = useState(null);
@@ -48,7 +74,8 @@ const Dashboard = () => {
         return <EditUsers/>;
       case 'Crear rutina':
         return <CreateRoutine/>; 
-      // Agrega más casos para otras opciones si es necesario
+      case 'Modificar rutina':
+        return <UpdateRoutine/>;  
       default:
         return null;
     }
@@ -126,7 +153,10 @@ const Dashboard = () => {
               </ListItemIcon>
               <ListItemText primary="Crear rutina" />
             </MenuItem>
-            <MenuItem onClick={() => handleCloseMenu(setRutinasAnchorEl)}>
+            <MenuItem onClick={() => {
+              handleCloseMenu(setRutinasAnchorEl)
+              setOpcionSeleccionada("Modificar rutina" )
+              }}>
               <ListItemIcon>
                 <EditIcon />
               </ListItemIcon>
@@ -190,15 +220,24 @@ const Dashboard = () => {
            
           </Menu>
         </ListItem>
-        {/* Repite el mismo patrón para los otros elementos del menú */}
-      </StyledDrawer>
-      <Box sx={{ width: `calc(100% - ${drawerWidth}px)`,height:'100vh',marginLeft:`${drawerWidth}px`}}>
-      
-      {opcionSeleccionada && showContent(opcionSeleccionada)} 
+        {/* Repite el mismo patrón para los otros elementos del menú }
+       /* </StyledDrawer>
+        <Box sx={{ width: `calc(100% - ${drawerWidth}px)`,height:'100vh',marginLeft:`${drawerWidth}px`}}>
+        
+        {opcionSeleccionada && showContent(opcionSeleccionada)} 
+        </Box>
+        
       </Box>
-      
-    </Box>
-  );
-};
+    ); */
 
-export default Dashboard;
+    /*
+    const drawerWidth = 240;
+
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  '& .MuiDrawer-paper': {
+    width: drawerWidth,
+  },
+}));
+    */
