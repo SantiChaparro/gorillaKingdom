@@ -1,5 +1,5 @@
-const { User,Payment,Routine,DayOfWeek,Exercise } = require('../db');
-const {Op} = require('sequelize');
+const { User, Payment, Routine, DayOfWeek, Exercise, sequelize } = require('../db');
+const { Sequelize, Op } = require('sequelize');
 const {hashPassword} = require('../functions/hasPassword');
 
 const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password) => {
@@ -19,6 +19,7 @@ const getAllUsers = async () => {
     ]});
     return users;
 };
+
 
 const getUser = async (name) => {
     const user = await User.findAll({
