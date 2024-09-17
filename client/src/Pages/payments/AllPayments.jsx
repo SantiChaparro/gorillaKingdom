@@ -134,6 +134,7 @@ const AllPayments = () => {
                 open={openDetail}
                 handleModalClose={handleModalClose}
                 selectedDetail={selectedDetail}
+                
             />
         </MainContainer>
     );
