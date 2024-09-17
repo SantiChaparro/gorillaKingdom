@@ -14,12 +14,13 @@ const UserNavBar = ({ handleMenuClick, handleMasterDrawer }) => {
   };
 
   useEffect(() => {
-    if (location.pathname === '/usuario') {
+    if (location.pathname.startsWith('/usuario')) {
       setOnclickFunction(() => handleMenuClick);
-    } else if (location.pathname === '/master') {
+    } else if (location.pathname.startsWith('/master')) {
       setOnclickFunction(() => handleMasterDrawer);
     }
   }, [location.pathname, handleMenuClick, handleMasterDrawer]);
+
 
   const shouldRenderBackButton = !['/usuario', '/master'].includes(location.pathname);
 

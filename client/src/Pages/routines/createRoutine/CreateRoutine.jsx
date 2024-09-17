@@ -1,157 +1,160 @@
-import React, {useState,useEffect} from "react";
-import { Box, Drawer, Typography, ListItem, Button, Menu, MenuItem, ListItemIcon, ListItemText, TextField, Alert , Snackbar, SnackbarContent} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, TextField, MenuItem, Button, Alert, Snackbar, styled } from "@mui/material";
 import { useExercisesStore } from "../../../store/useExercisesStore";
-import {useRoutinesStore} from "../../../store/useRoutinesStore";
-import { typography } from "@mui/system";
+import { useRoutinesStore } from "../../../store/useRoutinesStore";
 import RoutineNavBar from '../../../../src/Components/routineNavBar/RoutineNavBar';
+import MobileExerciseSelector from "../../../Components/MobileExerciseSelector";
+import RoutineDisplay from "../../../Components/RoutineDisplay";
+import UserNavBar from "../../../Components/UserNavBar";
+import Swal from 'sweetalert2';
 
 
 
-const CreateRoutine = () => {
-    const {exercises , fetchExercises} = useExercisesStore();
-    const {succesMessage , errorMessage, emptyMessages} = useRoutinesStore();
-    const {postRoutine} = useRoutinesStore();
-    const [routineObj , setRoutineObj] = useState({
-        userId: "",
-        days: []
-    });
-    const [dayValue , setDayValue] = useState("");
-    const [exercisesId , setExercisesId] = useState([]);
-    const [userId , setUserId] =useState("");
-    const [filteredExercises ,  setFilteredExercises] = useState([]);
-    const [detailValue , setDetailValue] = useState([]);
-    const [routineDetail , setRoutineDetail] = useState([]);
-    const [disable , setDisable] = useState(null)
-    const [message , setMessage] = useState("");
-    const [severity , setSeverity] = useState("");
-    const [alerSucces , setAlertSuccsess] = useState("")
-    const [alerError , setAlertError] = useState("")
-   
-    console.log('obj que se envia al back',routineObj);
-    console.log('mensaje de exito',succesMessage);
-    console.log('mensaje de error',errorMessage);
-    console.log(message);
+const CreateRoutine = ({ handleMasterDrawer }) => {
+    const { exercises, fetchExercises } = useExercisesStore();
+    const { succesMessage, errorMessage, emptyMessages, postRoutine } = useRoutinesStore();
+    const [routineObj, setRoutineObj] = useState({ userId: "", days: [] });
+    const [dayValue, setDayValue] = useState("");
+    const [exercisesId, setExercisesId] = useState([]);
+    const [userId, setUserId] = useState("");
+    const [filteredExercises, setFilteredExercises] = useState([]);
+    const [detailValue, setDetailValue] = useState({});
+    const [routineDetail, setRoutineDetail] = useState([]);
+    const [disable, setDisable] = useState(null);
+    const [message, setMessage] = useState("");
+    const [severity, setSeverity] = useState("");
+    const [currentExercise, setCurrentExercise] = useState(null);
 
-    useEffect(()=>{
+    console.log(routineObj);
+    console.log('error',errorMessage);
+    console.log(succesMessage);
+    
+    
+
+    useEffect(() => {
         fetchExercises();
+        setRoutineDetail(Object.values(detailValue));
+        //handleMessage();
+    }, [detailValue]);
 
-        setRoutineDetail(Object.values(detailValue))
-
-        handleMessage();
-      
-    },[detailValue,succesMessage,errorMessage])
-
-    const handleMessage = () => {
-        if(succesMessage){
-            //setAlertSuccsess(succesMessage)
-            setMessage(succesMessage);
-            setSeverity('success');
+    useEffect(() => {
+        // Observar cambios en los mensajes de éxito o error
+        if (succesMessage) {
+          Swal.fire({
+            icon: "success",
+            title: "Excelente!",
+            text: succesMessage,
+            showConfirmButton: true,
+          });
+          // Limpiar mensajes después de mostrar alerta
+          emptyMessages();
         }
-
-        if(errorMessage){
-            //setAlertError(errorMessage)
-            setMessage(errorMessage);
-            setSeverity('error');
+    
+        if (errorMessage) {
+          Swal.fire({
+            icon: "error",
+            title: "Upss!",
+            text: errorMessage,
+            showConfirmButton: true,
+          });
+          // Limpiar mensajes después de mostrar alerta
+          emptyMessages();
         }
+      }, [succesMessage, errorMessage, emptyMessages]);
 
+    // const handleMessage = () => {
+    //     if (succesMessage) {
+    //         setMessage(succesMessage);
+    //         console.log(message);
+            
+            
+    //     }
 
-    };
+    //     if (errorMessage) {
+    //         setMessage(errorMessage);
+    //         console.log(message);
+    //     }
+    // };
 
-    const handleCloseAlert = () => {
-        setMessage("");
-        emptyMessages();
-        
-    }
+    // const handleCloseAlert = () => {
+    //     setMessage("");
+    //     emptyMessages();
+    // };
+
     const handleAddDay = () => {
-
-        const dayObj = {
-            dayId: dayValue,
-            exercisesId: exercisesId,
-            routineDetail: routineDetail,
-        };
-        setRoutineObj(prevState =>({
+        const dayObj = { dayId: dayValue, exercisesId, routineDetail };
+        setRoutineObj(prevState => ({
             ...prevState,
-            userId:userId,
-            days:[...prevState.days,dayObj]
-        }))
-      
+            userId,
+            days: [...prevState.days, dayObj]
+        }));
         setDayValue("");
         setExercisesId([]);
-        setDetailValue([]);
+        setDetailValue({});
         setRoutineDetail([]);
         setDisable(null);
-
+        setCurrentExercise(null);
     };
 
-    const handleSaveRoutine = (routineObj) => {
-        postRoutine(routineObj);
-        setRoutineObj({
-            userId: "",
-            days: []
-        });
+    const handleSaveRoutine = async (routineObj) => {
 
-        setUserId("")
-        
+        try {
+            const newRoutine = await postRoutine(routineObj);
+            console.log(newRoutine.successMessage);
+
+         
+            
+        } catch (error) {
+            console.log(error);
+            
+           
+
+        }
+
+
     };
 
     const handleDayChange = (event) => {
-
-        setDayValue(event.target.value)
+        setDayValue(event.target.value);
     };
 
     const handleUserId = (event) => {
-
         setUserId(event.target.value);
-
     };
 
-    const handleExerciseSelection = (event,exercise) => {
-
-        const exerciseId = parseInt(event.currentTarget.getAttribute("data-id"), 10);
-        if(!exercisesId.includes(exerciseId)){
+    const handleExerciseSelection = (event) => {
+        const exerciseId = parseInt(event.target.value, 10);
+        setCurrentExercise(exerciseId);
+        if (!exercisesId.includes(exerciseId)) {
             setExercisesId(prevState => [...prevState, exerciseId]);
-
         }
-        setDisable(exerciseId)
-        
-        
+        setDisable(exerciseId);
     };
 
     const handleDetail = (event, exerciseId) => {
-        console.log("se activo la funcion",event.target.value);
-        const {value}  = event.target;
-        console.log(value);
+        const { value } = event.target;
         setDetailValue(prevState => ({
             ...prevState,
-            [exerciseId]: { id: exerciseId,setsAndReps: value, weights:{week1:"",week2:"",week3:"",week4:""} }
+            [exerciseId]: { id: exerciseId, setsAndReps: value, weights: { week1: "", week2: "", week3: "", week4: "" } }
         }));
     };
 
-   
-    const filterValues = (exercises) => {
-
+    const filterValues = (exercises = []) => {
         const musclesGroupSet = new Set();
-
         exercises.forEach(exercise => {
-           musclesGroupSet.add(exercise.grupo_muscular); 
+            musclesGroupSet.add(exercise.grupo_muscular);
         });
-
-        const filterOptions = [...musclesGroupSet];
-
-        return filterOptions;
-
+        return [...musclesGroupSet];
     };
 
-    const handleSelectChange = (filterOption,exercises) => {
+    const handleSelectChange = (filterOption) => {
         const filter = exercises.filter(exercise => exercise.grupo_muscular === filterOption);
         setFilteredExercises(filter);
-        
     };
 
     const handleRemove = (exerciseIdToRemove) => {
         setExercisesId(prevState => prevState.filter(exerciseId => exerciseId !== exerciseIdToRemove));
         setRoutineDetail(prevState => prevState.filter(detail => detail.id !== exerciseIdToRemove));
-    
         setDetailValue(prevState => {
             const cleanedDetail = { ...prevState };
             delete cleanedDetail[exerciseIdToRemove];
@@ -159,192 +162,190 @@ const CreateRoutine = () => {
         });
     };
 
-    return(
-        <>
-            <Box sx={{width:'calc(100vw - 280px)', height:'30vh', border:'solid 1px black'}}>
-                <Typography variant="h3" align="center">CREAR RUTINA</Typography>
-                <Box sx={{display:'flex', flexDirection:'column', gap:'1em'}}>
+    return (
+        <MainContainer>
+            <HeaderContainer>
+                <CustomTypography variant="h3" align="center">CREAR RUTINA</CustomTypography>
+                <Idcontainer>
                     <TextField
-                    label="Dni usuario"
-                    variant="outlined"
-                    value={userId}
-                    onChange={handleUserId}
-                    name="Dni usuario"
-                    
-                    sx={{
-                        width: '15%',
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '8px', 
-                          backgroundColor: '#f0f0f0', 
-                          '& fieldset': {
-                            borderColor: '#aaa', 
-                          },
-                          '&:hover fieldset': { 
-                            borderColor: '#555', 
-                          },
-                        },
-                      }}
+                        label="Dni usuario"
+                        variant="outlined"
+                        value={userId || ""}
+                        onChange={handleUserId}
+                        name="Dni usuario"
+                        sx={{ ...textFieldStyles }}
+                        InputLabelProps={{
+                            style: { color: 'white' }
+                        }}
                     />
                     <TextField
-                    select
-                    label="Dia de entrenamiento"
-                    variant="outlined"
-                    value={dayValue}
-                    onChange={handleDayChange}
-                    sx={{
-                        width: '15%', 
-                        '& .MuiOutlinedInput-root': { 
-                          borderRadius: '8px', 
-                          backgroundColor: '#f0f0f0', 
-                          '& fieldset': { 
-                            borderColor: '#aaa', 
-                          },
-                          '&:hover fieldset': { 
-                            borderColor: '#555', 
-                          },
-                        },
-                    }}
+                        select
+                        label="Dia de entrenamiento"
+                        variant="outlined"
+                        value={dayValue || ""}
+                        onChange={handleDayChange}
+                        sx={{ ...textFieldStyles }}
+                        InputLabelProps={{
+                            style: { color: 'white' }
+                        }}
                     >
-                        <MenuItem value=" ">Dias de entrenamiento</MenuItem>
-                        <MenuItem value="1">Dia 1</MenuItem>
-                        <MenuItem value="2">Dia 2</MenuItem>
-                        <MenuItem value="3">Dia 3</MenuItem>
-                        <MenuItem value="4">Dia 4</MenuItem>
-                        <MenuItem value="5">Dia 5</MenuItem>
-                        <MenuItem value="6">Dia 6</MenuItem>
-                    </TextField>  
-                </Box>
-            </Box>
-            <Box sx={{width:'calc(100vw - 240px)', display:'flex',justifyContent:'center',gap:'2em'}}>
+                        <MenuItem value="" sx={{ color: 'black' }}>Dias de entrenamiento</MenuItem>
+                        <MenuItem value="1" sx={{ color: 'black' }}>Dia 1</MenuItem>
+                        <MenuItem value="2" sx={{ color: 'black' }}>Dia 2</MenuItem>
+                        <MenuItem value="3" sx={{ color: 'black' }}>Dia 3</MenuItem>
+                        <MenuItem value="4" sx={{ color: 'black' }}>Dia 4</MenuItem>
+                        <MenuItem value="5" sx={{ color: 'black' }}>Dia 5</MenuItem>
+                        <MenuItem value="6" sx={{ color: 'black' }}>Dia 6</MenuItem>
+                    </TextField>
+                </Idcontainer>
+            </HeaderContainer>
+            <ExercisesContainer>
                 <Box>
-                    <Box sx={{width:'45vw', height:'8vh'}}>
-                      <RoutineNavBar filterValues={filterValues} handleSelectChange={handleSelectChange}/>
-                    </Box>
-                    <Box sx={{width:'45vw',height:'70vh',border:'solid 1px black', display:'flex', flexDirection:'row', gap:'5px'}}>
-                    <Box sx={{width:'50%'}}>
-                        <Typography textAlign="center">renderizado de ejercicios</Typography>
-                        {filteredExercises.length > 0 ? (
-                            filteredExercises.map(exercise => (
-                                <Typography
-                                    key={exercise.id}
-                                    align="left"
-                                    component="button"
-                                    variant="h9"
-                                    onClick={handleExerciseSelection}
-                                    sx={{width:'100%'}}
-                                    data-id={exercise.id}
-                                >
-                                    {exercise.nombre}
-                                </Typography>
-                            ))
-                        ) : (
-                            exercises.map(exercise => (
-                                <Typography
-                                    key={exercise.id}
-                                    align="left"
-                                    component="button"
-                                    variant="h9"
-                                    onClick={handleExerciseSelection}
-                                    sx={{width:'100%'}}
-                                    data-id={exercise.id}
-                                    
-                                >
-                                    {exercise.nombre}
-                                </Typography>
-                            ))
-                        )}
-                    </Box>
-                        <Box
-                            sx={{width:'50%'}}>
-                            
-                            <Typography textAlign="center">series y reps</Typography>
-                            {filteredExercises.length > 0 ? (
-                                filteredExercises.map(exercise => (
-                                    <TextField
-                                        key={exercise.id}
-                                        sx={{
-                                            width: '100%',
-                                            height: '27px',
-                                            '& .MuiInputBase-root': {
-                                                height: '1.7rem',
-                                                lineHeight: '1.7rem',
-                                            },
-                                            '& input': {
-                                                cursor: 'text',
-                                                height: '1.7rem',
-                                            },
-                                        }}
-                                        disabled={disable !== exercise.id}
-                                        value={detailValue[exercise.id]?.setsAndReps || ''}
-                                        onChange={(event) => handleDetail(event, exercise.id)} 
-                                    />
-                                ))
-                            ) : (
-                                exercises.map(exercise => (
-                                    <TextField
-                                        key={exercise.id}
-                                        sx={{
-                                            width: '100%',
-                                            height: '27px',
-                                            '& .MuiInputBase-root': {
-                                                height: '1.7rem',
-                                                lineHeight: '1.7rem',
-                                            },
-                                            '& input': {
-                                                cursor: 'text',
-                                                height: '1.7rem',
-                                            },
-                                        }}
-                                        disabled={disable !== exercise.id}
-                                        value={detailValue[exercise.id]?.setsAndReps || ''}
-                                        onChange={(event) => handleDetail(event, exercise.id)} 
-                                    />
-                                ))
-                            )}
-                                                    
+                    <RoutineNavBarContainer>
+                        <RoutineNavBar filterValues={filterValues(exercises)} handleSelectChange={handleSelectChange} />
 
+                    </RoutineNavBarContainer>
+                    <MobileExerciseSelector
+                        exercises={filteredExercises.length > 0 ? filteredExercises : exercises}
+                        handleExerciseSelection={handleExerciseSelection}
+                    />
+                    {currentExercise !== null && (
+                        <Box>
+                            <Typography sx={{ color: 'white' }}>series y reps</Typography>
+                            <TextField
+                                key={currentExercise}
+                                sx={{ ...textFieldDetailStyles }}
+                                disabled={disable !== currentExercise}
+                                value={detailValue[currentExercise]?.setsAndReps || ''}
+                                onChange={(event) => handleDetail(event, currentExercise)}
+                                placeholder={`Ejercicio ${currentExercise}`}
+                                InputLabelProps={{
+                                    style: { color: 'white' }
+                                }}
+                            />
                         </Box>
-                        
-                    </Box>
-                    
+                    )}
                 </Box>
-                
-                <Box sx={{width:'40vw',height:'70vh',border:'solid 1px black'}}>
-                    <Typography>renderizado de rutina</Typography>
-                        {dayValue ? (
-                            <Typography>{`Dia ${dayValue}`}</Typography>
-                        ):null}
-                    {exercisesId.length > 0 && (
-                             <div>
-                                <Typography variant="h5">{`Dia ${dayValue}`}</Typography>
-                                {exercisesId.map((exerciseId, index) => (
-                                    <Box key={index} sx={{border:'solid 1px black',margin:'1em', display:'flex', gap:'2em'}}>
-                                        {/* Encuentra el nombre del ejercicio basado en el exerciseId */}
-                                        <Typography>{exercises.find(exercise => exercise.id === exerciseId)?.nombre}</Typography>
-                                        {/* Encuentra el detalle correspondiente y muestra setsAndReps */}
-                                       { <Typography>{routineDetail.find(detail => detail.id === exerciseId)?.setsAndReps}</Typography>}
-                                       <Button onClick={() => handleRemove(exerciseId)}>QUITAR</Button>
-                                    </Box>
-                                ))}
-                            </div>
-                        )}
-                        <Button
-                        onClick={handleAddDay}
-                        >AGREGAR A RUTINA</Button>      
-                </Box>
-            </Box>
-            <Button onClick={()=>{handleSaveRoutine(routineObj)}}>GRABAR RUTINA</Button>
-            {
-                message && (
-                    <Snackbar open={!!message} autoHideDuration={3000} onClose={handleCloseAlert}>
-                        <Alert severity={severity} variant="filled">{message}</Alert>
-                    </Snackbar>
-                )
-            }
-        </>
-        
-    )
+                <RoutineDisplay
+                    dayValue={dayValue}
+                    exercisesId={exercisesId}
+                    exercises={exercises}
+                    routineDetail={routineDetail}
+                    handleRemove={handleRemove}
+                    handleAddDay={handleAddDay}
+                />
+
+            </ExercisesContainer>
+            <Button
+                onClick={() => handleSaveRoutine(routineObj)}
+                sx={{
+                    backgroundColor: '#0028ff',
+                    color: 'white',
+                    width: '100%',
+                    height: '60px',
+                    marginTop: '50px',
+                    '&:hover': {
+                        backgroundColor: '#0028ff' // mantener el color azul en hover
+                    }
+                }}
+            >
+                GRABAR RUTINA
+            </Button>
+
+        </MainContainer>
+    );
 };
 
-
 export default CreateRoutine;
+
+const MainContainer = styled(Box)(({ theme }) => ({
+    width: '100vw',
+    height: 'auto',
+    padding: '15px',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: 'black',
+
+}));
+
+const HeaderContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+}));
+
+const Idcontainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '20px',
+    marginTop: '40px'
+}));
+
+const ExercisesContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '10px'
+}));
+
+const RoutineNavBarContainer = styled(Box)(({ theme }) => ({
+    marginBottom: '20px'
+}));
+
+const textFieldStyles = {
+    width: '100%',
+    marginBottom: '20px',
+    '& .MuiInputBase-input': {
+        color: 'white'
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            borderColor: 'blue',
+        },
+        '&:hover fieldset': {
+            borderColor: 'blue',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: 'blue',
+        },
+    },
+    '& .MuiInputLabel-root': {
+        color: 'white',
+    }
+};
+
+const textFieldDetailStyles = {
+    width: '100%',
+    marginBottom: '10px',
+    '& .MuiInputBase-input': {
+        color: 'white'
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            borderColor: 'blue',
+        },
+        '&:hover fieldset': {
+            borderColor: 'blue',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: 'blue',
+        },
+    },
+    '& .MuiInputLabel-root': {
+        color: 'white',
+    }
+};
+
+const CustomTypography = styled(Typography)(({ theme }) => ({
+    fontFamily: "Bebas Neue",
+    fontWeight: '400',
+    fontSize: '3em',
+    color: 'white',
+    marginTop: '100px'
+}));

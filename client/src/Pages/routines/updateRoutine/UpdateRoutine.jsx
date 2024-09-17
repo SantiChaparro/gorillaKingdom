@@ -1,14 +1,667 @@
-
-
+import React, { useEffect, useState } from "react";
+import { Box, Typography, TextField, Button, styled, IconButton } from "@mui/material";
+import { useUsersStore } from "../../../store/useUsersStore";
+import { useRoutinesStore } from '../../../store/useRoutinesStore';
+import { useExercisesStore } from "../../../store/useExercisesStore";
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Tooltip } from '@nextui-org/react';
+import MobileExerciseSelector from "../../../Components/MobileExerciseSelector";
+import RoutineNavBar from "../../../Components/routineNavBar/RoutineNavBar";
+import UserNavBar from "../../../Components/UserNavBar";
+import Loader from "../../../Components/loader/Loader";
+import Swal from 'sweetalert2';
 
 const UpdateRoutine = () => {
+    const { exercises, fetchExercises } = useExercisesStore();
+    const { getUserById, searchedUser, clearSearchedUser } = useUsersStore();
+    const { masterUpdateRoutine, removeExercise, addingNewExercise, creatingNewDay, deleteDay } = useRoutinesStore();
+    const [userId, setUserId] = useState("");
+    const [user, setUser] = useState(null);
+    const [editingIndices, setEditingIndices] = useState({ dayIndex: null, exerciseIndex: null });
+    const [setsAndReps, setSetsAndReps] = useState("");
+    const [isAddingDayId, setIsAddingDayId] = useState(null);
+    const [addExercise, setAddExercise] = useState({
+        dayId: "",
+        exerciseId: "",
+        routineDetail: {}
+    })
+    const [filteredExercises, setFilteredExercises] = useState([]);
+    const [exercisesId, setExercisesId] = useState([]);
+    const [currentExercise, setCurrentExercise] = useState(null);
+    const [disable, setDisable] = useState(null);
+    const [detailValue, setDetailValue] = useState({});
+    const [day, setday] = useState(null);
+    const [newDetail, setnewdetail] = useState({})
+    const [isAddingDays, setIsAddingDays] = useState(false);
+    const [dayToAdd, setDayToAdd] = useState({ day: "" });
+    const [dayToRemove, setDayToRemove] = useState({ day: null });
+    const [loading, setLoading] = useState(false);
 
-return(
-    <>
-    <h1>modificar rutina</h1>
-    </>
-)
+    console.log(dayToRemove);
+    console.log(isAddingDays);
 
+    const handleDetail = (event, exerciseId) => {
+        const { value } = event.target;
+        setDetailValue(prevState => ({
+            ...prevState,
+            [exerciseId]: { id: exerciseId, setsAndReps: value, weights: { week1: "", week2: "", week3: "", week4: "" } }
+        }));
+    };
+
+
+    const showStoreState = () => {
+        const state = useUsersStore.getState();
+        console.log('Estado completo del store:', state);
+        console.log('searchedUser:', state.searchedUser);
+    };
+
+    showStoreState();
+
+
+    const handleUserId = (event) => {
+        const id = event.target.value;
+        setUserId(id);
+    };
+
+    useEffect(() => {
+
+        setUser(searchedUser);
+        fetchExercises();
+
+    }, [searchedUser, addExercise, getUserById]);
+
+    useEffect(() => {
+        if (day && currentExercise && detailValue[currentExercise]) {
+            const correctDetail = detailValue[currentExercise];
+            setAddExercise({
+                dayId: day,
+                exerciseId: currentExercise,
+                routineDetail: correctDetail
+            });
+            setnewdetail(correctDetail);
+        }
+    }, [day, currentExercise, detailValue]);
+
+
+    const handleSearch = async () => {
+        if (userId.trim()) {
+            setLoading(true);
+            try {
+                await getUserById(userId);
+    
+                // Simular un retraso de 2 segundos antes de ocultar el loader
+                setTimeout(() => {
+                    setLoading(false);
+                }, 2000);
+            } catch (error) {
+                console.error("Error fetching user:", error);
+                setLoading(false); // Asegúrate de ocultar el loader en caso de error
+            }
+        } else {
+            console.error("Please enter a valid user ID");
+        }
+    };
+
+    const handleEdit = (dayIndex, exerciseIndex, exerciseId) => {
+        setIsAddingDayId(null)
+        setEditingIndices({ dayIndex, exerciseIndex });
+        const routineDetail = user.Routine.routineDetail.find(detail => detail.id === exerciseId) || {};
+        setSetsAndReps(routineDetail.setsAndReps || "");
+    };
+
+    const handleInputChange = (e) => {
+        const { value } = e.target;
+        setSetsAndReps(value);
+    };
+
+    const handleSave = async (exerciseId) => {
+        console.log('Guardar cambios:', setsAndReps);
+        const id = user.RoutineId;
+
+        const updatedData = {
+            exerciseId: exerciseId,
+            setsAndReps: setsAndReps
+        };
+
+        try {
+            const modifyRoutine = await masterUpdateRoutine(id, updatedData);
+            await getUserById(userId);
+            setEditingIndices({ dayIndex: null, exerciseIndex: null });
+            if(modifyRoutine){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Excelente!',
+                    text: 'La rutina se modificó exitosamente.',
+                    showConfirmButton: true,
+                   // timer: 2000
+                });
+            }else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upss!',
+                    text: 'Hubo un problema, intenta de nuevo.',
+                    showConfirmButton: true,
+                   // timer: 2000
+                });
+            }
+        } catch (error) {
+            console.error("Error updating routine:", error);
+        }
+    };
+
+    const handleSaveNewExercise = async (routineId, addExercise) => {
+        if (!addExercise.dayId || !addExercise.exerciseId || !Object.keys(newDetail).length) {
+            console.error("Faltan datos para añadir un nuevo ejercicio.");
+            return;
+        }
+
+        try {
+            const exerciseToAdd = {
+                ...addExercise,
+                routineDetail: newDetail
+            };
+
+            const newExercise =await addingNewExercise(routineId, exerciseToAdd);
+            setIsAddingDayId(null);
+            await getUserById(userId);
+            if(newExercise){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Excelente!',
+                    text: 'La rutina se modificó exitosamente.',
+                    showConfirmButton: true,
+                   // timer: 2000
+                });
+            }else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upss!',
+                    text: 'Hubo un problema, intenta de nuevo.',
+                    showConfirmButton: true,
+                   // timer: 2000
+                });
+            }
+        } catch (error) {
+            console.error("Error al añadir el nuevo ejercicio:", error);
+        }
+    };
+
+    const handleCancel = () => {
+        setEditingIndices({ dayIndex: null, exerciseIndex: null });
+    };
+
+    const handleDelete = async (exerciseId) => {
+        try {
+            console.log('desde handledelete', user);
+
+            await removeExercise(user.RoutineId, exerciseId);
+            console.log('a ver si llega aca?');
+
+
+            setUser(prevUser => {
+
+                const updatedDays = prevUser.Routine.DayOfWeeks.map(day => ({
+                    ...day,
+                    Exercises: day.Exercises.filter(exercise => exercise.id !== exerciseId)
+                }));
+                return {
+                    ...prevUser,
+                    Routine: {
+                        ...prevUser.Routine,
+                        DayOfWeeks: updatedDays
+                    }
+                };
+            });
+            console.log('dlete/2');
+
+            await getUserById(userId);
+        } catch (error) {
+            console.error('Error en handleDelete:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (day && currentExercise && detailValue[currentExercise]) {
+            setAddExercise({
+                dayId: day,
+                exerciseId: currentExercise,
+                routineDetail: detailValue
+            });
+        }
+    }, [day, currentExercise, detailValue]);
+
+    const handleAddExercise = (dayId) => {
+        setIsAddingDayId(dayId);
+        setEditingIndices({ dayIndex: null, exerciseIndex: null });
+    };
+
+    const filterValues = (exercises = []) => {
+        const musclesGroupSet = new Set();
+        exercises.forEach(exercise => {
+            musclesGroupSet.add(exercise.grupo_muscular);
+        });
+        return [...musclesGroupSet];
+    };
+
+    const handleSelectChange = (filterOption) => {
+        const filter = exercises.filter(exercise => exercise.grupo_muscular === filterOption);
+        setFilteredExercises(filter);
+    };
+
+    const handleExerciseSelection = (event) => {
+        const exerciseId = parseInt(event.target.value, 10);
+        setCurrentExercise(exerciseId);
+        if (!exercisesId.includes(exerciseId)) {
+            setExercisesId(prevState => [...prevState, exerciseId]);
+        }
+        setDisable(exerciseId);
+    };
+
+    const handleDay = (day) => {
+        setday(day);
+    };
+
+    const handleCancelAddExercise = () => {
+        setIsAddingDayId(null);
+        setCurrentExercise(null);
+        setDetailValue({});
+    };
+
+
+
+
+    useEffect(() => {
+        return () => {
+            clearSearchedUser(); // Limpiar el estado global al desmontar el componente
+        };
+    }, [clearSearchedUser]);
+
+    const handleIsAddingDays = () => {
+        setIsAddingDays(true);
+    };
+
+    const handleNewDay = (event) => {
+        const dayId = event.target.value;
+        setDayToAdd(prevState => (
+            { ...prevState, day: dayId }
+        ));
+    }
+
+    const confirmAddDay = async (routineId, dayToAdd) => {
+        console.log(routineId);
+        console.log(dayToAdd.day);
+
+        const response = await creatingNewDay(routineId, dayToAdd)
+        console.log(response);
+
+        setIsAddingDays(false);
+        getUserById(userId);
+        setDayToAdd(prevState => (
+            { ...prevState, day: "" }
+        ));
+    };
+
+
+    const handleDeleteDay = async (routineId, dayId) => {
+        try {
+            setDayToRemove({ day: dayId });
+
+            await deleteDay(routineId, { day: dayId });
+
+
+            await getUserById(userId);
+        } catch (error) {
+            console.error('Error al eliminar el día:', error);
+        }
+    };
+
+    const handleCancelAddDay = () => {
+        setIsAddingDays(false)
+        // getUserById(userId)
+    };
+
+    return (
+        <MainContainer>
+            
+            <CustomTitle>Editar rutina</CustomTitle>
+            <SearchBox>
+                <TextField
+                    label="Dni usuario"
+                    variant="outlined"
+                    value={userId || ""}
+                    onChange={handleUserId}
+                    name="Dni usuario"
+                    sx={{ ...textFieldStyles, width: '50%' }}
+                    InputLabelProps={{ style: { color: 'white' } }}
+                />
+                <Button
+                    onClick={handleSearch}
+                    sx={{
+                        backgroundColor: '#0028ff',
+                        color: 'white',
+                        width: '30%',
+                        height: '55px',
+                        '&:hover': { backgroundColor: '#0028ff' }
+                    }}
+                >
+                    BUSCAR
+                </Button>
+            </SearchBox>
+            {loading ? (
+                <Loader />
+            ) : (
+                user && user.RoutineId ? (
+                    <UserContainer>
+                        <CustomTypography sx={{ marginBottom: '25px' }}>{user.nombre}</CustomTypography>
+                        <Button
+                            sx={{ backgroundColor: '#0028ff', color: 'white', marginBottom: '30px' }}
+                            onClick={handleIsAddingDays}
+                        >
+                            AGREGAR DIA
+                        </Button>
+                        {isAddingDays === true ? (
+                            <AddnewDayContainer>
+                                <CustomTypography sx={{ color: 'white' }}>Dia a agregar</CustomTypography>
+                                <TextField
+                                    label="Dia a agregar"
+                                    variant="outlined"
+                                    value={dayToAdd.day || ""}
+                                    onChange={handleNewDay}
+                                    name="Dia a agregar"
+                                    sx={{ ...textFieldStyles, width: '45%', marginBottom: '15px' }}
+                                    InputLabelProps={{ style: { color: 'white' } }}
+                                />
+                                <Button
+                                    sx={{ backgroundColor: '#0028ff', color: 'white', marginTop: '10px', marginBottom: '2px', width: '100%' }}
+                                    onClick={() => { confirmAddDay(user.RoutineId, dayToAdd) }}
+                                >
+                                    CONFIRMAR
+                                </Button>
+                                <Button
+                                    sx={{ backgroundColor: '#8a0bd2', color: 'white', marginTop: '10px', marginBottom: '30px', width: '100%' }}
+                                    onClick={handleCancelAddDay}
+                                >CANCELAR</Button>
+                            </AddnewDayContainer>
+                        ) : null}
+                        <RoutineContainer>
+                            {user.Routine.DayOfWeeks.map((day, dayIndex) => (
+                                <RoutineDisplay key={dayIndex}>
+                                    <DayMenuContainer>
+                                        <CustomTypography>{`Día ${day.id}`}</CustomTypography>
+
+                                        <Tooltip content="Agregar ejercicio" color="white" placement="top">
+                                            <span> {/* Añadir un span envolviendo el IconButton */}
+                                                <IconButton
+                                                    onClick={() => { handleDay(day.id); handleAddExercise(day.id) }}
+                                                >
+                                                    <AddBoxIcon sx={{ color: 'white', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                        <Tooltip title="eliminar dia" open={true}>
+                                            <IconButton
+                                                onClick={() => { handleDeleteDay(user.RoutineId, day.id) }}
+                                            >
+                                                <DeleteForeverIcon sx={{ color: 'white', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </DayMenuContainer>
+                                    {isAddingDayId === day.id && (
+                                        <AddExerciseContainer>
+                                            <ExerciseSelectorContainer>
+                                                <RoutineNavBar filterValues={filterValues(exercises)} handleSelectChange={handleSelectChange} />
+
+                                                <MobileExerciseSelector
+                                                    exercises={filteredExercises.length > 0 ? filteredExercises : exercises}
+                                                    handleExerciseSelection={handleExerciseSelection}
+                                                />
+                                                {currentExercise !== null && (
+                                                    <Box>
+                                                        <Typography sx={{ color: 'white' }}>series y reps</Typography>
+                                                        <TextField
+                                                            key={currentExercise}
+                                                            sx={{ ...textFieldDetailStyles }}
+                                                            disabled={disable !== currentExercise}
+                                                            value={detailValue[currentExercise]?.setsAndReps || ''}
+                                                            onChange={(event) => handleDetail(event, currentExercise)}
+                                                            placeholder={`Ejercicio ${currentExercise}`}
+                                                            InputLabelProps={{
+                                                                style: { color: 'white' }
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                )}
+                                                <AddExerciseButtonContainer>
+                                                    <Button
+                                                        onClick={() => { handleSaveNewExercise(user.RoutineId, addExercise) }}
+                                                        sx={{ backgroundColor: '#0028ff', color: 'white', width: '100%' }}
+                                                    >
+                                                        GRABAR CAMBIOS
+                                                    </Button>
+                                                    <Button
+                                                        onClick={handleCancelAddExercise}
+                                                        sx={{ backgroundColor: '#8a0bd2', color: 'white', marginTop: '10px' }}
+                                                    >
+                                                        CANCELAR
+                                                    </Button>
+                                                </AddExerciseButtonContainer>
+
+                                            </ExerciseSelectorContainer>
+                                        </AddExerciseContainer>
+                                    )}
+                                    {day.Exercises.map((exercise, exerciseIndex) => (
+                                        <Box key={exercise.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                            {editingIndices.dayIndex === dayIndex && editingIndices.exerciseIndex === exerciseIndex ? (
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                                    <Typography sx={{ color: 'white', marginBottom: '10px' }}>{exercise.nombre}</Typography>
+                                                    <TextField
+                                                        label="Sets y Reps"
+                                                        variant="outlined"
+                                                        value={setsAndReps}
+                                                        name="setsAndReps"
+                                                        onChange={handleInputChange}
+                                                        sx={textFieldDetailStyles}
+                                                    />
+                                                    <Button onClick={() => { handleSave(exercise.id) }} sx={{ backgroundColor: '#0028ff', color: 'white', marginTop: '10px' }}>Grabar cambios</Button>
+                                                    <Button onClick={handleCancel} sx={{ backgroundColor: '#8a0bd2', color: 'white', marginTop: '10px' }}>Cancelar</Button>
+                                                </Box>
+                                            ) : (
+                                                <>
+                                                    <RoutineTypography>{exercise.nombre}</RoutineTypography>
+                                                    <ButtonContainer>
+                                                        <Button onClick={() => handleEdit(dayIndex, exerciseIndex, exercise.id)} sx={{ backgroundColor: '#0028ff', color: 'white' }}>Editar</Button>
+                                                        <Button sx={{ backgroundColor: '#8a0bd2', color: 'white' }}
+                                                            onClick={() => handleDelete(exercise.id)}
+                                                        >Eliminar</Button>
+                                                    </ButtonContainer>
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
+                                </RoutineDisplay>
+                            ))}
+                        </RoutineContainer>
+                    </UserContainer>
+                ) : (
+                    <CustomTypography>El usuario no tiene rutina creada aún</CustomTypography>
+                )
+            )}
+
+        </MainContainer>
+    );
 };
 
 export default UpdateRoutine;
+
+const MainContainer = styled(Box)(({ theme }) => ({
+    width: '100vw',
+    height: '100%',
+    padding: '15px',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: 'black'
+}));
+
+const CustomTitle = styled(Typography)(({ theme }) => ({
+    marginTop:'100px',
+    fontFamily: "Bebas Neue",
+    fontWeight: '400',
+    fontSize: '3em',
+    color: 'white'
+}));
+
+const CustomTypography = styled(Typography)(({ theme }) => ({
+    fontFamily: "Bebas Neue",
+    fontSize: '2em',
+    color: 'white'
+}));
+
+const UserContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: '15px'
+}));
+
+const SearchBox = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: '150px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+}));
+
+const RoutineContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+}));
+
+const RoutineDisplay = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginBottom: '15px',
+    borderBottom: '1px solid blue'
+}));
+
+const textFieldStyles = {
+    width: '100%',
+    '& .MuiInputBase-input': {
+        color: 'white'
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            borderColor: 'blue',
+        },
+        '&:hover fieldset': {
+            borderColor: 'blue',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: 'blue',
+        },
+    },
+    '& .MuiInputLabel-root': {
+        color: 'white',
+    }
+};
+
+const textFieldDetailStyles = {
+    width: '100%',
+    marginBottom: '10px',
+    '& .MuiInputBase-input': {
+        color: 'white'
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            borderColor: 'blue',
+        },
+        '&:hover fieldset': {
+            borderColor: 'blue',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: 'blue',
+        },
+    },
+    '& .MuiInputLabel-root': {
+        color: 'white',
+    }
+};
+
+const RoutineTypography = styled(Typography)(({ theme }) => ({
+    color: 'white'
+}));
+
+const ButtonContainer = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    gap: '10px'
+}));
+
+const AddExerciseButtonContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column'
+
+}));
+
+const DayMenuContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    alignItems: 'center'
+
+}));
+
+
+const CustomTooltip = styled(Tooltip)(({ theme }) => ({
+    tooltip: {
+        backgroundColor: '#0028ff',
+        color: 'white',
+        fontSize: '0.75rem',
+        borderRadius: '4px',
+        padding: '8px'
+    }
+}));
+
+const AddExerciseContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+}));
+
+const ExerciseSelectorContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '20px',
+    marginBottom: '25px'
+}));
+
+const AddnewDayContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '20px',
+    marginBottom: '20px',
+    borderBottom: 'solid 1px blue'
+
+
+}));
