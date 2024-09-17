@@ -5,7 +5,7 @@ import { Box, styled } from '@mui/material';
 const UserDashBoard = ({ handleMenuClick, onClose, opendrawer }) => {
   return (
     <MainContainer>
-      <UserNavBar handleMenuClick={handleMenuClick} />
+      <UserNavBar handleMenuClick={handleMenuClick} opendrawer={opendrawer} />
     </MainContainer>
   );
 };
@@ -16,8 +16,9 @@ const MainContainer = styled(Box)(({ theme }) => ({
   margin: 0,
   padding: '15px',
   width: '100vw',
-  height: '100vh',
+  height: 'auto',
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: 'black',
+  overflow:'hidden'
 }));

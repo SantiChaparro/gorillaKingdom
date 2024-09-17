@@ -16,6 +16,8 @@ const getRoutineById = async (req,res)=>{
 const updateRoutine = async (req, res) => {
     const { updateData } = req.body;
     const { id } = req.params;
+    console.log(req.params);
+    
     
     console.log('id desde el handler', id);
     console.log('obj updatedata desde el handler', updateData);

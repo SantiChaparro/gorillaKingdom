@@ -1,0 +1,8 @@
+{
+    "activities": [
+      { "nombre": "musculacion", "costo": 1000.0 },
+      { "nombre": "crossfit", "costo": 1500.0 },
+      { "nombre": "zumba", "costo": 1200.0 },
+      { "nombre": "funcional", "costo": 1300.0 }
+    ]
+}

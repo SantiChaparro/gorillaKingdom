@@ -9,7 +9,7 @@ const UserDrawer = ({ open, onClose }) => {
   const navigate = useNavigate();
 
   const handleListItemClick = () => {
-    navigate('/rutina-usuario');
+    navigate('/usuario-rutina');
     onClose();
   };
 
@@ -25,7 +25,7 @@ const UserDrawer = ({ open, onClose }) => {
           <FitnessCenterIcon fontSize="large" />
         </ListItemIcon>
         <ListItemText sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="h6">Editar usuarios</Typography>
+          <Typography variant="h6">Mi rutina</Typography>
         </ListItemText>
       </ListItem>
     </CustomDrawer>

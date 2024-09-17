@@ -3,6 +3,8 @@ import axios from 'axios';
 
 export const useUsersStore = create((set) => ({
     users: [],
+    searchedUser: [],
+   
     fetchUsers: async () => {
         try {
             const users = await axios.get('http://localhost:3001/master/findUsers');
@@ -12,11 +14,26 @@ export const useUsersStore = create((set) => ({
             console.error('Error fetching users:', error);
         }
     },
+
+    getUserById: async(dni) => {
+        console.log('dni desde store',dni);
+        try {
+            const response = await axios.get(`http://localhost:3001/master/findUsers/${dni}`)
+            console.log('respuesta desde el store',response.data);
+            set({searchedUser:response.data});
+        } catch (error) {
+            console.error('error desde store:', error);
+        }
+    },
+
+    clearSearchedUser: () => set({ searchedUser: [] }), // Método para limpiar el estado
+
     postUser: async(values) => {
         console.log(values);
         try {
             const newUser = await axios.post('http://localhost:3001/master',values)
             console.log(newUser);
+            return newUser
         } catch (error) {
             console.error(error);
         }
@@ -32,6 +49,17 @@ export const useUsersStore = create((set) => ({
         } catch (error) {
             console.log(error);
         }
+    },
+
+    getUserByName: async(name)=> {
+
+        try {
+            const response = await axios.get(`http://localhost:3001/master/findUsers?name=${name}`);
+            set({ searchedUser: response.data });
+        } catch (error) {
+            
+        }
     }
 }));
+
 

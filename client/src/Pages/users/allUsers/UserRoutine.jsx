@@ -1,43 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
-import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button } from '@mui/material';
+import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress } from '@mui/material';
 import { useRoutinesStore } from '../../../store/useRoutinesStore';
-
+import Swal from 'sweetalert2';
 const UserRoutine = ({ handleMenuClick }) => {
-  const { getRoutine, modifyRoutine } = useRoutinesStore();
+  const { getRoutine, modifyRoutine, routines } = useRoutinesStore();
   const [option, setOption] = useState("");
   const [selectedDayRoutine, setSelectedDayRoutine] = useState(null);
   const [routine, setRoutine] = useState({});
   const [updateData, setUpdateData] = useState({});
 
+
   const dni = 28271453;
-  const routineId = routine.id;
+  
+  console.log(routine);
+  console.log(updateData);
+  
+
+   
+  useEffect(() => {
+    handleRoutine(dni);
+   
+  }, []);
+
+
+  
+  useEffect(() => {
+    const updateRoutineDetails = async () => {
+      // Verificar si routine y routine.routine están definidos
+      if (routine?.routine?.routineDetail?.length > 0) {
+        console.log(routine.routine.routineDetail);
+
+        const initialUpdateData = {};
+        routine.routine.routineDetail.forEach(detail => {
+          initialUpdateData[detail.id] = detail.weights;
+          console.log(initialUpdateData);
+          
+        });
+
+        // Actualiza updateData con los detalles de rutina
+        setUpdateData(prevState => ({
+          ...prevState,
+          ...initialUpdateData
+        }));
+      }
+    };
+
+    updateRoutineDetails();
+  }, [routine]);
 
   const handleChange = (event) => {
     const selectedDay = event.target.value;
     setOption(selectedDay);
-    const dayRoutine = routine.DayOfWeeks.find(day => day.id === selectedDay);
-    setSelectedDayRoutine(dayRoutine);
+  
+    // Encuentra el día de la rutina seleccionado
+    const dayRoutine = routine.routine.DayOfWeeks.find(day => day.id === selectedDay);
+    
+    // Imprime el día de la rutina seleccionado
+ 
+    if (dayRoutine) {
+      // Obtén los IDs de los ejercicios filtrados
+      const filteredExerciseIds = routine.filteredExercises.map(exercise => exercise.ExerciseId);
+        
+      // Filtra los ejercicios de `dayRoutine` basándote en los IDs filtrados
+      const filteredExercisesForDay = dayRoutine.Exercises.filter(exercise => 
+        filteredExerciseIds.includes(exercise.id)
+      );
+  
+      // Actualiza el estado con los ejercicios filtrados
+      setSelectedDayRoutine({
+        ...dayRoutine,
+        Exercises: filteredExercisesForDay
+      });
+    }
   };
+  
 
   const handleRoutine = async (dni) => {
-    const userRoutine = await getRoutine(dni);
-    setRoutine(userRoutine);
-
-    // Inicializa updateData con los datos actuales de routineDetail
-    const initialUpdateData = {};
-    userRoutine.routineDetail.forEach(detail => {
-      initialUpdateData[detail.id] = detail.weights;
-    });
-    setUpdateData(initialUpdateData);
+   const response = await getRoutine(dni);
+  // console.log(response);
+   
+    setRoutine(response)
+    
   };
 
-  useEffect(() => {
-    handleRoutine(dni);
-  }, []);
-
   const getExerciseDetails = (exerciseId) => {
-    return routine.routineDetail.find(detail => detail.id === exerciseId);
+    const detail = routine.routine.routineDetail.find(detail => detail.id === exerciseId);
+    console.log('detalle rutina',detail);
+
+    return detail
+    
   };
 
   const handleTextFieldChange = (exerciseId, weekIndex, value) => {
@@ -51,14 +103,35 @@ const UserRoutine = ({ handleMenuClick }) => {
   };
 
   const handleSaveChanges = async () => {
+    
     const updatedRoutine = {
-      id: routineId,
+      id: routine.routine.id, 
       updateData
     };
 
-    await modifyRoutine(updatedRoutine);
-  };
+    const newRoutine = await modifyRoutine(updatedRoutine);
 
+    if(newRoutine){
+      Swal.fire({
+          icon: 'success',
+          title: 'Excelente!',
+          text: 'Se guardaron tus cambios.',
+          showConfirmButton: true,
+         // timer: 2000
+      });
+      
+     }else{
+      Swal.fire({
+          icon: 'error',
+          title: 'Upss!',
+          text: 'Hubo un problema, intenta de nuevo.',
+          showConfirmButton: true,
+         // timer: 2000
+      });
+     }
+  };
+  console.log(selectedDayRoutine);
+  
   return (
     <MainContainer>
       <UserNavBar handleMenuClick={handleMenuClick} />
@@ -86,8 +159,8 @@ const UserRoutine = ({ handleMenuClick }) => {
             },
           }}
         >
-          {routine.DayOfWeeks && routine.DayOfWeeks.map((day) => (
-            <MenuItem key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
+          {routine?.routine?.DayOfWeeks && routine.routine.DayOfWeeks.map((day) => (
+            <MenuItem  key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
           ))}
         </CustomSelect>
       </FormControl>
@@ -95,6 +168,8 @@ const UserRoutine = ({ handleMenuClick }) => {
         {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ? (
           selectedDayRoutine.Exercises.map((exercise, index) => {
             const details = getExerciseDetails(exercise.id);
+            console.log(details);
+            
             return (
               <Exercise key={index}>
                 <ExcercieDescription>
@@ -113,7 +188,7 @@ const UserRoutine = ({ handleMenuClick }) => {
                     key={weekIndex}
                     size="small"
                     variant="outlined"
-                    value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ''}
+                    value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ""}
                     onChange={(e) => handleTextFieldChange(exercise.id, weekIndex, e.target.value)}
                   />
                   ))}
@@ -125,7 +200,8 @@ const UserRoutine = ({ handleMenuClick }) => {
           <Typography variant='body1' color='white'>No hay ejercicios para el día seleccionado</Typography>
         )}
       </ExerciseContainer>
-      <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton>
+      {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ?
+      <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton> : null}
     </MainContainer>
   );
 };
