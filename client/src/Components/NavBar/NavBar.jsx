@@ -2,8 +2,11 @@ import React from "react";
 import style from "./NavBar.module.css"
 import icon_gorilla from "../../assests/icon_gorilla.png"
 
+const handleClick = (setLoggin) => {
+    setLoggin(true);
+};
 
-const NavBar =()=>{
+const NavBar =({setLoggin,loggin})=>{
     return (
         <div className={style.navbar}>
             <div className={style.logo}>
@@ -29,7 +32,7 @@ const NavBar =()=>{
                         <a href="#" className={style.link}>Sobre Nosotros</a>
                     </li>
                 </ul>
-                <button>Entrar</button>
+                <button onClick={()=>{handleClick(setLoggin)}}>Entrar</button>
             </div>
         </div>
     )
