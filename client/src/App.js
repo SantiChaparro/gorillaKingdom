@@ -20,9 +20,13 @@ import AllPayments from './Pages/payments/AllPayments';
 import { useLocation } from 'react-router-dom';
 
 
+
 function App() {
   const [opendrawer, setOpenDrawer] = useState(false);
   const [openMasterdrawere , setOpenMasterdrawer] = useState(false);
+  const [verifiedUser , setVerifiedUser] = useState("");
+  console.log(verifiedUser);
+  
 
   const handleMenuClick = () => {
     setOpenDrawer(true);
@@ -44,18 +48,18 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Landing setVerifiedUser={setVerifiedUser}/>} />
         <Route
           path="/master"
           element={<Dashboard />}
         />
         <Route
           path="/usuario"
-          element={<UserDashBoard/>}
+          element={<UserDashBoard verifiedUser={verifiedUser}/>}
         />
         <Route
           path="/usuario-rutina"
-          element={<UserRoutine/>}
+          element={<UserRoutine verifiedUser={verifiedUser}/>}
         />
          <Route
         path='/master/crear-rutina'

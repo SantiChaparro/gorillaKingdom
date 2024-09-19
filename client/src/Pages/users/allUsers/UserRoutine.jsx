@@ -3,7 +3,8 @@ import UserNavBar from '../../../Components/UserNavBar';
 import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress } from '@mui/material';
 import { useRoutinesStore } from '../../../store/useRoutinesStore';
 import Swal from 'sweetalert2';
-const UserRoutine = ({ handleMenuClick }) => {
+
+const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
   const { getRoutine, modifyRoutine, routines } = useRoutinesStore();
   const [option, setOption] = useState("");
   const [selectedDayRoutine, setSelectedDayRoutine] = useState(null);
@@ -11,7 +12,7 @@ const UserRoutine = ({ handleMenuClick }) => {
   const [updateData, setUpdateData] = useState({});
 
 
-  const dni = 28271453;
+  const dni = verifiedUser.dni;
   
   console.log(routine);
   console.log(updateData);

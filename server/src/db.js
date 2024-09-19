@@ -58,23 +58,6 @@ User.hasMany(Payment);
 Posts.belongsTo(User); 
 User.hasMany(Posts);
 
-
-
-
-/*
-Routine.belongsToMany(Exercise, { through: 'RoutineExercise' });
-Exercise.belongsToMany(Routine, { through: 'RoutineExercise' });
-DayOfWeek.hasMany(Exercise);
-Exercise.belongsTo(DayOfWeek);
-sequelize.models.RoutineExercise.belongsTo(DayOfWeek);
-DayOfWeek.hasMany(sequelize.models.RoutineExercise);
-*/
-
-
-
-
-// Product.hasMany(Reviews);
-
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');
   conn: sequelize,     // para importart la conexión { conn } = require('./db.js');
