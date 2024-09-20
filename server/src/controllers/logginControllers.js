@@ -1,5 +1,8 @@
 const bcrypt = require('bcryptjs');
-const { User } = require('../db'); // Asegúrate de que este es el modelo correcto
+const { User } = require('../db');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 const verifyUser = async (dni, password) => {
     console.log('desde controller', dni);
@@ -20,8 +23,11 @@ const verifyUser = async (dni, password) => {
 
         if (isMatch) {
             // Si la contraseña coincide
-            console.log('La contraseña es correcta');
-            return { success: true, message: 'Contraseña correcta', user };
+          //  console.log('La contraseña es correcta');
+            const token = jwt.sign({ user, rol:user.rol }, jwtSecretKey, { expiresIn: '1h' });
+            return { success: true, message: 'Contraseña correcta', user,token };
+            // y genera el token
+
         } else {
             // Si la contraseña no coincide
             console.log('Contraseña incorrecta');

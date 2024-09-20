@@ -55,7 +55,7 @@ function App() {
         />
         <Route
           path="/usuario"
-          element={<UserDashBoard verifiedUser={verifiedUser}/>}
+          element={<UserDashBoard verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser}/>}
         />
         <Route
           path="/usuario-rutina"

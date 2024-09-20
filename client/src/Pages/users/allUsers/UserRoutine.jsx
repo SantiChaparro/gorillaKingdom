@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
 import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress } from '@mui/material';
 import { useRoutinesStore } from '../../../store/useRoutinesStore';
+import Cookies from 'js-cookie';
+import {jwtDecode} from "jwt-decode";
 import Swal from 'sweetalert2';
 
 const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
@@ -12,11 +14,22 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
   const [updateData, setUpdateData] = useState({});
 
 
-  const dni = verifiedUser.dni;
+  let dni = verifiedUser.dni;
   
   console.log(routine);
   console.log(updateData);
+  console.log(verifiedUser);
   
+  
+  useEffect(()=>{
+    const token = Cookies.get("token")
+    if(token){
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken.user.dni);
+      dni = decodedToken.user.dni
+    }
+    
+  },[])
 
    
   useEffect(() => {
