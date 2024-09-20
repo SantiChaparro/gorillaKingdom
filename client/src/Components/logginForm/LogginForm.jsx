@@ -15,6 +15,8 @@ const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
 
     console.log(password);
     console.log(dni);
+    
+    
 
     useEffect(() => {
         const token = Cookies.get('token'); 
@@ -58,15 +60,21 @@ const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
                 const decodedToken = jwtDecode(token); 
                 Cookies.set('token', token, { expires: 1 });  // La cookie expira en 1 día// Decodificar el token
                 console.log('Contenido del token:', decodedToken); // Loguear el contenido
+                if (response.data.success) {
+                    await setVerifiedUser(response.data.user)
+                   // navigate('/usuario');
+                   if(decodedToken.rol === "Master"){
+                    navigate("/master");
+                   } else {
+                    navigate("/usuario")
+                   }
+        
+                }else {
+                    await setMessage(response.data.message)
+                }
             }
         }
-        if (response.data.success) {
-            await setVerifiedUser(response.data.user)
-            navigate('/usuario');
-
-        }else {
-            await setMessage(response.data.message)
-        }
+       
         setLoggin(false);
 
     };

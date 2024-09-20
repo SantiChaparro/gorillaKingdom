@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
 import { Box, styled, Typography } from '@mui/material';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';  // Importa js-cookie
 
-const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser }) => {
+const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser,setVerifiedUser }) => {
   useEffect(() => {
     if (verifiedUser) {
       console.log(verifiedUser);
@@ -12,6 +14,27 @@ const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser }) =
 
 
   }, [verifiedUser])
+
+  useEffect(() => {
+    const token = Cookies.get('token'); 
+    console.log(token);
+     // Obtener la cookie del token si existe
+    if (token) {
+        try {
+            const decodedToken = jwtDecode(token);
+            console.log(decodedToken);
+              // Decodificar el token
+            const currentTime = Date.now() / 1000;  // Obtener la hora actual en formato UNIX
+            if (decodedToken.exp > currentTime) {   // Comparar con el tiempo de expiración
+                setVerifiedUser(decodedToken.user);  // Establecer el usuario verificado
+              
+            }
+        } catch (error) {
+            console.error("Error al decodificar el token:", error);
+            Cookies.remove('token');  // Remover el token si es inválido
+        }
+    }
+}, [setVerifiedUser]);
 
   return (
     <MainContainer>

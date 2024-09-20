@@ -23,7 +23,7 @@ const verifyUser = async (dni, password) => {
 
         if (isMatch) {
             // Si la contraseña coincide
-            console.log('La contraseña es correcta');
+          //  console.log('La contraseña es correcta');
             const token = jwt.sign({ user, rol:user.rol }, jwtSecretKey, { expiresIn: '1h' });
             return { success: true, message: 'Contraseña correcta', user,token };
             // y genera el token
