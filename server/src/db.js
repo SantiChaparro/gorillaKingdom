@@ -28,7 +28,7 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Routine,Exercise,User,Payment,DayOfWeek } = sequelize.models;
+const { Routine,Exercise,User,Payment,DayOfWeek,ExerciseDayOfWeek,Posts,Section,Activity ,UserActivities,PaymentActivities} = sequelize.models;
 
 //const RoutineExercise = sequelize.models.RoutineExercise || sequelize.define('RoutineExercise', {});
 
@@ -43,25 +43,20 @@ DayOfWeek.belongsToMany(Routine, { through: 'RoutineDayOfWeek' });
 DayOfWeek.belongsToMany(Exercise, {through: 'ExerciseDayOfWeek'});
 Exercise.belongsToMany(DayOfWeek, {through: 'ExerciseDayOfWeek'});
 
+User.belongsToMany(Activity, { through: 'UserActivities' });
+Activity.belongsToMany(User, { through: 'UserActivities' });
+
+Payment.belongsToMany(Activity,{ through: 'PaymentActivities'});
+Activity.belongsToMany(Payment,{ through: 'PaymentActivities'})
+
+ExerciseDayOfWeek.belongsTo(Routine);
+Routine.hasMany(ExerciseDayOfWeek);
+
 Payment.belongsTo(User); 
 User.hasMany(Payment);
 
-
-
-
-/*
-Routine.belongsToMany(Exercise, { through: 'RoutineExercise' });
-Exercise.belongsToMany(Routine, { through: 'RoutineExercise' });
-DayOfWeek.hasMany(Exercise);
-Exercise.belongsTo(DayOfWeek);
-sequelize.models.RoutineExercise.belongsTo(DayOfWeek);
-DayOfWeek.hasMany(sequelize.models.RoutineExercise);
-*/
-
-
-
-
-// Product.hasMany(Reviews);
+Posts.belongsTo(User); 
+User.hasMany(Posts);
 
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');

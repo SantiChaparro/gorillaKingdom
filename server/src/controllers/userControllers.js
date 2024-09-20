@@ -1,26 +1,26 @@
-const { User , Routine , Exercise , DayOfWeek } = require('../db');
+const { User , Routine , Exercise , DayOfWeek ,ExerciseDayOfWeek} = require('../db');
 const { Op } = require('sequelize');
 
-const getRoutineByUserId = async (id) => {
+const getRoutineByUserId = async (dni) => {
     try {
-        const user = await User.findByPk(id, {
+        const user = await User.findByPk(dni, {  // Cambié 'id' por 'dni' para que coincida con el parámetro
             include: [{
                 model: Routine,
-                attributes: ['id','routineDetail'],
+                attributes: ['id', 'routineDetail'],
                 include: [
                     {
                         model: DayOfWeek,
                         attributes: ['id'],
                         through: {
                             attributes: [],
-                          },
+                        },
                         include: [
                             {
                                 model: Exercise,
-                                attributes: ['nombre','id'],
+                                attributes: ['nombre', 'id'],
                                 through: {
                                     attributes: [],
-                                  }
+                                }
                             }
                         ]
                     }
@@ -30,8 +30,18 @@ const getRoutineByUserId = async (id) => {
         });
 
         if (user) {
-            console.log(user.Routine);
-            return user.Routine;
+        
+            const routine = user.Routine;
+            const routineId = user.Routine.id;  // Ajuste para acceder al ID de la rutina
+
+            const filteredExercises = await ExerciseDayOfWeek.findAll({ // Cambio de 'ExerciseDayOfWeeks' a 'ExerciseDayOfWeek'
+                where: {
+                    RoutineId: routineId,
+                    activo: true
+                }
+            });
+
+            return { routine, filteredExercises }; // Ajuste en la estructura del objeto devuelto
         } else {
             console.log('Usuario no encontrado');
             return null;
@@ -41,6 +51,7 @@ const getRoutineByUserId = async (id) => {
         throw error;
     }
 };
+
 
 
 
@@ -59,6 +70,19 @@ const modifyRoutine = async (routineId, updateData) => {
         let routineDetails = routine.routineDetail || [];
         console.log('routinedetail desde controller', routineDetails);
 
+        // Eliminar duplicados
+        const uniqueDetails = [];
+        const seenIds = new Set();
+
+        for (const detail of routineDetails) {
+            if (!seenIds.has(detail.id)) {
+                seenIds.add(detail.id);
+                uniqueDetails.push(detail);
+            }
+        }
+
+        routineDetails = uniqueDetails;
+
         // Actualizar los detalles de la rutina
         for (const exerciseId in updateData) {
             const exerciseUpdates = updateData[exerciseId];
@@ -73,8 +97,12 @@ const modifyRoutine = async (routineId, updateData) => {
                     detail.weights[weekIndex] = load;
                 }
             } else {
-                // Log para entender si hay ejercicios que no se encuentran
-                console.log(`Detail with id ${exerciseIdNumber} not found, skipping update.`);
+                // Agregar el nuevo ejercicio si no existe
+                routineDetails.push({
+                    id: exerciseIdNumber,
+                    weights: exerciseUpdates,
+                    setsAndReps: 'Default value' // O el valor por defecto que necesites
+                });
             }
         }
 

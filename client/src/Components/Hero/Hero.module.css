@@ -4,6 +4,7 @@
     height: 100vh;
     background:linear-gradient(180deg, rgba(0, 0, 75, 0.048), #342abd 60%);
     display: flex;
+    border: 1px solid red
 }
 
 

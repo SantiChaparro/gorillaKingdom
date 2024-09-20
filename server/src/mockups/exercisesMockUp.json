@@ -1,26 +1,27 @@
 
 {
-    "exercises" : [
-        {"nombre": "press banca","grupo_muscular": "Pecho"},
-        {"nombre": "press banca mancuernas","grupo_muscular": "Pecho"},
-        {"nombre": "press banca inclinado","grupo_muscular": "Pecho"},
-        {"nombre": "press banca inclinado mancuernas","grupo_muscular": "Pecho"},
-        {"nombre": "press banca declinado","grupo_muscular": "Pecho"},
-        {"nombre": "press banca declinado mancuernas","grupo_muscular": "Pecho"},
-        {"nombre": "apertura plana","grupo_muscular": "Pecho"},
-        {"nombre": "apertura inclinado","grupo_muscular": "Pecho"},
-        {"nombre": "apertura declinado","grupo_muscular": "Pecho"},
-    
-        {"nombre": "press militar","grupo_muscular": "Hombros"},
-        {"nombre": "press mancuernas","grupo_muscular": "Hombros"},
-        {"nombre": "vuelo lateral","grupo_muscular": "Hombros"},
-        {"nombre": "vuelo frontal","grupo_muscular": "Hombros"},
-        {"nombre": "deltoide posterior","grupo_muscular": "Hombros"},
-
-        {"nombre": "curl barra","grupo_muscular": "Brazos"},
-        {"nombre": "curl mancuerna","grupo_muscular": "Brazos"},
-        {"nombre": "curl mancuerna supinado","grupo_muscular": "Brazos"},
-        {"nombre": "curl martillo","grupo_muscular": "Brazos"},
-        {"nombre": "curl scott","grupo_muscular": "Brazos"}
+    "exercises": [
+      {"nombre": "press banca", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "press banca mancuernas", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "press banca inclinado", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "press banca inclinado mancuernas", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "press banca declinado", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "press banca declinado mancuernas", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "apertura plana", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "apertura inclinado", "grupo_muscular": "Pecho", "activo": true},
+      {"nombre": "apertura declinado", "grupo_muscular": "Pecho", "activo": true},
+  
+      {"nombre": "press militar", "grupo_muscular": "Hombros", "activo": true},
+      {"nombre": "press mancuernas", "grupo_muscular": "Hombros", "activo": true},
+      {"nombre": "vuelo lateral", "grupo_muscular": "Hombros", "activo": true},
+      {"nombre": "vuelo frontal", "grupo_muscular": "Hombros", "activo": true},
+      {"nombre": "deltoide posterior", "grupo_muscular": "Hombros", "activo": true},
+  
+      {"nombre": "curl barra", "grupo_muscular": "Brazos", "activo": true},
+      {"nombre": "curl mancuerna", "grupo_muscular": "Brazos", "activo": true},
+      {"nombre": "curl mancuerna supinado", "grupo_muscular": "Brazos", "activo": true},
+      {"nombre": "curl martillo", "grupo_muscular": "Brazos", "activo": true},
+      {"nombre": "curl scott", "grupo_muscular": "Brazos", "activo": true}
     ]
-}
+  }
+  

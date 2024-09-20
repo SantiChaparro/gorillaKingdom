@@ -9,10 +9,24 @@ import Dashboard from './Pages/dashboard/Dashboard';
 import MasterDrawer from './Components/searchBar/MasterDrawer';
 import NewUserForm from './Pages/users/newUserForm/NewUserForm';
 import EditUsers from './Pages/users/allUsers/editUsers';
+import CreateRoutine from './Pages/routines/createRoutine/CreateRoutine';
+import CreateExercise from './Pages/create-exercise/CreateExercise';
+import UpdateRoutine from './Pages/routines/updateRoutine/UpdateRoutine';
+import Posts from './Pages/posts/Posts';
+import Settings from './Pages/settings/Settings';
+import UserNavBar from './Components/UserNavBar';
+import Payments from './Pages/payments/Payments';
+import AllPayments from './Pages/payments/AllPayments';
+import { useLocation } from 'react-router-dom';
+
+
 
 function App() {
   const [opendrawer, setOpenDrawer] = useState(false);
   const [openMasterdrawere , setOpenMasterdrawer] = useState(false);
+  const [verifiedUser , setVerifiedUser] = useState("");
+  console.log(verifiedUser);
+  
 
   const handleMenuClick = () => {
     setOpenDrawer(true);
@@ -34,32 +48,70 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Landing setVerifiedUser={setVerifiedUser}/>} />
         <Route
           path="/master"
-          element={<Dashboard handleMasterDrawer={handleMasterDrawer} onClose={closeMasterdrawer} openMasterdrawere={openMasterdrawere}/>}
+          element={<Dashboard />}
         />
         <Route
           path="/usuario"
-          element={<UserDashBoard handleMenuClick={handleMenuClick} onClose={closeUserDrawer } opendrawer={opendrawer} />}
+          element={<UserDashBoard verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser}/>}
         />
         <Route
-          path="/rutina-usuario"
-          element={<UserRoutine handleMenuClick={handleMenuClick} />}
+          path="/usuario-rutina"
+          element={<UserRoutine verifiedUser={verifiedUser}/>}
+        />
+         <Route
+        path='/master/crear-rutina'
+        element={<CreateRoutine/>}
+        />
+          <Route
+        path='/master/editar-rutina'
+        element={<UpdateRoutine/>}
         />
         <Route
-        path='/registro-usuario'
+        path='/master/registro-usuario'
         element={<NewUserForm/>}
         />
         <Route
-        path='/editar-usuario'
+        path='/master/editar-usuario'
         element={<EditUsers/>}
+        />
+         <Route
+        path='/master/crear-ejercicio'
+        element={<CreateExercise/>}
+        />
+         <Route
+        path='/master/posts'
+        element={<Posts/>}
+        />
+          <Route
+        path='/master/settings'
+        element={<Settings/>}
+        />
+          <Route
+        path='/master/payments'
+        element={<Payments/>}
+        />
+          <Route
+        path='/master/all-payments'
+        element={<AllPayments/>}
         />
       </Routes>
       <UserDrawer open={opendrawer} onClose={closeUserDrawer } />
       <MasterDrawer open={openMasterdrawere} onClose={closeMasterdrawer}/>
+      <AppContent handleMenuClick={handleMenuClick} handleMasterDrawer={handleMasterDrawer} />
     </Router>
   );
+
+  function AppContent({ handleMenuClick, handleMasterDrawer }) {
+    const location = useLocation();
+    const shouldRenderNavBar = !['/'].includes(location.pathname);
+  
+    return shouldRenderNavBar ? (
+      <UserNavBar handleMenuClick={handleMenuClick} handleMasterDrawer={handleMasterDrawer} />
+    ) : null;
+  }
 }
 
 export default App;
