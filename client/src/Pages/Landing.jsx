@@ -5,15 +5,14 @@ import Footer from "../Components/Footer/Footer";
 import { usePostStore } from "../store/usePostStore";
 import { useSectionStore } from "../store/useSectionStore";
 import LogginForm from "../Components/logginForm/LogginForm";
+import Swal from "sweetalert2";
 
-const Landing = ({setVerifiedUser}) => {
+const Landing = ({ setVerifiedUser }) => {
     const { getPost, posts } = usePostStore();
     const { getSections, sections } = useSectionStore();
     const [orderedSections, setOrderedSections] = useState([]);
     const [loggin, setLoggin] = useState(false);
-
-    console.log(loggin);
-    
+    const [message, setMessage] = useState("");
 
     const handleSections = () => {
         if (sections && sections.length > 0) {
@@ -23,20 +22,34 @@ const Landing = ({setVerifiedUser}) => {
     };
 
     useEffect(() => {
-        getSections(); 
-        getPost(); 
+        getSections();
+        getPost();
     }, [getSections, getPost]);
 
     useEffect(() => {
-        handleSections(); 
+        handleSections();
     }, [sections]);
+
+    // Show SweetAlert when message changes
+    useEffect(() => {
+        if (message) {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                setMessage(""); // Reset the message
+            });
+        }
+    }, [message]);
 
     return (
         <LandingMainContainer>
             <NavBar setLoggin={setLoggin} />
             {loggin && (
                 <LogginFormOverlay>
-                    <LogginForm setLoggin={setLoggin} setVerifiedUser={setVerifiedUser}/>
+                    <LogginForm setLoggin={setLoggin} setVerifiedUser={setVerifiedUser} setMessage={setMessage} />
                 </LogginFormOverlay>
             )}
             <ContentContainer>
@@ -94,11 +107,12 @@ const LandingMainContainer = styled(Box)(({ theme }) => ({
     flexDirection: "column",
     alignItems: "center",
     backgroundColor: "black",
-    position: "relative", // Ensure the overlay is positioned relative to this container
+    position: "relative",
+    boxSizing:'border-box'
 }));
 
 const ContentContainer = styled(Box)(({}) => ({
-    position: "relative", // Ensure content is positioned relative for overlay
+    position: "relative",
     width: "100%",
     height: "100%",
 }));
@@ -109,11 +123,11 @@ const LogginFormOverlay = styled(Box)(({}) => ({
     left: 0,
     width: "100%",
     height: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 10, // Ensure it sits above other content
+    zIndex: 10,
 }));
 
 const PostItem = styled(Box)(({}) => ({

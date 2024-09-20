@@ -3,8 +3,11 @@ import { Box, Button, TextField, Typography, styled } from '@mui/material';
 import { blue } from "@mui/material/colors";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';  // Importa js-cookie
 
-const LogginForm = ({ setLoggin, setVerifiedUser }) => {
+
+const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
     const [password, setPassword] = useState("");
     const [dni, setDni] = useState("");
 
@@ -13,6 +16,26 @@ const LogginForm = ({ setLoggin, setVerifiedUser }) => {
     console.log(password);
     console.log(dni);
 
+    useEffect(() => {
+        const token = Cookies.get('token'); 
+        console.log(token);
+         // Obtener la cookie del token si existe
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                console.log(decodedToken);
+                  // Decodificar el token
+                const currentTime = Date.now() / 1000;  // Obtener la hora actual en formato UNIX
+                if (decodedToken.exp > currentTime) {   // Comparar con el tiempo de expiración
+                    setVerifiedUser(decodedToken.user);  // Establecer el usuario verificado
+                    navigate('/usuario');  // Redirigir al dashboard del usuario
+                }
+            } catch (error) {
+                console.error("Error al decodificar el token:", error);
+                Cookies.remove('token');  // Remover el token si es inválido
+            }
+        }
+    }, [navigate, setVerifiedUser]);
 
 
     const handleDniChange = (event) => {
@@ -29,10 +52,20 @@ const LogginForm = ({ setLoggin, setVerifiedUser }) => {
     const handleSubmit = async () => {
         const response = await axios.post(`http://localhost:3001/loggin/postLoggin`, { dni, password });
         console.log(response.data);
+        const token = response.data.token;
+        if(token){
+            if (token) {
+                const decodedToken = jwtDecode(token); 
+                Cookies.set('token', token, { expires: 1 });  // La cookie expira en 1 día// Decodificar el token
+                console.log('Contenido del token:', decodedToken); // Loguear el contenido
+            }
+        }
         if (response.data.success) {
             await setVerifiedUser(response.data.user)
             navigate('/usuario');
 
+        }else {
+            await setMessage(response.data.message)
         }
         setLoggin(false);
 
