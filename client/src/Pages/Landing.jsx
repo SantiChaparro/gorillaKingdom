@@ -14,6 +14,7 @@ const Landing = ({ setVerifiedUser }) => {
     const [loggin, setLoggin] = useState(false);
     const [message, setMessage] = useState("");
     const [selectedFont, setSelectedFont] = useState([]); // Estado para la fuente seleccionada
+    const [selectedFontSize, setSelectedFontSize] = useState([]);
 
 
     console.log(sections);
@@ -24,11 +25,12 @@ const Landing = ({ setVerifiedUser }) => {
 
    const handleSections = () => {
     if (sections && sections.length > 0) {
-        const sortedSections = sections.sort((a, b) => a.settings.orden - b.settings.orden)
+        const sortedSections = sections
+            .sort((a, b) => a.settings.orden - b.settings.orden)
             .map(section => {
                 let parsedStyle = {};
                 try {
-                    // Deserializar sectionStyle
+                    // Parsear el estilo de la sección
                     if (typeof section.settings.sectionStyle === 'string') {
                         parsedStyle = JSON.parse(section.settings.sectionStyle);
                     }
@@ -36,23 +38,30 @@ const Landing = ({ setVerifiedUser }) => {
                     console.error("Error parsing sectionStyle:", e);
                 }
 
-                // Establecer las fuentes seleccionadas desde los estilos
+                // Recopilar fuentes y tamaños de fuente para cargar
                 const fontsToLoad = [];
+                const sizesToLoad = [];
                 for (const style of Object.values(parsedStyle)) {
                     if (style.fontFamily && !fontsToLoad.includes(style.fontFamily)) {
                         fontsToLoad.push(style.fontFamily);
                     }
+                    if (style.fontSize && !sizesToLoad.includes(style.fontSize)) {
+                        sizesToLoad.push(style.fontSize); // Aquí capturas el tamaño de la fuente
+                    }
                 }
+
+                // Actualizar los estados para las fuentes y tamaños seleccionados
                 setSelectedFont(prevFonts => [...new Set([...prevFonts, ...fontsToLoad])]);
+                setSelectedFontSize(prevSizes => [...new Set([...prevSizes, ...sizesToLoad])]);
 
                 return {
                     ...section,
-                    sectionStyle: parsedStyle
+                    sectionStyle: parsedStyle // Asegurarte de que los estilos estén bien parseados
                 };
             });
         setOrderedSections(sortedSections);
     }
-}
+};
 useEffect(() => {
     selectedFont.forEach(font => {
         const link = document.createElement('link');
