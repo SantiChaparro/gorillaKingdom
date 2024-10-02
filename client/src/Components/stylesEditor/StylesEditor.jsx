@@ -10,7 +10,7 @@ import { ChromePicker } from 'react-color';
 import axios from "axios";
 import Select from 'react-select';
 
-const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing}) => {
+const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing,fontSizeEditing,setFontSizeEditing}) => {
     const [color, setColor] = useState('#ffffff');
     
 
@@ -18,12 +18,16 @@ const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing}) => {
         setFontEditing(!fontEditing);
     }
 
+    const handleFontSize = () => {
+        setFontSizeEditing(!fontSizeEditing)
+    };
+
     return (
         <StyleeditorContainer>
             <StyledIconButton onClick={handleFontSelection}>
                 <FontDownloadIcon fontSize='large' />
             </StyledIconButton>
-            <StyledIconButton>
+            <StyledIconButton onClick={handleFontSize}>
                 <FormatSizeIcon fontSize='large' />
             </StyledIconButton>
             <StyledIconButton>
