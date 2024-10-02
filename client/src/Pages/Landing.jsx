@@ -13,13 +13,59 @@ const Landing = ({ setVerifiedUser }) => {
     const [orderedSections, setOrderedSections] = useState([]);
     const [loggin, setLoggin] = useState(false);
     const [message, setMessage] = useState("");
+    const [selectedFont, setSelectedFont] = useState([]); // Estado para la fuente seleccionada
 
-    const handleSections = () => {
-        if (sections && sections.length > 0) {
-            const sortedSections = sections.sort((a, b) => a.settings.orden - b.settings.orden);
-            setOrderedSections(sortedSections);
-        }
-    };
+
+    console.log(sections);
+    console.log(orderedSections);
+   // console.log("Estilo de sección:", sections.settings.sectionStyle);
+
+
+
+   const handleSections = () => {
+    if (sections && sections.length > 0) {
+        const sortedSections = sections.sort((a, b) => a.settings.orden - b.settings.orden)
+            .map(section => {
+                let parsedStyle = {};
+                try {
+                    // Deserializar sectionStyle
+                    if (typeof section.settings.sectionStyle === 'string') {
+                        parsedStyle = JSON.parse(section.settings.sectionStyle);
+                    }
+                } catch (e) {
+                    console.error("Error parsing sectionStyle:", e);
+                }
+
+                // Establecer las fuentes seleccionadas desde los estilos
+                const fontsToLoad = [];
+                for (const style of Object.values(parsedStyle)) {
+                    if (style.fontFamily && !fontsToLoad.includes(style.fontFamily)) {
+                        fontsToLoad.push(style.fontFamily);
+                    }
+                }
+                setSelectedFont(prevFonts => [...new Set([...prevFonts, ...fontsToLoad])]);
+
+                return {
+                    ...section,
+                    sectionStyle: parsedStyle
+                };
+            });
+        setOrderedSections(sortedSections);
+    }
+}
+useEffect(() => {
+    selectedFont.forEach(font => {
+        const link = document.createElement('link');
+        link.href = `https://fonts.googleapis.com/css2?family=${font.replace(' ', '+')}&display=swap`;
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+
+        // Limpieza: elimina el enlace cuando la fuente cambia o se desmonta el componente
+        return () => {
+            document.head.removeChild(link);
+        };
+    });
+}, [selectedFont]);
 
     useEffect(() => {
         getSections();
@@ -60,10 +106,22 @@ const Landing = ({ setVerifiedUser }) => {
                 {/* Renderizar las secciones ordenadas */}
                 {orderedSections.length > 0 && orderedSections.map((section, index) => (
                     <SectionBox key={index}>
-                        <Typography sx={{ color: 'white' }} variant="h5">{section.settings.titulo}</Typography>
-                        <Typography sx={{ color: 'white' }}>{section.settings.subTitulo}</Typography>
+                        <Typography sx={{
+                            color: section.sectionStyle.titulo.color || 'white', // Usar color de estilo o blanco por defecto
+                            fontFamily: section.sectionStyle.titulo.fontFamily, // Usar fuente de estilo o fantasy por defecto
+                            fontSize: section.sectionStyle.titulo.fontSize || '24px', // Usar tamaño de fuente de estilo o tamaño por defecto
+                        }} variant="h5" >{section.settings.titulo}</Typography>
+                        <Typography sx={{
+                            color: section.sectionStyle.subTitulo.color || 'white', // Usar color de estilo o blanco por defecto
+                            fontFamily: section.sectionStyle.subTitulo.fontFamily, // Usar fuente de estilo o fantasy por defecto
+                            fontSize: section.sectionStyle.subTitulo.fontSize || '24px', // Usar tamaño de fuente de estilo o tamaño por defecto
+                        }} >{section.settings.subTitulo}</Typography>
                         <br />
-                        <Typography sx={{ color: 'white' }}>{section.settings.cuerpo}</Typography>
+                        <Typography sx={{
+                            color: section.sectionStyle.cuerpo.color || 'white', // Usar color de estilo o blanco por defecto
+                            fontFamily: section.sectionStyle.cuerpo.fontFamily, // Usar fuente de estilo o fantasy por defecto
+                            fontSize: section.sectionStyle.cuerpo.fontSize || '24px', // Usar tamaño de fuente de estilo o tamaño por defecto
+                        }} >{section.settings.cuerpo}</Typography>
                         <MultimediaContainer>
                             {section.settings.imagenes.map((url, index) => (
                                 <img key={index} src={url} alt={`multimedia-${index}`} style={{ width: '100%', marginBottom: '10px' }} />
@@ -108,16 +166,16 @@ const LandingMainContainer = styled(Box)(({ theme }) => ({
     alignItems: "center",
     backgroundColor: "black",
     position: "relative",
-    boxSizing:'border-box'
+    boxSizing: 'border-box'
 }));
 
-const ContentContainer = styled(Box)(({}) => ({
+const ContentContainer = styled(Box)(({ }) => ({
     position: "relative",
     width: "100%",
     height: "100%",
 }));
 
-const LogginFormOverlay = styled(Box)(({}) => ({
+const LogginFormOverlay = styled(Box)(({ }) => ({
     position: "absolute",
     top: 0,
     left: 0,
@@ -130,7 +188,7 @@ const LogginFormOverlay = styled(Box)(({}) => ({
     zIndex: 10,
 }));
 
-const PostItem = styled(Box)(({}) => ({
+const PostItem = styled(Box)(({ }) => ({
     backgroundColor: "#1e1e1e",
     padding: "20px",
     borderRadius: "8px",
@@ -138,13 +196,13 @@ const PostItem = styled(Box)(({}) => ({
     marginBottom: "20px",
 }));
 
-const MultimediaContainer = styled(Box)(({}) => ({
+const MultimediaContainer = styled(Box)(({ }) => ({
     display: "flex",
     flexDirection: "column",
     marginTop: "10px",
 }));
 
-const SectionBox = styled(Box)(({}) => ({
+const SectionBox = styled(Box)(({ }) => ({
     width: '100%',
     height: 'auto',
     boxSizing: 'border-box',

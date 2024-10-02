@@ -31,6 +31,7 @@ const Routine = require('../models/Routine');
 const { uploadImage } = require('../services/cloudinaryService');
 const fs = require('fs');
 const path = require('path');
+const { json } = require('sequelize');
 
 
 const postUser = async (req,res)=>{
@@ -378,6 +379,8 @@ const addSection = async (req, res) => {
     console.log('addsection',orden);
     console.log('addsection',cuerpo);
     console.log('addsection',multimedia);
+    console.log('addSection', sectionStyle);
+    
 
     try {
         // Subir las imágenes a Cloudinary utilizando el servicio

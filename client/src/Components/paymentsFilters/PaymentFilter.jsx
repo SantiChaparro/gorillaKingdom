@@ -129,7 +129,7 @@ const PaymentFilter = ({ onFilterChange }) => {
       </Box>
 
 
-      <StyledButton variant="contained" onClick={handleSearch}>Buscar</StyledButton>
+      <StyledButton variant="contained" onClick={()=>{handleSearch(month,selectedUser)}}>Buscar</StyledButton>
     </Box>
   );
 };
