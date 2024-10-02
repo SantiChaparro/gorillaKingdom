@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';  // Importa js-cookie
 
 
-const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
+const LogginForm = ({ setLoggin, setVerifiedUser, setMessage }) => {
     const [password, setPassword] = useState("");
     const [dni, setDni] = useState("");
 
@@ -15,22 +15,31 @@ const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
 
     console.log(password);
     console.log(dni);
-    
-    
+
+
 
     useEffect(() => {
-        const token = Cookies.get('token'); 
+        const token = Cookies.get('token');
         console.log(token);
-         // Obtener la cookie del token si existe
+        // Obtener la cookie del token si existe
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
                 console.log(decodedToken);
-                  // Decodificar el token
-                const currentTime = Date.now() / 1000;  // Obtener la hora actual en formato UNIX
-                if (decodedToken.exp > currentTime) {   // Comparar con el tiempo de expiración
-                    setVerifiedUser(decodedToken.user);  // Establecer el usuario verificado
-                    navigate('/usuario');  // Redirigir al dashboard del usuario
+                console.log(decodedToken.rol);
+                // Decodificar el token
+                const currentTime = Date.now() / 1000;
+                if (decodedToken.exp > currentTime) {
+                    if (decodedToken.rol === 'Master') {
+
+                        setVerifiedUser(decodedToken.user);
+                        navigate('/master')
+                    } else {
+                        setVerifiedUser(decodedToken.user);
+                        navigate('/usuario')
+                    }
+                    //  // Establecer el usuario verificado
+                    //  navigate('/usuario');  // Redirigir al dashboard del usuario
                 }
             } catch (error) {
                 console.error("Error al decodificar el token:", error);
@@ -55,26 +64,26 @@ const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
         const response = await axios.post(`http://localhost:3001/loggin/postLoggin`, { dni, password });
         console.log(response.data);
         const token = response.data.token;
-        if(token){
+        if (token) {
             if (token) {
-                const decodedToken = jwtDecode(token); 
+                const decodedToken = jwtDecode(token);
                 Cookies.set('token', token, { expires: 1 });  // La cookie expira en 1 día// Decodificar el token
                 console.log('Contenido del token:', decodedToken); // Loguear el contenido
                 if (response.data.success) {
                     await setVerifiedUser(response.data.user)
-                   // navigate('/usuario');
-                   if(decodedToken.rol === "Master"){
-                    navigate("/master");
-                   } else {
-                    navigate("/usuario")
-                   }
-        
-                }else {
+                    // navigate('/usuario');
+                    if (decodedToken.rol === "Master") {
+                        navigate("/master");
+                    } else {
+                        navigate("/usuario")
+                    }
+
+                } else {
                     await setMessage(response.data.message)
                 }
             }
         }
-       
+
         setLoggin(false);
 
     };
@@ -134,7 +143,7 @@ const LogginForm = ({ setLoggin, setVerifiedUser,setMessage }) => {
                         },
                     }}
                 />
-                <Button sx={{ backgroundColor: 'blue', color: 'white', width: '80%' }} onClick={() => { handleSubmit(dni, password, setLoggin,setVerifiedUser) }}>INGRESAR</Button>
+                <Button sx={{ backgroundColor: 'blue', color: 'white', width: '80%' }} onClick={() => { handleSubmit(dni, password, setLoggin, setVerifiedUser) }}>INGRESAR</Button>
             </FormContainer>
         </LogginMainContainer>
 

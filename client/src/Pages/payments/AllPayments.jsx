@@ -12,6 +12,7 @@ import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
+
 // Aquí el resto del código...
 
 const AllPayments = () => {
@@ -22,14 +23,38 @@ const AllPayments = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filteredPayments, setFilteredPayments] = useState([]);
-
+    console.log(filteredPayments);
+    console.log(filters.month);
+    console.log(filters.dni);
+    
+    
     useEffect(() => {
         fetchAllPayments();
     }, [filters, fetchAllPayments]);
 
     useEffect(() => {
         const applyFilters = () => {
-            setFilteredPayments(payments); // Aplica los filtros aquí
+            let filtered = payments;
+
+            // Filtrar por mes si el mes está seleccionado
+            if (filters.month) {
+                filtered = filtered.filter(payment => (
+                   // console.log(payment)
+                    
+                    dayjs(payment.fecha_pago).month() + 1 === parseInt(filters.month)
+                ) 
+                    
+                );
+                console.log(filtered);
+                
+            }
+
+            // Filtrar por DNI si está disponible
+            if (filters.dni) {
+                filtered = filtered.filter(payment => payment.UserDni === filters.dni);
+            }
+
+            setFilteredPayments(filtered);
         };
 
         applyFilters();

@@ -2,28 +2,70 @@ import React, { useEffect, useState } from "react";
 import { Box, TextField, Typography, styled, Button } from '@mui/material';
 import { useSectionStore } from "../../store/useSectionStore";
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import StylesEditor from "../../Components/stylesEditor/StylesEditor";
+import FontSelector from "../../Components/fontSelector/FontSelector";
+import axios from "axios";
 
 const Settings = () => {
-  const {postSection,getSections,sections} = useSectionStore();
+  const { postSection, getSections, sections } = useSectionStore();
   const [titulo, setTitulo] = useState("");
   const [subTitulo, setSubTitulo] = useState("");
   const [cuerpo, setCuerpo] = useState("");
   const [orden, setOrden] = useState("");
   const [imagen, setImagen] = useState([]);
-  const [sectionStyle , setSectionStyle] = useState({
-    titulo:{},
-    subTitulo:{},
-    cuerpo:{}
+  const [sectionStyle, setSectionStyle] = useState({
+    titulo: {
+      fontFamily: "",
+      fontSize: "",
+      color: "",
+      aligment: ""
+    },
+    subTitulo: {
+      fontFamily: "",
+      fontSize: "",
+      color: "",
+      aligment: ""
+    },
+    cuerpo: {
+      fontFamily: "",
+      fontSize: "",
+      color: "",
+      aligment: ""
+    }
   });
+  const [fontEditing, setFontEditing] = useState(false);
+  const [fonts, setFonts] = useState([]);
+  const [selectedFont, setSelectedFont] = useState(null);
 
-  console.log(titulo);
-  console.log(subTitulo);
-  console.log(cuerpo);
-  console.log(imagen);
-  console.log(orden);
+  console.log(sectionStyle);
   console.log(sections);
   
   
+
+  useEffect(() => {
+    if (selectedFont) {
+      const link = document.createElement('link');
+      link.href = `https://fonts.googleapis.com/css2?family=${selectedFont.value.replace(' ', '+')}&display=swap`;
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+
+      // Limpieza: elimina el enlace cuando la fuente cambia o se desmonta el componente
+      return () => {
+        document.head.removeChild(link);
+      };
+    }
+  }, [selectedFont]);
+
+  console.log(sectionStyle);
+  console.log(fonts);
+
+
+  // Función para actualizar el estado al hacer foco en otro input
+  const handleFocus = (field) => {
+    if (field !== 'orden') { // Excluir el campo orden de la función
+      handleStyleChange(field, { fontFamily: selectedFont?.value });
+    }
+  };
 
   const handleTitulo = (event) => setTitulo(event.target.value);
   const handleSubTitulo = (event) => setSubTitulo(event.target.value);
@@ -44,7 +86,7 @@ const Settings = () => {
     formData.append('subTitulo', subTitulo);
     formData.append('cuerpo', cuerpo);
     formData.append('orden', orden);
-    formData.append('sectionStyle',JSON.stringify(sectionStyle));
+    formData.append('sectionStyle', JSON.stringify(sectionStyle));
 
     // Añadir los archivos seleccionados al FormData
     if (imagen.length > 0) {
@@ -53,45 +95,100 @@ const Settings = () => {
 
     await postSection(formData);
 
-    // Limpiar los campos después de subir el post
     setTitulo("");
     setSubTitulo("");
     setCuerpo("");
     setImagen([]);
-    
+
+
+    // Limpiar los campos después de subir el post
     getSections();
   };
 
+  const fontKey = 'AIzaSyCyYOAM__29rPzT3IyuQsx4CoqI_P1pGCs';
+  const fetchFonts = async () => {
+    const response = await axios.get(`https://www.googleapis.com/webfonts/v1/webfonts?key=${fontKey}`)
+    setFonts(response.data.items);
+  };
+
+  useEffect(() => {
+    fetchFonts();
+  }, [])
+
+  const handleStyleChange = (field, newStyles) => {
+    setSectionStyle(prev => ({
+      ...prev,
+      [field]: {
+        fontFamily: prev[field].fontFamily || "", // Asegúrate de que no se convierta en undefined
+        fontSize: prev[field].fontSize || "",
+        color: prev[field].color || "",
+        aligment: prev[field].aligment || "",
+        ...newStyles // Actualiza solo las propiedades que cambian
+      }
+    }));
+  };
 
   return (
     <MainContainer>
-      <CustomTitle sx={{marginTop:'20px',marginTop:'100px', marginBottom:'30px'}}>ajustes</CustomTitle>
+      <CustomTitle sx={{ marginTop: '20px', marginTop: '100px', marginBottom: '30px' }}>ajustes</CustomTitle>
 
       <CustomTitle>TITULO</CustomTitle>
+      <StylesEditor setSectionStyle={setSectionStyle} setFontEditing={setFontEditing} fontEditing={fontEditing} />
+      {fontEditing && <FontSelector fonts={fonts} selectedFont={selectedFont} setSelectedFont={setSelectedFont} />}
+
       <TextField
         value={titulo}
         onChange={handleTitulo}
-        sx={textFieldStyles}
+        onFocus={() => handleFocus('titulo')} // Actualiza el estado al hacer foco
+        sx={{
+          ...textFieldStyles,
+          '& .MuiInputBase-input': {
+            fontFamily: sectionStyle.titulo.fontFamily,
+            color: sectionStyle.titulo.color || 'white',
+          },
+        }}
       />
+
       <CustomTitle>orden</CustomTitle>
       <TextField
         value={orden}
         onChange={handleOrden}
-        sx={textFieldStyles}
+        onFocus={() => handleFocus('orden')} // Actualiza el estado al hacer foco
+        sx={{
+          ...textFieldStyles,
+          '& .MuiInputBase-input': {
+
+            color: 'white',
+          },
+        }}
       />
 
       <CustomTitle>SUBTITULO</CustomTitle>
       <TextField
         value={subTitulo}
         onChange={handleSubTitulo}
-        sx={textFieldStyles}
+        onFocus={() => handleFocus('subTitulo')} // Actualiza el estado al hacer foco
+        sx={{
+          ...textFieldStyles,
+          '& .MuiInputBase-input': {
+            fontFamily: sectionStyle.subTitulo.fontFamily,
+            color: sectionStyle.subTitulo.color || 'white',
+          },
+        }}
       />
 
       <CustomTitle>CUERPO</CustomTitle>
       <TextField
         value={cuerpo}
         onChange={handleCuerpo}
-        sx={{ ...textFieldStyles, height: '250px' }}
+        onFocus={() => handleFocus('cuerpo')}// Actualiza el estado al hacer foco
+        sx={{
+          ...textFieldStyles,
+          '& .MuiInputBase-input': {
+            fontFamily: sectionStyle.cuerpo.fontFamily,
+            color: sectionStyle.cuerpo.color || 'white',
+          },
+        }}
         multiline
         rows={10}
       />
@@ -113,8 +210,8 @@ const Settings = () => {
         />
       </UploadContainer>
       <Button variant="contained" color="primary" onClick={handleUpload} disabled={imagen.length === 0} style={{ marginTop: 16, backgroundColor: 'blue', width: '100%' }}>
-          postear
-        </Button>
+        postear
+      </Button>
     </MainContainer>
   )
 };
@@ -132,7 +229,7 @@ const MainContainer = styled(Box)(({ theme }) => ({
   backgroundColor: "black",
 }));
 
-const CustomTitle = styled(Typography)(({}) => ({
+const CustomTitle = styled(Typography)(({ }) => ({
   fontFamily: "Bebas Neue",
   fontWeight: "400",
   fontSize: "3em",
@@ -167,11 +264,10 @@ const UploadContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   marginTop: '20px',
-  
 }));
 
 const UploadLabel = styled('label')(({ theme }) => ({
-  fontFamily:'sans-serif',
+  fontFamily: 'sans-serif',
   backgroundColor: 'blue',
   color: 'white',
   padding: '10px 20px',
@@ -181,5 +277,5 @@ const UploadLabel = styled('label')(({ theme }) => ({
   '&:hover': {
     backgroundColor: '#0056b3',
   },
-  marginBottom:'20px'
+  marginBottom: '20px'
 }));

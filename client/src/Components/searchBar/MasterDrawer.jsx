@@ -9,18 +9,27 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import GroupIcon from '@mui/icons-material/Group'; // Icono para el acordeón de usuarios
-import AssignmentIcon from '@mui/icons-material/Assignment'; // Icono para el acordeón de rutinas
+import GroupIcon from '@mui/icons-material/Group';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import LogoutIcon from '@mui/icons-material/Logout'; // Icono para salir
+import Cookies from 'js-cookie'; // Librería para manejar cookies
+
 
 const drawerWidth = '240px';
 
 const MasterDrawer = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [navPath, setNavPath] = useState(null);
-
+  
   const handleListItemClick = (path) => {
     setNavPath(path);
     onClose();
+  };
+
+  const handleLogout = () => {
+    Cookies.remove('token'); // Eliminar cookie
+    onClose();
+    navigate('/'); // Redirigir al login
   };
 
   useEffect(() => {
@@ -109,9 +118,11 @@ const MasterDrawer = ({ open, onClose }) => {
         <ListItemIcon><SettingsIcon fontSize="large" style={{ color: 'white' }} /></ListItemIcon>
         <ListItemText><Typography variant="h6" sx={{ color: '#fff' }}>Ajustes</Typography></ListItemText>
       </StyledListItem>
-      <StyledListItem onClick={() => handleListItemClick('/master/payments')} sx={{ marginTop: '20px' }}>
-        <ListItemIcon><AttachMoneyIcon fontSize="large" style={{ color: 'white' }} /></ListItemIcon>
-        <ListItemText><Typography variant="h6" sx={{ color: '#fff' }}>Pagos</Typography></ListItemText>
+
+      {/* ListItem para Salir */}
+      <StyledListItem onClick={handleLogout} sx={{ marginTop: '20px' }}>
+        <ListItemIcon><LogoutIcon fontSize="large" style={{ color: 'white' }} /></ListItemIcon>
+        <ListItemText><Typography variant="h6" sx={{ color: '#fff' }}>Salir</Typography></ListItemText>
       </StyledListItem>
     </CustomDrawer>
   );
