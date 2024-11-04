@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, styled } from '@mui/material';
 import NavBar from "../Components/NavBar/NavBar";
-import Footer from "../Components/Footer/Footer";
+//import Footer from "../Components/Footer/Footer";
 import { usePostStore } from "../store/usePostStore";
 import { useSectionStore } from "../store/useSectionStore";
 import LogginForm from "../Components/logginForm/LogginForm";
 import Swal from "sweetalert2";
+import { keys } from "@mui/system";
+import LandingDrawer from "../Components/landingDrawer/LandingDrawer";
+
 
 const Landing = ({ setVerifiedUser }) => {
     const { getPost, posts } = usePostStore();
@@ -15,13 +18,12 @@ const Landing = ({ setVerifiedUser }) => {
     const [message, setMessage] = useState("");
     const [selectedFont, setSelectedFont] = useState([]); // Estado para la fuente seleccionada
     const [selectedFontSize, setSelectedFontSize] = useState([]);
-
-
-    console.log(sections);
-    console.log(orderedSections);
-   // console.log("Estilo de sección:", sections.settings.sectionStyle);
-
-
+    const [openDrawer, setOpendrawer] = useState(false);
+    
+    
+    const hanldeCloseDrawer = () => {
+        setOpendrawer(false)
+    };
 
    const handleSections = () => {
     if (sections && sections.length > 0) {
@@ -41,12 +43,16 @@ const Landing = ({ setVerifiedUser }) => {
                 // Recopilar fuentes y tamaños de fuente para cargar
                 const fontsToLoad = [];
                 const sizesToLoad = [];
+                const colorsToLoad = [];
                 for (const style of Object.values(parsedStyle)) {
                     if (style.fontFamily && !fontsToLoad.includes(style.fontFamily)) {
                         fontsToLoad.push(style.fontFamily);
                     }
                     if (style.fontSize && !sizesToLoad.includes(style.fontSize)) {
                         sizesToLoad.push(style.fontSize); // Aquí capturas el tamaño de la fuente
+                    }
+                    if (style.color && !colorsToLoad.includes(style.color)) {
+                        colorsToLoad.push(style.color);
                     }
                 }
 
@@ -101,36 +107,36 @@ useEffect(() => {
 
     return (
         <LandingMainContainer>
-            <NavBar setLoggin={setLoggin} />
+            <NavBar setLoggin={setLoggin} setOpendrawer={setOpendrawer} />
+            {openDrawer && <LandingDrawer open={openDrawer} close={hanldeCloseDrawer} sections={sections} />} {/* Renderizado condicional del Drawer */}
             {loggin && (
                 <LogginFormOverlay>
                     <LogginForm setLoggin={setLoggin} setVerifiedUser={setVerifiedUser} setMessage={setMessage} />
                 </LogginFormOverlay>
             )}
             <ContentContainer>
-                <div className="w-full h-full bg-gray-800 p-4 flex items-center justify-center">
-                    <h1 className="text-2xl text-blue-500">Probando Tailwind</h1>
-                </div>
-
                 {/* Renderizar las secciones ordenadas */}
                 {orderedSections.length > 0 && orderedSections.map((section, index) => (
-                    <SectionBox key={index}>
+                    <SectionBox id={`${section.id}`} key={section.id}>
                         <Typography sx={{
-                            color: section.sectionStyle.titulo.color || 'white', // Usar color de estilo o blanco por defecto
-                            fontFamily: section.sectionStyle.titulo.fontFamily, // Usar fuente de estilo o fantasy por defecto
-                            fontSize: section.sectionStyle.titulo.fontSize || '24px', // Usar tamaño de fuente de estilo o tamaño por defecto
-                        }} variant="h5" >{section.settings.titulo}</Typography>
+                            width: '100%',
+                            color: section.sectionStyle.titulo.color || 'white',
+                            fontFamily: section.sectionStyle.titulo.fontFamily,
+                            fontSize: section.sectionStyle.titulo.fontSize || '24px',
+                        }} variant="h5">{section.settings.titulo}</Typography>
                         <Typography sx={{
-                            color: section.sectionStyle.subTitulo.color || 'white', // Usar color de estilo o blanco por defecto
-                            fontFamily: section.sectionStyle.subTitulo.fontFamily, // Usar fuente de estilo o fantasy por defecto
-                            fontSize: section.sectionStyle.subTitulo.fontSize || '24px', // Usar tamaño de fuente de estilo o tamaño por defecto
-                        }} >{section.settings.subTitulo}</Typography>
+                            width: '100%',
+                            color: section.sectionStyle.subTitulo.color || 'white',
+                            fontFamily: section.sectionStyle.subTitulo.fontFamily,
+                            fontSize: section.sectionStyle.subTitulo.fontSize || '24px',
+                        }}>{section.settings.subTitulo}</Typography>
                         <br />
                         <Typography sx={{
-                            color: section.sectionStyle.cuerpo.color || 'white', // Usar color de estilo o blanco por defecto
-                            fontFamily: section.sectionStyle.cuerpo.fontFamily, // Usar fuente de estilo o fantasy por defecto
-                            fontSize: section.sectionStyle.cuerpo.fontSize || '24px', // Usar tamaño de fuente de estilo o tamaño por defecto
-                        }} >{section.settings.cuerpo}</Typography>
+                            width: '100%',
+                            color: section.sectionStyle.cuerpo.color || 'white',
+                            fontFamily: section.sectionStyle.cuerpo.fontFamily,
+                            fontSize: section.sectionStyle.cuerpo.fontSize || '24px',
+                        }}>{section.settings.cuerpo}</Typography>
                         <MultimediaContainer>
                             {section.settings.imagenes.map((url, index) => (
                                 <img key={index} src={url} alt={`multimedia-${index}`} style={{ width: '100%', marginBottom: '10px' }} />
@@ -138,7 +144,7 @@ useEffect(() => {
                         </MultimediaContainer>
                     </SectionBox>
                 ))}
-
+    
                 {/* Renderizar los posts después de las secciones */}
                 {posts.length > 0 ? (
                     <Box>
@@ -156,8 +162,8 @@ useEffect(() => {
                         ))}
                     </Box>
                 ) : null}
-
-                <Footer />
+    
+                {/* <Footer /> */}
             </ContentContainer>
         </LandingMainContainer>
     );
@@ -169,7 +175,7 @@ const LandingMainContainer = styled(Box)(({ theme }) => ({
     width: "100%",
     height: "100vh",
     boxSizing: "border-box",
-    padding: '15px',
+    padding: '0 16px',
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -217,6 +223,6 @@ const SectionBox = styled(Box)(({ }) => ({
     boxSizing: 'border-box',
     display: "flex",
     flexDirection: "column",
-    marginTop: "10px",
+    marginTop: "100px",
     marginBottom: '25px'
 }));
