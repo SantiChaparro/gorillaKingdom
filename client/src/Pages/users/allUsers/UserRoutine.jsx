@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
-import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress,Card,CardMedia } from '@mui/material';
 import { useRoutinesStore } from '../../../store/useRoutinesStore';
 import Cookies from 'js-cookie';
 import {jwtDecode} from "jwt-decode";
 import Swal from 'sweetalert2';
+import trainingImage from '../../../assests/imagenes/womenLift.jpg';
 
 const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
   const { getRoutine, modifyRoutine, routines } = useRoutinesStore();

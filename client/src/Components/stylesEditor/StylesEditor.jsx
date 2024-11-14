@@ -10,7 +10,7 @@ import { ChromePicker } from 'react-color';
 import axios from "axios";
 import Select from 'react-select';
 
-const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing,fontSizeEditing,setFontSizeEditing}) => {
+const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing,fontSizeEditing,setFontSizeEditing,setColorediting,colorEditing}) => {
     const [color, setColor] = useState('#ffffff');
     
 
@@ -22,6 +22,10 @@ const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing,fontSizeEditin
         setFontSizeEditing(!fontSizeEditing)
     };
 
+    const handleColorEditing = () => {
+        setColorediting(!colorEditing)
+    };
+
     return (
         <StyleeditorContainer>
             <StyledIconButton onClick={handleFontSelection}>
@@ -30,7 +34,7 @@ const StylesEditor = ({setSectionStyle,setFontEditing,fontEditing,fontSizeEditin
             <StyledIconButton onClick={handleFontSize}>
                 <FormatSizeIcon fontSize='large' />
             </StyledIconButton>
-            <StyledIconButton>
+            <StyledIconButton onClick={handleColorEditing}>
                 <FormatColorFillIcon fontSize='large' />
             </StyledIconButton>
             <StyledIconButton>

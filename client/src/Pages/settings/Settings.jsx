@@ -5,6 +5,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import StylesEditor from "../../Components/stylesEditor/StylesEditor";
 import FontSelector from "../../Components/fontSelector/FontSelector";
 import FontSizeSelector from "../../Components/fontSizeSelector/FontSizeSelector";
+import ColorPicker from "../../Components/colorPicker/ColorPiker";
 import axios from "axios";
 
 const Settings = () => {
@@ -36,14 +37,20 @@ const Settings = () => {
   });
   const [fontEditing, setFontEditing] = useState(false);
   const [fontSizeEditing , setFontSizeEditing] = useState(false);
+  const [colorEditing , setColorediting] = useState(false);
   const [fonts, setFonts] = useState([]);
   const [selectedFont, setSelectedFont] = useState(null);
   const [selectedFontSize , setSelectedFontSize] = useState(null);
+  const [color , setColor] = useState("");
 
   console.log(sectionStyle);
   console.log(sections);
   console.log(fontSizeEditing);
   console.log(selectedFontSize);
+  console.log(colorEditing);
+  console.log(color);
+  
+  
   
   
   
@@ -71,7 +78,8 @@ const Settings = () => {
     if (field !== 'orden') { // Excluir el campo orden de la función
       handleStyleChange(field, { 
         fontFamily: selectedFont?.value,
-        fontSize: selectedFontSize?.value || sectionStyle[field]?.fontSize  
+        fontSize: selectedFontSize?.value || sectionStyle[field]?.fontSize,  
+        color: color
       });
     }
   };
@@ -142,9 +150,10 @@ const Settings = () => {
       <CustomTitle sx={{ marginTop: '20px', marginTop: '100px', marginBottom: '30px' }}>ajustes</CustomTitle>
 
       <CustomTitle>TITULO</CustomTitle>
-      <StylesEditor setSectionStyle={setSectionStyle} setFontEditing={setFontEditing} fontEditing={fontEditing} fontSizeEditing={fontSizeEditing} setFontSizeEditing={setFontSizeEditing} />
+      <StylesEditor setSectionStyle={setSectionStyle} setFontEditing={setFontEditing} fontEditing={fontEditing} fontSizeEditing={fontSizeEditing} setFontSizeEditing={setFontSizeEditing} setColorediting={setColorediting} colorEditing={colorEditing} />
       {fontEditing && <FontSelector fonts={fonts} selectedFont={selectedFont} setSelectedFont={setSelectedFont} />}
       {fontSizeEditing && <FontSizeSelector selectedFontSize={selectedFontSize} setSelectedFontSize={setSelectedFontSize} />}
+      {colorEditing && <ColorPicker color={color} setColor={setColor}/>}
 
       <TextField
         value={titulo}

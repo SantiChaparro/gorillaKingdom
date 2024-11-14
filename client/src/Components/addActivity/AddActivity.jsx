@@ -51,13 +51,28 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
                         value={selectedActivity}
                         onChange={handleActivityChange}
                         label="Actividades"
-                        sx={{ ...textFieldStyles }}
+                        sx={{
+                            ...textFieldStyles,
+                            borderRadius: '5px',
+                            '& .MuiSelect-select': {
+                                color: 'black', // Asegúrate de que el texto seleccionado sea negro
+                            },
+                            '&.Mui-focused .MuiSelect-select': {
+                                color: 'black', // Asegúrate de que el texto sea negro al estar enfocado
+                            },
+                            '&.MuiSelect-outlined .MuiSelect-select': {
+                                color: 'black', // Color del texto para el valor seleccionado
+                            },
+                            '& .MuiInputLabel-root': {
+                                color: 'black', // Asegúrate de que la etiqueta sea legible
+                            },
+                        }}
                         MenuProps={{
                             PaperProps: {
                                 sx: {
                                     bgcolor: '#2E3B55',
                                     '& .MuiMenuItem-root': {
-                                        color: 'white',
+                                        color: 'black',
                                     },
                                 },
                             },
@@ -83,7 +98,10 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
                                     variant="body2"
                                     sx={{
                                         flex: 1,
-                                        color: userActivityIds.has(activity.id) ? '#FFD700' : 'white',
+                                        fontFamily:'Nunito',
+                                        fontWeight:'500',
+                                        fontSize:'16px',
+                                        color: userActivityIds.has(activity.id) ? '#FFD700' : 'black',
                                     }}
                                 >
                                     {activity.nombre}
@@ -112,39 +130,56 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
 export default AddActivity;
 
 const formControlStyles = {
+    width: '100%',
+    backgroundColor: 'white', // Fondo blanco para el select
+    borderRadius: '5px', // Ajustar el border-radius aquí también
     '& .MuiInputBase-root': {
-        color: 'white',
+        color: 'black', // Texto negro
+        fontFamily: 'Nunito, sans-serif', // Aplicar tipografía Nunito
+        fontSize: '16px', // Tamaño de fuente 16px
+        padding: '8px 14px',
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
-            borderColor: 'blue',
+            border: 'none', // Sin borde por defecto
         },
         '&:hover fieldset': {
-            borderColor: 'blue',
+            border: 'none', // Sin borde en hover
         },
         '&.Mui-focused fieldset': {
-            borderColor: 'blue',
+            border: 'none', // Mantener sin borde cuando está enfocado
         },
     },
     '& .MuiInputLabel-root': {
-        color: 'white',
-    }
+        color: 'black', // Etiquetas en negro para que sean legibles
+        fontFamily: 'Nunito, sans-serif', // Aplicar tipografía Nunito
+        fontWeight: 500, // Peso medio
+        fontSize: '16px', // Tamaño de fuente 16px
+    },
+    
 };
 
 const textFieldStyles = {
     width: '100%',
+    backgroundColor: 'white', // Fondo blanco para el select
     '& .MuiInputBase-input': {
-        color: 'white',
+        color: 'black', // Texto negro
+        fontFamily: 'Nunito, sans-serif', // Aplicar tipografía Nunito
+        fontWeight: 500, // Medium (peso 500)
+        fontSize: '16px', // Tamaño de fuente 16px
+        padding: '8px 14px', // Ajustar el padding según sea necesario
     },
     '& .MuiOutlinedInput-root': {
+        borderRadius: '5px', // Asegúrate de que el texto tenga borderRadius
         '& fieldset': {
-            borderColor: 'blue',
+            border: 'none', // Sin borde por defecto
         },
         '&:hover fieldset': {
-            borderColor: 'blue',
+            border: 'none', // Sin borde en hover
         },
         '&.Mui-focused fieldset': {
-            borderColor: 'blue',
+            border: 'none', // Mantener sin borde cuando está enfocado
         },
     },
 };
+
