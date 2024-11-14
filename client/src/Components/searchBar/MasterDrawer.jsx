@@ -14,6 +14,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Cookies from 'js-cookie';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { display } from "@mui/system";
 
 const drawerWidth = '240px';
 
@@ -50,7 +51,7 @@ const MasterDrawer = ({ open, onClose }) => {
       isDesktop={isDesktop}
     >
       <DrawerContent isDesktop={isDesktop}>
-        <Typography variant="h5" textAlign="center" sx={{ marginTop: '30px', fontFamily: 'Nunito', fontWeight: '300', fontSize: '26px' }}>
+        <Typography variant="h5" textAlign="center" sx={{ marginTop: '30px', fontFamily: 'Nunito', fontWeight: '300', fontSize: '26px',marginBottom:'30px' }}>
           Panel de control
         </Typography>
 
@@ -148,6 +149,7 @@ const CustomDrawer = styled(Drawer)(({ theme, isDesktop }) => ({
     fontFamily: 'Nunito',
     fontSize: '26px',
     zIndex: isDesktop ? 1201 : 'auto',
+    display:'flex',
   },
 }));
 
@@ -158,6 +160,7 @@ const DrawerContent = styled(Box)(({ isDesktop }) => ({
   height: '100%',
   justifyContent: isDesktop ? 'center' : 'flex-start',  // Centramos verticalmente solo en desktop
   padding: isDesktop ? '0 20px' : '20px',  // Espaciado condicional
+  marginTop:'50px'
 }));
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({

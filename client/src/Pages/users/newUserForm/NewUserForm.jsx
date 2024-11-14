@@ -139,7 +139,7 @@ const NewUserForm = () => {
   return (
     <MainContainer >
       <CustomTitle>Nuevo usuario</CustomTitle>
-      <ImageBacgroung>
+      <ImageBackground>
       <form onSubmit={formik.handleSubmit}>
         <FormControl 
         sx={{
@@ -271,7 +271,7 @@ const NewUserForm = () => {
               <ParagraphContent>Hace meses que uso esta app y realmente ha sido un antes y un después. Lo que más me gusta es la facilidad para gestionar las rutinas de mis clientes y llevar un control preciso de cada uno de ellos. ¡Definitivamente una herramienta indispensable para cualquier gimnasio que quiera crecer y ofrecer un servicio de calidad!</ParagraphContent>
               <UserName>— Carlos Gutiérrez, propietario de FitZone Gym</UserName>
       </Paragraph>
-      </ImageBacgroung>
+      </ImageBackground>
      
     </MainContainer>
   );
@@ -359,26 +359,25 @@ const FormContainer = styled(Box)(({theme}) => ({
   }
 }));
 
-const ImageBacgroung = styled(Box)(({theme}) => ({
-  width:'100%',
-  height:'auto',
-  boxSizing:'border-box',
-  backgroundImage:`url(${rectangle51})`,
-  backgroundSize: 'cover',
-  boxSizing:'border-box',
-  
- 
+const ImageBackground = styled(Box)(({ theme }) => ({
+  width: '100%',
+  height: '100vh', // Ensures it covers the full height of the viewport
+  boxSizing: 'border-box',
+  backgroundImage: `url(${rectangle51})`,
+  backgroundSize: 'cover', 
+  backgroundPosition: 'center', 
+  backgroundRepeat: 'no-repeat', 
+  backgroundAttachment: 'fixed',
   
   [theme.breakpoints.up('md')]: {
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center',
-    gap:'100px'
-   
- 
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '100px',
   }
- 
 }));
+
 
 const Paragraph = styled(Box)(({ theme }) => ({
   display: 'none', // Oculto por defecto (en móviles)

@@ -156,6 +156,7 @@ const formControlStyles = {
         fontWeight: 500, // Peso medio
         fontSize: '16px', // Tamaño de fuente 16px
     },
+    
 };
 
 const textFieldStyles = {
