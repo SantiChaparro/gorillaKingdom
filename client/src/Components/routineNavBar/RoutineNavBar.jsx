@@ -10,26 +10,28 @@ const RoutineNavBar = ({ filterValues = [], handleSelectChange }) => {
                 onChange={(event) => handleSelectChange(event.target.value)}
                 sx={{
                     width: '100%',
+                    backgroundColor:'white',
+                    borderRadius:'5px',
                     '& .MuiInputBase-input': {
-                        color: 'white',
+                        color: 'black',
                     },
                     '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                            borderColor: 'blue',
+                            borderColor: 'black',
                         },
                         '&:hover fieldset': {
-                            borderColor: 'blue',
+                            borderColor: 'black',
                         },
                         '&.Mui-focused fieldset': {
-                            borderColor: 'blue',
+                            borderColor: 'black',
                         },
                     },
                     '& .MuiInputLabel-root': {
-                        color: 'white',
+                        color: 'black',
                     },
                 }}
                 InputLabelProps={{
-                    style: { color: 'white' },
+                    style: { color: 'black' },
                 }}
             >
                 {filterValues.map((item, index) => (
@@ -49,3 +51,4 @@ const SelectContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     height: 'auto',
 }));
+

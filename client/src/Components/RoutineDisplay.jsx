@@ -4,27 +4,33 @@ import { Box, Typography, Button, styled } from '@mui/material';
 const RoutineDisplay = ({ dayValue, exercisesId, exercises, routineDetail, handleRemove, handleAddDay }) => {
     return (
         <ExerciseMainContainer>
-            <CustomTypography variant="h6">Rutina del Día {dayValue}</CustomTypography>
+            <CustomTypography variant="h6" sx={{fontFamily:'Nunito',fontWeight:'400', textDecoration:'underline'}}>Rutina del Día {dayValue}</CustomTypography>
+            <ExerciseContainer>
             {exercisesId.map(exerciseId => {
                 const exercise = exercises.find(ex => ex.id === exerciseId);
                 const detail = routineDetail.find(detail => detail.id === exerciseId);
                 return (
-                    <ExerciseContainer key={exerciseId}>
-                        <Typography sx={{ color: 'white' }}>
+                        <Box sx={{width:'100%',display:'flex', flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                             <Typography key={exerciseId} sx={{ color: 'black' }}>
                             {exercise.nombre} - {detail?.setsAndReps}
                         </Typography>
-                        <Button onClick={() => handleRemove(exerciseId)} sx={{ color: 'white' }}>ELIMINAR</Button>
-                    </ExerciseContainer>
+                        <Button onClick={() => handleRemove(exerciseId)} sx={{ color: 'black' }}>ELIMINAR</Button>
+                 
+                        </Box>
+                       
                 );
             })}
+            </ExerciseContainer>
+           
             <Button 
                 onClick={handleAddDay} 
                 variant='contained' 
                 sx={{
-                    backgroundColor: '#0028ff',
+                    background: 'linear-gradient(45deg, #C004FF, #730399)',
                     color: 'white',
-                    marginTop: '30px',
+                    marginTop: '10px',
                     height: '50px',
+                  
                     '&:hover': {
                         backgroundColor: '#0028ff' // mantener el color azul en hover
                     }
@@ -40,31 +46,35 @@ export default RoutineDisplay;
 
 const ExerciseContainer = styled(Box)(({ theme }) => ({
     width: '100%',
-    padding: '10px',
+    height:'150px',
+    padding:'5px',
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px',
-    boxSizing: 'border-box',
-    borderBottom: '1px solid blue'
+    flexDirection:'column',
+    alignItems:'center',
+    justifyContent:'center',
+    overflowY: 'auto', 
+    //backgroundColor:'white',
+   
 }));
 
 const ExerciseMainContainer = styled(Box)(({ theme }) => ({
     width: '100%',
-    height: 'auto',
+    height: 'auto', 
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: '50px',
-    border: '1px solid blue',
+    justifyContent: 'center',
     padding: '10px',
     boxSizing: 'border-box',
-    borderRadius: '5px'
+    background: 'white', // Fondo semi-transparente
+   // backdropFilter: 'blur(20px)', // Efecto esmerilado
+    borderRadius: '5px',
+    //border: '1px solid rgba(255, 255, 255, 0.3)', // Bordes con un toque de transparencia
 }));
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
     fontFamily: "Bebas Neue",
-    fontWeight: '400',
-    fontSize: '3em',
-    color: 'white'
+    fontWeight: '300',
+    fontSize: '1.5em',
+    color: 'black'
 }));

@@ -9,28 +9,31 @@ const MobileExerciseSelector = ({ exercises, handleExerciseSelection }) => {
             variant="outlined"
             onChange={handleExerciseSelection}
             sx={{
-                width: '200px',
-                marginBottom: '16px',
+                width: '100%',
+                backgroundColor:'white',
+                borderRadius:'5px',
+               // margin:'0px',
+               // border:'1px solid green',
                 '& .MuiInputBase-input': {
-                    color: 'white',
+                    color: 'black',
                 },
                 '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                        borderColor: 'blue',
+                        borderColor: 'black',
                     },
                     '&:hover fieldset': {
-                        borderColor: 'blue',
+                        borderColor: 'black',
                     },
                     '&.Mui-focused fieldset': {
-                        borderColor: 'blue',
+                        borderColor: 'black',
                     },
                 },
                 '& .MuiInputLabel-root': {
-                    color: 'white',
+                    color: 'black',
                 },
             }}
             InputLabelProps={{
-                style: { color: 'white' },
+                style: { color: 'black' },
             }}
         >
             {exercises.map((exercise) => (
