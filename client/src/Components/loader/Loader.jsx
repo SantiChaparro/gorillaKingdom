@@ -6,7 +6,7 @@ const LoaderContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   height: 'auto', // Puedes ajustar esto según dónde quieras usar el loader
-  backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fondo oscuro semi-transparente
+  //backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fondo oscuro semi-transparente
   marginTop:'200px'
 }));
 
@@ -17,8 +17,9 @@ const Loader = () => {
         size={80} // Tamaño del loader
         thickness={3} // Grosor del loader
         sx={{
-          color: 'blue', // Color personalizado
+          color: 'violet', // Color personalizado
           animationDuration: '1.5s', // Velocidad de la animación
+        //  backgroundColor:'trasnparent'
         }}
       />
     </LoaderContainer>

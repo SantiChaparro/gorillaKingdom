@@ -11,6 +11,9 @@ import RoutineNavBar from "../../../Components/routineNavBar/RoutineNavBar";
 import UserNavBar from "../../../Components/UserNavBar";
 import Loader from "../../../Components/loader/Loader";
 import Swal from 'sweetalert2';
+import { boxSizing, color, height, minHeight, width } from "@mui/system";
+import picture1 from '../../../../src/assests/imagenes/editRoutineLeft.png';
+import picture2 from '../../../../src/assests/imagenes/editRoutineRitght.png';
 
 const UpdateRoutine = () => {
     const { exercises, fetchExercises } = useExercisesStore();
@@ -324,8 +327,12 @@ const UpdateRoutine = () => {
     return (
         <MainContainer>
             
-            <CustomTitle>Editar rutina</CustomTitle>
-            <SearchBox>
+           
+            <ContentContainer>
+                <PictureleftContainer></PictureleftContainer>
+                <MainContentContainer>
+                <CustomTitle>Editar rutina</CustomTitle>
+                <SearchBox>
                 <TextField
                     label="Dni usuario"
                     variant="outlined"
@@ -333,12 +340,12 @@ const UpdateRoutine = () => {
                     onChange={handleUserId}
                     name="Dni usuario"
                     sx={{ ...textFieldStyles, width: '50%' }}
-                    InputLabelProps={{ style: { color: 'white' } }}
+                    InputLabelProps={{ style: { color: 'black' } }}
                 />
                 <Button
                     onClick={handleSearch}
                     sx={{
-                        backgroundColor: '#0028ff',
+                        background: 'linear-gradient(45deg, #C004FF, #730399)',
                         color: 'white',
                         width: '30%',
                         height: '55px',
@@ -355,31 +362,32 @@ const UpdateRoutine = () => {
                     <UserContainer>
                         <CustomTypography sx={{ marginBottom: '25px' }}>{user.nombre}</CustomTypography>
                         <Button
-                            sx={{ backgroundColor: '#0028ff', color: 'white', marginBottom: '30px' }}
+                            sx={{  background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', marginBottom: '30px', width:'100%' }}
                             onClick={handleIsAddingDays}
                         >
                             AGREGAR DIA
                         </Button>
                         {isAddingDays === true ? (
                             <AddnewDayContainer>
-                                <CustomTypography sx={{ color: 'white' }}>Dia a agregar</CustomTypography>
+                                <CustomTypography sx={{ color: 'black',marginBottom:'10px', fontWeight:'500' }}>Dia a agregar</CustomTypography>
                                 <TextField
                                     label="Dia a agregar"
                                     variant="outlined"
                                     value={dayToAdd.day || ""}
                                     onChange={handleNewDay}
                                     name="Dia a agregar"
-                                    sx={{ ...textFieldStyles, width: '45%', marginBottom: '15px' }}
-                                    InputLabelProps={{ style: { color: 'white' } }}
+                                    sx={{ ...textFieldStyles, width: '100%'}}
+                                    InputLabelProps={{ style: { color: 'black',textAlign:'center' } }}
+                                    inputProps={{ style: { textAlign: 'center' } }}
                                 />
                                 <Button
-                                    sx={{ backgroundColor: '#0028ff', color: 'white', marginTop: '10px', marginBottom: '2px', width: '100%' }}
+                                    sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', marginTop: '10px', marginBottom: '2px', width: '100%' }}
                                     onClick={() => { confirmAddDay(user.RoutineId, dayToAdd) }}
                                 >
                                     CONFIRMAR
                                 </Button>
                                 <Button
-                                    sx={{ backgroundColor: '#8a0bd2', color: 'white', marginTop: '10px', marginBottom: '30px', width: '100%' }}
+                                    sx={{background: 'linear-gradient(90deg, #4d4d4d, #b3b3b3)', color: 'white', marginTop: '10px', marginBottom: '30px', width: '100%' }}
                                     onClick={handleCancelAddDay}
                                 >CANCELAR</Button>
                             </AddnewDayContainer>
@@ -395,16 +403,18 @@ const UpdateRoutine = () => {
                                                 <IconButton
                                                     onClick={() => { handleDay(day.id); handleAddExercise(day.id) }}
                                                 >
-                                                    <AddBoxIcon sx={{ color: 'white', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
+                                                    <AddBoxIcon sx={{ color: 'black', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
                                                 </IconButton>
                                             </span>
                                         </Tooltip>
-                                        <Tooltip title="eliminar dia" open={true}>
+                                        <Tooltip  content="Eliminar día" color="white" placement="top" fontFamily="Nunito">
+                                            <span>
                                             <IconButton
                                                 onClick={() => { handleDeleteDay(user.RoutineId, day.id) }}
                                             >
-                                                <DeleteForeverIcon sx={{ color: 'white', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
+                                                <DeleteForeverIcon sx={{ color: 'black', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
                                             </IconButton>
+                                            </span>
                                         </Tooltip>
                                     </DayMenuContainer>
                                     {isAddingDayId === day.id && (
@@ -418,7 +428,7 @@ const UpdateRoutine = () => {
                                                 />
                                                 {currentExercise !== null && (
                                                     <Box>
-                                                        <Typography sx={{ color: 'white' }}>series y reps</Typography>
+                                                        <Typography sx={{ color: 'black' }}>series y reps</Typography>
                                                         <TextField
                                                             key={currentExercise}
                                                             sx={{ ...textFieldDetailStyles }}
@@ -427,7 +437,7 @@ const UpdateRoutine = () => {
                                                             onChange={(event) => handleDetail(event, currentExercise)}
                                                             placeholder={`Ejercicio ${currentExercise}`}
                                                             InputLabelProps={{
-                                                                style: { color: 'white' }
+                                                                style: { color: 'black' }
                                                             }}
                                                         />
                                                     </Box>
@@ -435,13 +445,13 @@ const UpdateRoutine = () => {
                                                 <AddExerciseButtonContainer>
                                                     <Button
                                                         onClick={() => { handleSaveNewExercise(user.RoutineId, addExercise) }}
-                                                        sx={{ backgroundColor: '#0028ff', color: 'white', width: '100%' }}
+                                                        sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', width: '100%' }}
                                                     >
                                                         GRABAR CAMBIOS
                                                     </Button>
                                                     <Button
                                                         onClick={handleCancelAddExercise}
-                                                        sx={{ backgroundColor: '#8a0bd2', color: 'white', marginTop: '10px' }}
+                                                        sx={{ background: 'linear-gradient(90deg, #4d4d4d, #b3b3b3)', color: 'white', marginTop: '10px' }}
                                                     >
                                                         CANCELAR
                                                     </Button>
@@ -463,15 +473,15 @@ const UpdateRoutine = () => {
                                                         onChange={handleInputChange}
                                                         sx={textFieldDetailStyles}
                                                     />
-                                                    <Button onClick={() => { handleSave(exercise.id) }} sx={{ backgroundColor: '#0028ff', color: 'white', marginTop: '10px' }}>Grabar cambios</Button>
-                                                    <Button onClick={handleCancel} sx={{ backgroundColor: '#8a0bd2', color: 'white', marginTop: '10px' }}>Cancelar</Button>
+                                                    <Button onClick={() => { handleSave(exercise.id) }} sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', marginTop: '10px' }}>Grabar cambios</Button>
+                                                    <Button onClick={handleCancel} sx={{ background: 'linear-gradient(90deg, #4d4d4d, #b3b3b3)', color: 'white', marginTop: '10px' }}>Cancelar</Button>
                                                 </Box>
                                             ) : (
                                                 <>
                                                     <RoutineTypography>{exercise.nombre}</RoutineTypography>
                                                     <ButtonContainer>
-                                                        <Button onClick={() => handleEdit(dayIndex, exerciseIndex, exercise.id)} sx={{ backgroundColor: '#0028ff', color: 'white' }}>Editar</Button>
-                                                        <Button sx={{ backgroundColor: '#8a0bd2', color: 'white' }}
+                                                        <Button onClick={() => handleEdit(dayIndex, exerciseIndex, exercise.id)} sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white' }}>Editar</Button>
+                                                        <Button sx={{ background: 'linear-gradient(90deg, #4d4d4d, #b3b3b3)', color: 'white' }}
                                                             onClick={() => handleDelete(exercise.id)}
                                                         >Eliminar</Button>
                                                     </ButtonContainer>
@@ -487,7 +497,11 @@ const UpdateRoutine = () => {
                     <CustomTypography>El usuario no tiene rutina creada aún</CustomTypography>
                 )
             )}
-
+                </MainContentContainer>
+           
+            <PictureRightContainer></PictureRightContainer>
+            </ContentContainer>
+           
         </MainContainer>
     );
 };
@@ -496,27 +510,106 @@ export default UpdateRoutine;
 
 const MainContainer = styled(Box)(({ theme }) => ({
     width: '100vw',
-    height: '100%',
+    minHeight: '100vh',
     padding: '15px',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    backgroundColor: 'black'
+    backgroundColor: 'white',
+    
+
+    [theme.breakpoints.up('md')]: {
+        width: 'calc(100vw - 240px)',
+       height:'100vh',
+        marginLeft: '240px',
+        padding: '0',
+        boxSizing:'border-box',
+        
+
+      },
+}));
+
+const ContentContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: '100%',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    
+
+    [theme.breakpoints.up('md')]: {
+       display:'flex',
+       flexDirection:'row',
+       
+      },
+}));
+
+const MainContentContainer = styled(Box)(({ theme }) => ({
+    width:'100%',
+    backgroundColor:'white',
+
+    [theme.breakpoints.up('md')]: {
+       width:'60%',
+       height:'100%',
+       display:'flex',
+       flexDirection:'column',
+       alignItems:'center',
+       backgroundColor:'white',
+      overflowY: 'auto', // Habilita el scroll en pantallas más grandes también
+       maxHeight: '100vh', // Asegura que el scroll también funcione en dispositivos má
+       
+      },
+}));
+
+const PictureleftContainer = styled(Box)(({ theme }) => ({
+   
+
+    [theme.breakpoints.up('md')]: {
+       width:'25%',
+       height:'100%',
+       backgroundImage: `url(${picture1})`, // Aplicamos la imagen
+        backgroundSize: 'cover', // Hace que la imagen cubra todo el contenedor
+        backgroundPosition: 'center', // Centra la imagen
+        backgroundRepeat: 'no-repeat', // Evita que la imagen se repita
+       
+      },
+}));
+
+const PictureRightContainer = styled(Box)(({ theme }) => ({
+   
+    
+
+    [theme.breakpoints.up('md')]: {
+       
+        width:'25%',
+        height:'100%',
+        backgroundImage: `url(${picture2})`, // Aplicamos la imagen
+         backgroundSize: 'cover', // Hace que la imagen cubra todo el contenedor
+         backgroundPosition: 'center', // Centra la imagen
+         backgroundRepeat: 'no-repeat', // Evita que la imagen se repita
+        
+       
+      },
 }));
 
 const CustomTitle = styled(Typography)(({ theme }) => ({
-    marginTop:'100px',
-    fontFamily: "Bebas Neue",
-    fontWeight: '400',
+    marginTop:'50px',
+    marginBottom:'50px',
+    fontFamily: "Nunito",
+    fontWeight: '700',
     fontSize: '3em',
-    color: 'white'
+    color: 'black',
+    textAlign:'center'
 }));
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
-    fontFamily: "Bebas Neue",
+    fontFamily: "Nunito",
     fontSize: '2em',
-    color: 'white'
+    color: 'black',
+    textAlign:'center'
 }));
 
 const UserContainer = styled(Box)(({ theme }) => ({
@@ -526,7 +619,14 @@ const UserContainer = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: '15px'
+    marginTop: '15px',
+    boxSizing:'border-box',
+
+    [theme.breakpoints.up('md')]: {
+        width: '100%',
+        padding:'15px',
+        boxSizing:'border-box'
+      },
 }));
 
 const SearchBox = styled(Box)(({ theme }) => ({
@@ -534,7 +634,13 @@ const SearchBox = styled(Box)(({ theme }) => ({
     height: '150px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+
+    [theme.breakpoints.up('md')]: {
+        width: '40%',
+       
+        boxSizing:'border-box'
+      },
 }));
 
 const RoutineContainer = styled(Box)(({ theme }) => ({
@@ -542,7 +648,9 @@ const RoutineContainer = styled(Box)(({ theme }) => ({
     height: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    overflowY: 'auto', // Habilita el scroll en pantallas más grandes también
+       maxHeight: '100vh', // Asegura que el scroll también funcione en dispositivos má
 }));
 
 const RoutineDisplay = styled(Box)(({ theme }) => ({
@@ -552,27 +660,33 @@ const RoutineDisplay = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     marginBottom: '15px',
-    borderBottom: '1px solid blue'
+    borderBottom: '1px solid gray'
 }));
 
 const textFieldStyles = {
     width: '100%',
     '& .MuiInputBase-input': {
-        color: 'white'
+        color: 'black', // El color del texto
+       backgroundColor: 'white', // El fondo del campo de entrada
     },
     '& .MuiOutlinedInput-root': {
+        backgroundColor: 'white', // Fondo blanco del input completo
+        color:'black',
         '& fieldset': {
-            borderColor: 'blue',
+            borderColor: 'black', // Color del borde por defecto
         },
         '&:hover fieldset': {
-            borderColor: 'blue',
+            borderColor: 'violet', // Color del borde al hacer hover
         },
         '&.Mui-focused fieldset': {
-            borderColor: 'blue',
+            borderColor: 'violet', // Color del borde cuando está enfocado
+           // backgroundColor:'white',
+          //  color:'black'
+
         },
     },
     '& .MuiInputLabel-root': {
-        color: 'white',
+        color: 'white', // Color de la etiqueta
     }
 };
 
@@ -580,26 +694,26 @@ const textFieldDetailStyles = {
     width: '100%',
     marginBottom: '10px',
     '& .MuiInputBase-input': {
-        color: 'white'
+        color: 'black'
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
-            borderColor: 'blue',
+            borderColor: 'black',
         },
         '&:hover fieldset': {
-            borderColor: 'blue',
+            borderColor: 'violet',
         },
         '&.Mui-focused fieldset': {
-            borderColor: 'blue',
+            borderColor: 'violet',
         },
     },
     '& .MuiInputLabel-root': {
-        color: 'white',
+        color: 'black',
     }
 };
 
 const RoutineTypography = styled(Typography)(({ theme }) => ({
-    color: 'white'
+    color: 'black'
 }));
 
 const ButtonContainer = styled(Box)(({ theme }) => ({
@@ -626,7 +740,7 @@ const DayMenuContainer = styled(Box)(({ theme }) => ({
 const CustomTooltip = styled(Tooltip)(({ theme }) => ({
     tooltip: {
         backgroundColor: '#0028ff',
-        color: 'white',
+        color: 'black',
         fontSize: '0.75rem',
         borderRadius: '4px',
         padding: '8px'
@@ -659,7 +773,7 @@ const AddnewDayContainer = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '20px',
+   // marginTop: '20px',
     marginBottom: '20px',
     borderBottom: 'solid 1px blue'
 
