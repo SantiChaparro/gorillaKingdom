@@ -282,7 +282,7 @@ export default NewUserForm;
 // Estilos
 const MainContainer = styled(Box)(({ theme }) => ({
   width: '100vw', 
-  height: 'auto',
+  height: '100vh',
   padding: '0',
   boxSizing: 'border-box',
   display: 'flex',
