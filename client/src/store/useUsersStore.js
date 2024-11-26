@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export const useUsersStore = create((set) => ({
     users: [],
@@ -21,8 +22,17 @@ export const useUsersStore = create((set) => ({
             const response = await axios.get(`http://localhost:3001/master/findUsers/${dni}`)
             console.log('respuesta desde el store',response.data);
             set({searchedUser:response.data});
+           
         } catch (error) {
-            console.error('error desde store:', error);
+            if (error.response && error.response.status === 404) {
+                console.log(error.response);
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Usuario no encontrado',
+                });
+            }
         }
     },
 

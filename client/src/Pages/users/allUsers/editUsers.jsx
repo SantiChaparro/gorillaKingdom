@@ -205,10 +205,10 @@ const EditUsers = () => {
                 ) : (
                    
                        
-                         <CustomTableContainer component={Paper} >
+                         <CustomTableContainer component={Paper} elevation={4} >
                         <Table sx={{border:'none', height:'100%'}}>
-                            <TableHead>
-                                <TableRow>
+                            <TableHead >
+                                <TableRow >
                                     <TableCell sx={{color:'black',textAlign:'center',width:'30%', fontWeight:'600'}}>Usuario</TableCell>
                                     <TableCell sx={{color:'black',textAlign:'center',width:'30%', fontWeight:'600'}}>DNI</TableCell>
                                     <TableCell sx={{color:'black',textAlign:'center',width:'40%', fontWeight:'600'}}>Acciones</TableCell>
@@ -220,7 +220,7 @@ const EditUsers = () => {
                                     key={user.dni}
                                     sx={{
                                         '&:not(:last-child) td': {
-                                            borderBottom: '1px solid #C004FF', // Línea divisoria violeta entre filas
+                                            borderBottom: '2px solid #ca99ef', // Línea divisoria violeta entre filas
                                         },
                                     }}
                                     >
@@ -420,17 +420,21 @@ const MainContainer = styled(Box)(({ theme }) => ({
 
   const CustomTableContainer = styled(Box)(({ theme }) => ({
     width: '100%',
-    height:'100%',
+    maxHeight:'550px',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     padding: '20px',
     margin:'0px',
+    overflowY:'auto',
     
     // Estilos para diferentes tamaños de pantalla usando el theme
     [theme.breakpoints.up('md')]: {
-        maxWidth:'100%'
+        maxWidth:'100%',
+        maxHeight:'650px',
+        overflowY:'auto'
+        
     },
   
   }));
@@ -488,7 +492,7 @@ const StyledButton = styled(Button)({
 });
 
 const CancelButton = styled(Button)({
-    backgroundColor: '#6c757d',
+    background: 'linear-gradient(90deg, #4d4d4d, #b3b3b3)',
     color: 'white',
 });
 
@@ -505,15 +509,15 @@ const textFieldStyles = {
     '& .MuiOutlinedInput-root': {
       borderRadius: '5px', // Aquí aplicamos el border-radius por defecto
       '& fieldset': {
-        border: '1px solid black', // Sin borde por defecto
+        border: '2px solid #ca99ef', // Sin borde por defecto
       },
       '&:hover fieldset': {
-        border: '2px solid transparent', // Borde transparente en hover
+        border: '2px solid #ca99ef', // Borde transparente en hover
         borderImage: 'linear-gradient(45deg, #C004FF, #730399) 1', // Gradiente en hover
         borderRadius: '5px', // Aplicar border-radius en hover
       },
       '&.Mui-focused fieldset': {
-        border: '2px solid transparent', // Mantener borde cuando está enfocado
+        border: '2px solid #ca99ef', // Mantener borde cuando está enfocado
         borderImage: 'linear-gradient(45deg, #C004FF, #730399) 1', // Gradiente en foco
         borderRadius: '5px', // Mantener el border-radius cuando está enfocado
       },

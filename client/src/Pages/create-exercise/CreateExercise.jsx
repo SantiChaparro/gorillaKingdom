@@ -12,6 +12,9 @@ import {
   FormHelperText,
 } from "@mui/material";
 import Swal from 'sweetalert2';
+import { border, boxSizing, display, height, maxWidth, padding, width } from "@mui/system";
+import picture from '../../../src/assests/imagenes/createExercise.png'
+import zIndex from "@mui/material/styles/zIndex";
 
 const initialValues = {
   nombre: "",
@@ -68,47 +71,171 @@ const MainContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  backgroundColor: "black",
+  backgroundColor: "white",
+
+  [theme.breakpoints.up('md')]: {
+    width: 'calc(100vw - 240px)',
+    height:'100vh',
+    marginLeft: '240px',
+    padding: '0',
+    boxSizing:'border-box',
+    
+
+  },
 }));
 
+const ContentContainer = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "100vh",
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent:'space-between',
+ 
+  [theme.breakpoints.up('md')]: {
+    maxWidth: '100%',
+    height:'100vh',
+    padding: '0',
+    boxSizing:'border-box',
+    backgroundColor:'white',
+ 
+
+  },
+}));
+
+const MainContentContainer = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "100%",
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: 'flex-start',
+ 
+  [theme.breakpoints.up('md')]: {
+    maxWidth: '40%',
+    height:'100%',
+    padding: '10px',
+    boxSizing:'border-box',
+    backgroundColor:'white',
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    justifyContent:'center'
+
+    
+  },
+}));
+
+const LeftBox = styled(Box)(({ theme }) => ({
+ display:'none',
+ 
+  [theme.breakpoints.up('md')]: {
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    justifyContent:'center',
+    width: '25%',
+    height:'100%',
+    boxSizing:'border-box',
+    backgroundImage:`url(${picture})`,
+    
+    
+  },
+}));
+
+const RightBox = styled(Box)(({ theme }) => ({
+  display:'none',
+  
+   [theme.breakpoints.up('md')]: {
+     display:'block',
+     flexDirection:'column',
+     alignItems:'center',
+     justifyContent:'center',
+     width: '25%',
+     height:'100vh',
+     backgroundImage:`url(${picture})`,
+     boxSizing:'border-box',
+    
+ 
+     
+   },
+ }));
+
+ const ParagraphContainer = styled(Box)(({ theme }) => ({
+  display:'none',
+  
+   [theme.breakpoints.up('md')]: {
+    width:'100%',
+    height:'100%',
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    justifyContent:'center',
+    boxSizing:'border-box',
+    padding:'15px',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Fondo con transparencia
+    backdropFilter: 'blur(10px)', // Efecto de desenfoque
+    borderRadius: '15px', // Bordes redondeados para un estilo más suave
+    padding: '20px', // Espaciado interno
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Sombra suave para mayor cont
+   // zIndex:1000,
+   },
+ }));
+
+
+ const StyledForm = styled('form')(({ theme }) => ({
+  maxWidth: '100%',
+  marginTop: '100px', // Reducir el margen superior del formulario para vista móvil
+  [theme.breakpoints.up('md')]: {
+    maxWidth: '100%', 
+    height: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: '50px', // Margen más amplio para pantallas grandes
+  },
+}));
+
+
+
 const CustomTitle = styled(Typography)(({}) => ({
-  fontFamily: "Bebas Neue",
-  fontWeight: "400",
+  fontFamily: "Nunito",
+  fontWeight: "700",
   fontSize: "3em",
-  color: "white",
-  marginBottom: "30px",
-  marginTop:'100px'
+  color: "black",
+  textAlign:'center',
+   marginTop:'50px',
+ 
 }));
 
 
 const textFieldStyles = {
-  width: "100%", 
-  marginBottom: "20px", 
+  width: "100%",
+  marginBottom: "20px",
   "& .MuiInputBase-input": {
-    color: "white", 
-
+    color: "black", // Asegura que el texto sea visible
   },
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: "blue", 
+      borderColor: "black", 
+      //backgroundColor: 'white',
     },
     "&:hover fieldset": {
-      borderColor: "blue",
+      borderColor: "violet",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "blue", 
+      borderColor: "violet", 
     },
   },
   "& .MuiInputLabel-root": {
-    color: "white", 
-  },
-  "& .MuiSelect-select": {
-    width: "100%", 
+    color: "black", // Asegura que el label sea negro
   },
   "& .MuiFormHelperText-root": {
-    color: "white", 
+    color: "black", // Color del texto de ayuda
   },
 };
+
 
 const CreateExercise = () => {
   const { newExercise } = useExercisesStore();
@@ -123,8 +250,26 @@ const CreateExercise = () => {
 
   return (
     <MainContainer>
-      <CustomTitle>Crear ejercicio</CustomTitle>
-      <form style={{ marginTop: "100px" }} onSubmit={formik.handleSubmit}>
+       
+      <ContentContainer>
+      <LeftBox>
+      <ParagraphContainer>
+        <Typography sx={{
+          color:'black',
+          fontFamily:'Nunito',
+          fontSize:'30px',
+          fontWeight:'700',
+          textAlign:'center',
+          lineHeight:0.8
+          
+          }}>Usa tu imaginación...</Typography>
+          <Typography sx={{textAlign:'center',lineHeight:1.1, marginTop:'10px', fontFamily:'Nunito'}}>Crea ejercicios personalizados, que se ajusten a la necesidad de tus clientes.</Typography>
+          <Typography sx={{marginTop:'50px', fontFamily:'Nunito',fontSize:'22px',fontWeight:'600',textAlign:'center'}}>"Personaliza cada movimiento, alcanza nuevas metas."</Typography>
+      </ParagraphContainer>
+     </LeftBox>
+     <MainContentContainer>
+     <CustomTitle>Crear ejercicio</CustomTitle>
+     <StyledForm  onSubmit={formik.handleSubmit}>
         <FormControl fullWidth>
           <Box>
             <TextField
@@ -142,7 +287,7 @@ const CreateExercise = () => {
                 ) : ""
               }
             />
-            <FormControl fullWidth sx={{ ...textFieldStyles, marginTop: "20px" }}>
+            <FormControl fullWidth >
               <TextField
                 select
                 label="Grupo muscular"
@@ -151,7 +296,7 @@ const CreateExercise = () => {
                 onBlur={formik.handleBlur}
                 name="grupo_muscular"
                 variant="outlined"
-                sx={{ width: "100%" }}
+                sx={textFieldStyles}
                 error={formik.touched.grupo_muscular && Boolean(formik.errors.grupo_muscular)}
                 helperText={
                   formik.touched.grupo_muscular && formik.errors.grupo_muscular ? (
@@ -178,7 +323,7 @@ const CreateExercise = () => {
               rows={4}
               variant="outlined"
               fullWidth
-              sx={{ ...textFieldStyles, marginTop: "20px" }}
+              sx={{ ...textFieldStyles }}
               error={formik.touched.descripcion && Boolean(formik.errors.descripcion)}
               helperText={
                 formik.touched.descripcion && formik.errors.descripcion ? (
@@ -191,20 +336,33 @@ const CreateExercise = () => {
           <Button
             type="submit"
             sx={{
-              backgroundColor: "#0028ff",
+              background: 'linear-gradient(45deg, #C004FF, #730399)',
               color: "white",
               width: "100%",
               height: "60px",
-              marginTop: "20px",
+              marginTop: "70px",
               "&:hover": {
                 backgroundColor: "#0028ff",
               },
             }}
           >
-            Enviar
+            Crear  ejercicio
           </Button>
         </FormControl>
-      </form>
+      </StyledForm>
+     </MainContentContainer>
+    
+      <RightBox>
+          <ParagraphContainer>
+            <Typography>Simplemente...</Typography>
+            <Typography>Elige un nombre para tu ejercicio.</Typography>
+            <Typography>Asígnalo a un grupo muscular.</Typography>
+            <Typography>Agrega una simple descripción.</Typography>
+            <Typography>Presiona crear ejercicio y listo....</Typography>
+          </ParagraphContainer>
+      </RightBox>
+      </ContentContainer>
+     
     </MainContainer>
   );
 };

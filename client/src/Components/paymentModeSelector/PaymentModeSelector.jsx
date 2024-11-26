@@ -11,22 +11,24 @@ const PaymentModeSelector = ({ selectedPaymentmode, handlePaymentModeChange }) =
       fullWidth
       sx={{
         "& .MuiOutlinedInput-root": {
-          color: "white",
+          backgroundColor:'white',
+          color: "black",
           "& fieldset": {
-            borderColor: "blue",
+            borderColor: "black",
           },
           "&:hover fieldset": {
-            borderColor: "blue",
+            borderColor: "#ca99ef",
+            border:'2px solid #ca99ef'
           },
           "&.Mui-focused fieldset": {
-            borderColor: "blue",
+            borderColor: "#ca99ef",
           },
         },
         "& .MuiInputBase-input": {
-          color: "white",
+          color: "black",
         },
         "& .MuiInputLabel-root": {
-          color: "white",
+          color: "black",
         },
         marginTop: 3, // Para dar algo de separación con la tabla
       }}
