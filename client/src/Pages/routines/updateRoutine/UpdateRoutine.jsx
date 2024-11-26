@@ -11,7 +11,7 @@ import RoutineNavBar from "../../../Components/routineNavBar/RoutineNavBar";
 import UserNavBar from "../../../Components/UserNavBar";
 import Loader from "../../../Components/loader/Loader";
 import Swal from 'sweetalert2';
-import { boxSizing, color, height, minHeight, width } from "@mui/system";
+import { boxSizing, color, height, maxHeight, minHeight, width } from "@mui/system";
 import picture1 from '../../../../src/assests/imagenes/editRoutineLeft.png';
 import picture2 from '../../../../src/assests/imagenes/editRoutineRitght.png';
 
@@ -92,7 +92,7 @@ const UpdateRoutine = () => {
             setLoading(true);
             try {
                 await getUserById(userId);
-    
+                
                 // Simular un retraso de 2 segundos antes de ocultar el loader
                 setTimeout(() => {
                     setLoading(false);
@@ -392,13 +392,13 @@ const UpdateRoutine = () => {
                                 >CANCELAR</Button>
                             </AddnewDayContainer>
                         ) : null}
-                        <RoutineContainer>
+                        <RoutineContainer >
                             {user.Routine.DayOfWeeks.map((day, dayIndex) => (
                                 <RoutineDisplay key={dayIndex}>
                                     <DayMenuContainer>
                                         <CustomTypography>{`Día ${day.id}`}</CustomTypography>
 
-                                        <Tooltip content="Agregar ejercicio" color="white" placement="top">
+                                        <Tooltip content="Agregar ejercicio" color="white" placement="top" arrow="true" style={{backgroundColor:'black', borderRadius:'10px',color:'white',padding:'5px',boxShadow:'0 4px 8px rgba(0, 0, 0, 0.15)',fontFamily:'Nunito',transition: 'opacity 0.2s ease, transform 0.2s ease',transitionDelay: '0s'}}>
                                             <span> {/* Añadir un span envolviendo el IconButton */}
                                                 <IconButton
                                                     onClick={() => { handleDay(day.id); handleAddExercise(day.id) }}
@@ -407,7 +407,7 @@ const UpdateRoutine = () => {
                                                 </IconButton>
                                             </span>
                                         </Tooltip>
-                                        <Tooltip  content="Eliminar día" color="white" placement="top" fontFamily="Nunito">
+                                        <Tooltip  content="Eliminar día" color="white" placement="top" arrow="true" style={{backgroundColor:'black', borderRadius:'10px',color:'white',padding:'5px',boxShadow:'0 4px 8px rgba(0, 0, 0, 0.15)',fontFamily:'Nunito',transition: 'opacity 0.2s ease, transform 0.2s ease',transitionDelay: '0s'}}>
                                             <span>
                                             <IconButton
                                                 onClick={() => { handleDeleteDay(user.RoutineId, day.id) }}
@@ -597,7 +597,7 @@ const PictureRightContainer = styled(Box)(({ theme }) => ({
 
 const CustomTitle = styled(Typography)(({ theme }) => ({
     marginTop:'50px',
-    marginBottom:'50px',
+   // marginBottom:'25px',
     fontFamily: "Nunito",
     fontWeight: '700',
     fontSize: '3em',
@@ -619,7 +619,7 @@ const UserContainer = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: '15px',
+    //marginTop: '15px',
     boxSizing:'border-box',
 
     [theme.breakpoints.up('md')]: {
@@ -643,6 +643,7 @@ const SearchBox = styled(Box)(({ theme }) => ({
       },
 }));
 
+
 const RoutineContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     height: 'auto',
@@ -651,6 +652,13 @@ const RoutineContainer = styled(Box)(({ theme }) => ({
     alignItems: 'center',
     overflowY: 'auto', // Habilita el scroll en pantallas más grandes también
        maxHeight: '100vh', // Asegura que el scroll también funcione en dispositivos má
+
+    [theme.breakpoints.up('md')]: {
+        width: '100%',
+        maxHeight:'400px',
+       
+        boxSizing:'border-box'
+      },
 }));
 
 const RoutineDisplay = styled(Box)(({ theme }) => ({

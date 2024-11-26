@@ -32,14 +32,14 @@ const SearchBar = ({ handleSearch, resetSearchValue }) => {
                     width: '100%',
                     '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                            borderColor: '#C004FF', // Cambiar el color del borde a violeta
+                            borderColor: '#ca99ef', // Cambiar el color del borde a violeta
                            
                         },
                         '&:hover fieldset': {
-                            borderColor: '#C004FF', // Cambiar el color del borde al pasar el mouse
+                            borderColor: '#ca99ef', // Cambiar el color del borde al pasar el mouse
                         },
                         '&.Mui-focused fieldset': {
-                            borderColor: '#C004FF', // Cambiar el color del borde cuando el input está enfocado
+                            borderColor: '#ca99ef', // Cambiar el color del borde cuando el input está enfocado
                         },
                         '& .MuiInputBase-input': {
                             color: 'black', // Cambiar el color del texto a negro

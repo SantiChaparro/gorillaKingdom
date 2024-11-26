@@ -7,6 +7,9 @@ import Loader from '../../Components/loader/Loader';
 import dayjs from "dayjs";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import { boxSizing, display, height, maxWidth } from "@mui/system";
+import picture1 from '../../../src/assests/imagenes/payment1.png';
+import picture2 from '../../../src/assests/imagenes/payment2.png';
 
 
 
@@ -135,6 +138,8 @@ const Payments = () => {
 
   return (
     <MainContainer>
+      <LeftBox></LeftBox>
+      <MainContentContainer>
       <CustomTitle>Nuevo Pago</CustomTitle>
       <SearchBox>
         <TextField
@@ -144,35 +149,35 @@ const Payments = () => {
           onChange={handleUserId}
           name="Dni usuario"
           sx={{ ...textFieldStyles, width: "50%" }}
-          InputLabelProps={{ style: { color: "white" } }}
+          InputLabelProps={{ style: { color: "black" } }}
         />
         <Button
           onClick={handleSearch}
           sx={{
-            backgroundColor: "#0028ff",
+            background: 'linear-gradient(45deg, #C004FF, #730399)',
             color: "white",
             width: "30%",
             height: "55px",
-            "&:hover": { backgroundColor: "#0028ff" }
+           
           }}
         >
           BUSCAR
         </Button>
       </SearchBox>
-      <TableContainer component={Paper} sx={{ width: '100%', marginTop: 2, backgroundColor: "black" }}>
+      <TableContainer component={Paper} elevation={4} sx={{ width: '100%', marginTop: 2, backgroundColor: "white",marginBottom:4 }}>
         <Table >
           <TableHead>
-            <TableRow sx={{ width: '100%', borderBottom: "2px solid blue" }}>
-              <TableCell sx={{ fontSize: '20px', color: "white", borderBottom: "none" }}>Actividad</TableCell>
-              <TableCell sx={{ fontSize: '20px', color: "white", borderBottom: "none" }}>Costo</TableCell>
-              <TableCell sx={{ fontSize: '20px', color: "white", borderBottom: "none" }}>Importe</TableCell>
+            <TableRow sx={{ width: '100%', borderBottom: "2px solid #ca99ef" }}>
+              <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Actividad</TableCell>
+              <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Costo</TableCell>
+              <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Importe</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredActivities.map((activity) => (
-              <TableRow key={activity.id} sx={{ borderBottom: "2px solid blue" }}>
-                <TableCell sx={{ fontSize: '15px', color: "white", borderBottom: "none" }}>{activity.nombre}</TableCell>
-                <TableCell sx={{ color: "white", borderBottom: "none" }}>{`$${activity.costo}`}</TableCell>
+              <TableRow key={activity.id} sx={{ borderBottom: "2px solid #ca99ef" }}>
+                <TableCell sx={{ fontSize: '15px', color: "black", borderBottom: "none" }}>{activity.nombre}</TableCell>
+                <TableCell sx={{ color: "black", borderBottom: "none" }}>{`$${activity.costo}`}</TableCell>
                 <TableCell sx={{ borderBottom: "none" }}>
                   <TextField
                     type="number"
@@ -181,19 +186,19 @@ const Payments = () => {
                     sx={{
                       width: "100px",
                       "& .MuiOutlinedInput-root": {
-                        color: "white",
+                        color: "black",
                         "& fieldset": {
-                          borderColor: "white",
+                          borderColor: "black",
                         },
                         "&:hover fieldset": {
-                          borderColor: "white",
+                          borderColor: "black",
                         },
                         "&.Mui-focused fieldset": {
-                          borderColor: "white",
+                          borderColor: "black",
                         },
                       },
                       "& .MuiInputBase-input": {
-                        color: "white",
+                        color: "black",
                       }
                     }}
                   />
@@ -213,18 +218,18 @@ const Payments = () => {
         type="submit"
         onClick={handleSubmit}
         sx={{
-          backgroundColor: "#0028ff",
+          background: 'linear-gradient(45deg, #C004FF, #730399)',
           color: "white",
           width: "100%",
           height: "60px",
           marginTop: "100px",
-          "&:hover": {
-            backgroundColor: "#0028ff",
-          },
+         
         }}
       >
         GENERAR PAGO
       </Button>
+      </MainContentContainer>
+      <RightBox></RightBox>
     </MainContainer>
   );
 };
@@ -233,21 +238,100 @@ export default Payments;
 
 const MainContainer = styled(Box)(({ theme }) => ({
   width: '100vw',
-  height: '100%',
+  height: '100vh',
   padding: '15px',
   boxSizing: 'border-box',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: 'black'
+  backgroundColor: 'white',
+
+  [theme.breakpoints.up('md')]: {
+    width: 'calc(100vw - 240px)',
+    height:'100vh',
+    marginLeft: '240px',
+    display:'flex',
+    padding:'0',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    backgroundColor:'white'
+   
+    //justifyContent: 'space-around',
+  },
 }));
+
+const MainContentContainer = styled(Box)(({ theme }) => ({
+  width: '100vw',
+  height: '100%',
+  padding:'15px',
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  backgroundColor: 'white',
+
+  [theme.breakpoints.up('md')]: {
+    maxWidth: '50%',
+    height:'100vh',
+    boxSizing:'border-box',
+    //justifyContent:'center',
+  
+   
+    
+  },
+ 
+}));
+
+const LeftBox = styled(Box)(({ theme }) => ({
+  display:'none',
+  [theme.breakpoints.up('md')]: {
+    display: 'block',
+    width: '25%',
+    height: '100%',
+    boxSizing: 'border-box',
+    //marginTop:'50px',
+    backgroundImage: `url(${picture1})`,
+    backgroundSize: 'cover',  // Asegura que la imagen cubra todo el área
+    backgroundPosition: 'center',  // Centra la imagen
+    backgroundRepeat: 'no-repeat',  // Evita que la imagen se repita
+  },
+}));
+
+const RightBox = styled(Box)(({ theme }) => ({
+ display:'none',
+  [theme.breakpoints.up('md')]: {
+    display: 'block',
+    width: '25%',
+    height: '100%',
+    boxSizing: 'border-box',
+    backgroundImage: `url(${picture2})`,
+    backgroundSize: 'cover',  // Asegura que la imagen cubra todo el área
+    backgroundPosition: 'center',  // Centra la imagen
+    backgroundRepeat: 'no-repeat',  // Evita 
+    
+  
+   
+    
+  },
+ 
+}));
+
+
 
 const CustomTitle = styled(Typography)(({ theme }) => ({
   marginTop: '100px',
-  fontFamily: "Bebas Neue",
-  fontWeight: '400',
+  fontFamily: "Nunito",
+  fontWeight: '700',
   fontSize: '3em',
-  color: 'white'
+  color: 'black',
+
+  [theme.breakpoints.up('md')]: {
+    marginTop:'40px',
+    marginBottom:'100px'
+ 
+   
+    
+  },
 }));
 
 const SearchBox = styled(Box)(({ theme }) => ({
@@ -260,21 +344,24 @@ const SearchBox = styled(Box)(({ theme }) => ({
 
 const textFieldStyles = {
   width: '100%',
+ backgroundColor: 'white',
+ borderRadius: '5px',
   '& .MuiInputBase-input': {
-    color: 'white'
+      color: 'black'
   },
   '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'blue',
-    },
-    '&:hover fieldset': {
-      borderColor: 'blue',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'blue',
-    },
+      '& fieldset': {
+          borderColor: 'black',
+      },
+      '&:hover fieldset': {
+          //borderColor: '#ca99ef',
+          border:'2px solid #ca99ef'
+      },
+      '&.Mui-focused fieldset': {
+          borderColor: '#ca99ef',
+      },
   },
   '& .MuiInputLabel-root': {
-    color: 'white',
+      color: 'black',
   }
 };

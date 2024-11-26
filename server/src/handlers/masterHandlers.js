@@ -64,7 +64,6 @@ const getUsers = async (req, res) => {
     const { dni } = req.params;
 
     console.log(dni);
-    
 
     try {
         let user;
@@ -78,16 +77,14 @@ const getUsers = async (req, res) => {
         }
 
         if (user !== null && (Array.isArray(user) ? user.length > 0 : true)) {
-            res.status(200).json(user);}
-            console.log('usuario',user);
-            
-        // } else {
-        //     res.status(404).send('Usuario no encontrado');
-        // }
+            console.log('usuario', user);
+            res.status(200).json(user);
+        } else {
+            res.status(404).send({message:'Usuario no encontrado'});
+        }
     } catch (error) {
-        console.log('error desde el handler',error);
-        
-        res.status(500).send({error:error.message});
+        console.log('error desde el handler', error);
+        res.status(500).send({ error: error.message });
     }
 };
 

@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useActivitiesStore } from "../../store/useActiviriesStore";
-import { Select, MenuItem, Box, InputLabel, FormControl, Typography, Button } from "@mui/material";
+import { Select, MenuItem, Box, InputLabel, FormControl, Typography, Button,IconButton  } from "@mui/material";
 import Swal from 'sweetalert2';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChange, userDni , setIsEditing}) => {
     const { activities, fetchActivities, userActivities, fetchUserActivities, deleteUserActivity } = useActivitiesStore();
@@ -46,7 +47,7 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
         <Box>
             {activities && activities.length > 0 ? (
                 <FormControl fullWidth sx={{ ...formControlStyles }}>
-                    <InputLabel sx={{ color: 'white' }}>Actividades</InputLabel>
+                    <InputLabel sx={{ color: 'black' }}>Actividades</InputLabel>
                     <Select
                         value={selectedActivity}
                         onChange={handleActivityChange}
@@ -64,13 +65,17 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
                                 color: 'black', // Color del texto para el valor seleccionado
                             },
                             '& .MuiInputLabel-root': {
-                                color: 'black', // Asegúrate de que la etiqueta sea legible
+                                color: 'black', // Asegúrate de que la etiqueta sea siempre negra
+                                '&.Mui-focused': {
+                                    color: 'black', // Mantener negro cuando está enfocado
+                                },
+                                
                             },
                         }}
                         MenuProps={{
                             PaperProps: {
                                 sx: {
-                                    bgcolor: '#2E3B55',
+                                    bgcolor: 'lightgray',
                                     '& .MuiMenuItem-root': {
                                         color: 'black',
                                     },
@@ -86,9 +91,10 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
                                 key={activity.id}
                                 value={activity.id}
                                 sx={{
-                                    backgroundColor: userActivityIds.has(activity.id) ? '#3A4A6B' : 'transparent',
+                                    backgroundColor: userActivityIds.has(activity.id) ? '#B39DDB' : 'transparent',
+                                  
                                     '&:hover': {
-                                        backgroundColor: userActivityIds.has(activity.id) ? '#2E3B55' : '#3A4A6B',
+                                        backgroundColor: userActivityIds.has(activity.id) ? '#B39DDB' : '#B39DDB',
                                     },
                                     display: 'flex',
                                     alignItems: 'center',
@@ -101,22 +107,21 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
                                         fontFamily:'Nunito',
                                         fontWeight:'500',
                                         fontSize:'16px',
-                                        color: userActivityIds.has(activity.id) ? '#FFD700' : 'black',
+                                        color: userActivityIds.has(activity.id) ? 'black' : 'black',
                                     }}
                                 >
                                     {activity.nombre}
                                 </Typography>
                                 {userActivityIds.has(activity.id) && (
-                                    <Button
-                                        onClick={() => handleDeleteUserActivity(userDni, activity.id)}
-                                        sx={{
-                                            color: '#FFD700',
-                                            ml: 1,
-                                            fontStyle: 'italic',
-                                        }}
-                                    >
-                                        ELIMINAR
-                                    </Button>
+                                    <IconButton
+                                    onClick={() => handleDeleteUserActivity(userDni, activity.id)}
+                                    sx={{
+                                        color: 'black', // Color negro para el ícono
+                                        ml: 1,
+                                    }}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
                                 )}
                             </MenuItem>
                         ))}
