@@ -36,7 +36,7 @@ const LandingDrawer = ({ open, close , sections}) => {
                     <ButtonBase key={section.id}  onClick={() => handleClick(section.id)}>
                         <StyledListItem>
                             <ListItemText>
-                                <Typography>{section.name}</Typography>
+                                
                             </ListItemText>
                         </StyledListItem>
                     </ButtonBase>

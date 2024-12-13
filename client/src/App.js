@@ -18,6 +18,7 @@ import UserNavBar from './Components/UserNavBar';
 import Payments from './Pages/payments/Payments';
 import AllPayments from './Pages/payments/AllPayments';
 import { useLocation } from 'react-router-dom';
+import Features from './Pages/features/Features';
 
 
 
@@ -25,6 +26,7 @@ function App() {
   const [opendrawer, setOpenDrawer] = useState(false);
   const [openMasterdrawere , setOpenMasterdrawer] = useState(false);
   const [verifiedUser , setVerifiedUser] = useState("");
+  const [openLandingDrawer, setOpenLandingDrawer] = useState(false);
   console.log(verifiedUser);
   
 
@@ -45,10 +47,15 @@ function App() {
 
   };
 
+  const hanldeCloseDrawer = () => {
+    setOpenLandingDrawer(false)
+};
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Landing setVerifiedUser={setVerifiedUser}/>} />
+        <Route path="/" element={<Landing verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser} setOpenLandingDrawer={setOpenLandingDrawer} hanldeCloseDrawer={hanldeCloseDrawer} openLandingDrawer={openLandingDrawer} />} />
+        <Route path="/features" element={<Features />} />
         <Route
           path="/master"
           element={<Dashboard />}
@@ -98,15 +105,15 @@ function App() {
         element={<AllPayments/>}
         />
       </Routes>
-      <UserDrawer open={opendrawer} onClose={closeUserDrawer } />
-      <MasterDrawer open={openMasterdrawere} onClose={closeMasterdrawer}/>
+      <UserDrawer open={opendrawer} onClose={closeUserDrawer }setVerifiedUser={setVerifiedUser} />
+      <MasterDrawer open={openMasterdrawere} onClose={closeMasterdrawer} setVerifiedUser={setVerifiedUser}/>
       <AppContent handleMenuClick={handleMenuClick} handleMasterDrawer={handleMasterDrawer} />
     </Router>
   );
 
   function AppContent({ handleMenuClick, handleMasterDrawer }) {
     const location = useLocation();
-    const shouldRenderNavBar = !['/'].includes(location.pathname);
+    const shouldRenderNavBar = ['/master', '/usuario'].some(path => location.pathname.includes(path));
   
     return shouldRenderNavBar ? (
       <UserNavBar handleMenuClick={handleMenuClick} handleMasterDrawer={handleMasterDrawer} />

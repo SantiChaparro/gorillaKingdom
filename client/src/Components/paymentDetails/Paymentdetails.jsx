@@ -4,9 +4,12 @@ import { Box, Modal, Button, Typography, styled } from "@mui/material";
 const Paymentdetails = ({ open, handleModalClose, selectedDetail }) => {
 
     return (
-        <Box sx={{   display: 'flex',
+        <Box sx={{  
+            width:'100%', 
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            boxSizing:'border-box',
             padding: '20px',
             '& .MuiDialog-paper': {
                 backgroundColor: 'white', 
@@ -45,6 +48,7 @@ const Paymentdetails = ({ open, handleModalClose, selectedDetail }) => {
 export default Paymentdetails;
 
 const CustomModal = styled(Modal)(({ theme }) => ({
+    width:'100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -55,7 +59,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
     borderRadius: '10px',
     padding: '20px',
     maxWidth: '500px',    // Ancho máximo del modal
-    width: '100%',
+    width: '80%',
     maxHeight: '90vh',    // Alto máximo para evitar desbordamiento
     overflowY: 'auto',    // Scroll automático si el contenido es demasiado alto
     boxShadow: theme.shadows[5],

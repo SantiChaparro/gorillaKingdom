@@ -17,10 +17,13 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
-      borderColor: theme.palette.text.primary, // Borde del input
+      borderColor: '#8A2BE2', // Borde violeta en estado normal (usa el color que prefieras)
     },
     '&:hover fieldset': {
-      borderColor: theme.palette.primary.main, // Borde al pasar el ratón
+      borderColor: '#9400D3', // Borde violeta oscuro al pasar el ratón (o el tono que prefieras)
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#9400D3', // Borde violeta cuando el campo está enfocado
     },
   },
 }));
@@ -34,21 +37,25 @@ const StyledSelect = styled(Select)(({ theme }) => ({
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
-      borderColor: theme.palette.text.primary, // Borde del select
+      borderColor: '#8A2BE2', // Borde violeta
     },
     '&:hover fieldset': {
-      borderColor: theme.palette.primary.main, // Borde al pasar el ratón
+      borderColor: '#9400D3', // Borde violeta más oscuro al pasar el ratón
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#9400D3', // Borde violeta más oscuro al enfocar
     },
   },
 }));
 
+
 const StyledButton = styled(Button)(({ theme }) => ({
-  width:'100%',
-  marginTop: theme.spacing(2),
-  backgroundColor: theme.palette.primary.main, // Fondo del botón
-  color: theme.palette.text.secondary, // Color del texto del botón
-  '&:hover': {
-    backgroundColor: theme.palette.primary.dark, // Fondo del botón al pasar el ratón
+  width: '100%',
+ // marginTop: '16px', // Margen superior para dispositivos pequeños
+  background: 'linear-gradient(45deg, #C004FF, #730399)',
+  color: 'white', // Color del texto del botón
+  [theme.breakpoints.up('md')]: {
+    marginTop: '50px', // Mayor margen superior para pantallas más grandes (desktop)
   },
 }));
 
@@ -93,7 +100,7 @@ const PaymentFilter = ({ onFilterChange }) => {
   };
 
   return (
-    <Box sx={{width:'100%',padding:'20px'}}>
+    <Box sx={{width:'100%'}}>
       <Box sx={{display:'flex',alignItems:'center', justifyContent:'space-between'}}>
         <StyledAutocomplete
           options={searchedUser || []}

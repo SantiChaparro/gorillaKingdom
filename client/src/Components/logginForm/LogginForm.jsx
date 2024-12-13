@@ -5,9 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';  // Importa js-cookie
+import { useLogginStore } from "../../store/useLogginStore";
+//import { verifyUser } from "../../../../server/src/controllers/logginControllers";
 
 
-const LogginForm = ({ setLoggin, setVerifiedUser, setMessage }) => {
+const LogginForm = ({setVerifiedUser, setMessage }) => {
+    const {postLoggin,logginResponse,setLoggin} =useLogginStore();
     const [password, setPassword] = useState("");
     const [dni, setDni] = useState("");
 
@@ -15,38 +18,57 @@ const LogginForm = ({ setLoggin, setVerifiedUser, setMessage }) => {
 
     console.log(password);
     console.log(dni);
+    console.log(logginResponse);
+ 
+    // useEffect(() => {
+    //     const token = Cookies.get('token');
+    //     console.log(token);
+    //     // Obtener la cookie del token si existe
+    //     if (token) {
+    //         try {
+    //             const decodedToken = jwtDecode(token);
+    //             console.log(decodedToken);
+    //             console.log(decodedToken.rol);
+    //             // Decodificar el token
+    //             const currentTime = Date.now() / 1000;
+    //             if (decodedToken.exp > currentTime) {
+    //                 if (decodedToken.rol === 'Master') {
 
-
+    //                     setVerifiedUser(decodedToken.user);
+    //                     navigate('/master')
+    //                 } else {
+    //                     setVerifiedUser(decodedToken.user);
+    //                     navigate('/usuario')
+    //                 }
+    //                 //  // Establecer el usuario verificado
+    //                 //  navigate('/usuario');  // Redirigir al dashboard del usuario
+    //             }
+    //         } catch (error) {
+    //             console.error("Error al decodificar el token:", error);
+    //             Cookies.remove('token');  // Remover el token si es inválido
+    //         }
+    //     }
+    // }, [navigate, setVerifiedUser,logginResponse,postLoggin]);
 
     useEffect(() => {
-        const token = Cookies.get('token');
-        console.log(token);
-        // Obtener la cookie del token si existe
-        if (token) {
-            try {
-                const decodedToken = jwtDecode(token);
-                console.log(decodedToken);
-                console.log(decodedToken.rol);
-                // Decodificar el token
-                const currentTime = Date.now() / 1000;
-                if (decodedToken.exp > currentTime) {
-                    if (decodedToken.rol === 'Master') {
-
-                        setVerifiedUser(decodedToken.user);
-                        navigate('/master')
-                    } else {
-                        setVerifiedUser(decodedToken.user);
-                        navigate('/usuario')
-                    }
-                    //  // Establecer el usuario verificado
-                    //  navigate('/usuario');  // Redirigir al dashboard del usuario
+        if (logginResponse && logginResponse.token) {
+            const token = logginResponse.token;
+            const decodedToken = jwtDecode(token);
+            Cookies.set('token', token, { expires: 1 }); // Guarda la cookie por 1 día
+    
+            if (logginResponse.user) {
+                setVerifiedUser(logginResponse.user);
+    
+                if (decodedToken.rol === "Master") {
+                    navigate("/master");
+                } else {
+                    navigate("/usuario");
                 }
-            } catch (error) {
-                console.error("Error al decodificar el token:", error);
-                Cookies.remove('token');  // Remover el token si es inválido
+            } else {
+                setMessage(logginResponse.successMessage);
             }
         }
-    }, [navigate, setVerifiedUser]);
+    }, [logginResponse, setVerifiedUser, navigate, setMessage]);
 
 
     const handleDniChange = (event) => {
@@ -61,28 +83,33 @@ const LogginForm = ({ setLoggin, setVerifiedUser, setMessage }) => {
     }
 
     const handleSubmit = async () => {
-        const response = await axios.post(`http://localhost:3001/loggin/postLoggin`, { dni, password });
-        console.log(response.data);
-        const token = response.data.token;
-        if (token) {
-            if (token) {
-                const decodedToken = jwtDecode(token);
-                Cookies.set('token', token, { expires: 1 });  // La cookie expira en 1 día// Decodificar el token
-                console.log('Contenido del token:', decodedToken); // Loguear el contenido
-                if (response.data.success) {
-                    await setVerifiedUser(response.data.user)
-                    // navigate('/usuario');
-                    if (decodedToken.rol === "Master") {
-                        navigate("/master");
-                    } else {
-                        navigate("/usuario")
-                    }
+        //const response = await axios.post(`http://localhost:3001/loggin/postLoggin`, { dni, password });
+         await postLoggin(dni,password);
+        
+        
+       
+        //  const token = logginResponse.token;
+        // // console.log(token);
+        
+        // if (token) {
+        //     if (token) {
+        //         const decodedToken = jwtDecode(token);
+        //         Cookies.set('token', token, { expires: 1 });  // La cookie expira en 1 día// Decodificar el token
+        //         console.log('Contenido del token:', decodedToken); // Loguear el contenido
+        //         if (logginResponse.user) {
+        //             await setVerifiedUser(logginResponse.user)
+        //             // navigate('/usuario');
+        //             if (decodedToken.rol === "Master") {
+        //                 navigate("/master");
+        //             } else {
+        //                 navigate("/usuario")
+        //             }
 
-                } else {
-                    await setMessage(response.data.message)
-                }
-            }
-        }
+        //         } else {
+        //             await setMessage(logginResponse.successMessage)
+        //         }
+        //     }
+        // }
 
         setLoggin(false);
 
@@ -143,7 +170,7 @@ const LogginForm = ({ setLoggin, setVerifiedUser, setMessage }) => {
                         },
                     }}
                 />
-                <Button sx={{ backgroundColor: 'blue', color: 'white', width: '80%' }} onClick={() => { handleSubmit(dni, password, setLoggin, setVerifiedUser) }}>INGRESAR</Button>
+                <Button sx={{ backgroundColor: 'blue', color: 'white', width: '80%' }} onClick={ handleSubmit }>INGRESAR</Button>
             </FormContainer>
         </LogginMainContainer>
 
@@ -154,10 +181,10 @@ const LogginForm = ({ setLoggin, setVerifiedUser, setMessage }) => {
 export default LogginForm;
 
 const LogginMainContainer = styled(Box)(({ theme }) => ({
-    width: "100%",
-    height: "100vh",
+    width: "50%",
+    height: "500px",
     boxSizing: "border-box",
-    padding: '15px',
+    //padding: '15px',
     display: "flex",
     flexDirection: "column",
     alignItems: "center",

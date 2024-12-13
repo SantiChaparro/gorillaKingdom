@@ -4,11 +4,13 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import LogoutIcon from '@mui/icons-material/Logout'; // Icono para salir
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // Para manejar cookies
+import { useLogginStore } from '../store/useLogginStore'; 
 
 const drawerWidth = '240px';
 
-const UserDrawer = ({ open, onClose, handleLogout }) => {
+const UserDrawer = ({ open, onClose, handleLogout ,setVerifiedUser}) => {
   const navigate = useNavigate();
+   const {logout,setLoggin} = useLogginStore();
 
   const handleListItemClick = () => {
     navigate('/usuario-rutina');
@@ -22,8 +24,9 @@ const UserDrawer = ({ open, onClose, handleLogout }) => {
     Cookies.remove("token"); // Reemplaza 'userToken' por el nombre de tu cookie
     console.log(token);
     
-    
-    // Cerrar el drawer
+    setVerifiedUser("")
+    logout();
+    setLoggin(false);
     onClose();
 
     // Redirigir a la landing page

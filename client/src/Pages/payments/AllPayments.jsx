@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
     Box, Typography, styled, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, TablePagination, IconButton,
+    TableHead, TableRow,Paper,
     Button
 } from "@mui/material";
 import { usePaymentsStore } from "../../store/usePaymentsStore";
@@ -11,6 +11,7 @@ import Paymentdetails from "../../Components/paymentDetails/Paymentdetails";
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { height, maxHeight, maxWidth } from "@mui/system";
 
 
 // Aquí el resto del código...
@@ -83,12 +84,14 @@ const AllPayments = () => {
 
     return (
         <MainContainer>
-            <CustomTitle>pagos</CustomTitle>
-            <PaymentFilter onFilterChange={onFilterChange} />
+            
+           
             <ContentContainer>
+            <CustomTitle>Pagos</CustomTitle>
+            <PaymentFilter onFilterChange={onFilterChange} />
                 {filteredPayments.length > 0 && (
-                    <CustomTableContainer>
-                        <Table>
+                    <CustomTableContainer component={Paper} elevation={4}>
+                        <Table sx={{width:'100%', boxSizing:'border-box'}}>
                             <TableHead>
                                 <TableRow>
                                     <CustomTableCell>Fecha</CustomTableCell>
@@ -103,7 +106,11 @@ const AllPayments = () => {
                                     <TableRow
                                         key={payment.id}
                                         onClick={() => handleModalOpen(payment)}
-                                        sx={{ cursor: 'pointer' }}
+                                        sx={{ cursor: 'pointer', 
+                                            '&:not(:last-child) td': {
+                                                borderBottom: '2px solid #ca99ef', // Línea divisoria violeta entre filas
+                                              },
+                                        }}
                                     >
                                         <CustomTableCell>{dayjs(payment.fecha_pago).format('DD-MM-YYYY')}</CustomTableCell>
                                         <CustomTableCell>$ {payment.monto}</CustomTableCell>
@@ -116,8 +123,7 @@ const AllPayments = () => {
                         </Table>
                     </CustomTableContainer>
                 )}
-            </ContentContainer>
-            <PaginationContainer>
+                  <PaginationContainer>
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button
                         onClick={() => handleChangePage(page - 1)}
@@ -152,15 +158,18 @@ const AllPayments = () => {
                     </Button>
                 </Box>
 
-                <Typography sx={{ color: 'white', marginTop: '10px' }}>{pageLabel}</Typography>
+                <Typography sx={{ color: 'black',}}>{pageLabel}</Typography>
             </PaginationContainer>
+            </ContentContainer>
+          
 
-            <Paymentdetails
-                open={openDetail}
-                handleModalClose={handleModalClose}
-                selectedDetail={selectedDetail}
-                
-            />
+            {openDetail && (
+                <Paymentdetails
+                    open={openDetail}
+                    handleModalClose={handleModalClose}
+                    selectedDetail={selectedDetail}
+                />
+                )}
         </MainContainer>
     );
 };
@@ -169,47 +178,81 @@ export default AllPayments;
 
 // Estilos
 const MainContainer = styled(Box)(({ theme }) => ({
-    width: '100vw',
+    maxWidth: '100vw',
     height: '100vh',
+    minHeight:'100vh',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    backgroundColor: 'black',
+    justifyContent:'center',
+    backgroundColor: 'white',
     boxSizing: 'border-box',
     padding: '15px',
+
+    [theme.breakpoints.up('md')]: {
+        width: 'calc(100vw - 240px)',
+        height:'100vh',
+        marginLeft: '240px',
+        padding: '0',
+        
+      },
 }));
 
 const CustomTitle = styled(Typography)(({ theme }) => ({
-    marginTop: '100px',
-    fontFamily: "Bebas Neue",
-    fontWeight: '400',
-    fontSize: '3em',
-    color: 'white',
-    marginBottom: '30px',
+    //marginTop: '50px',
+    fontFamily: "Nunito",
+    fontWeight: '600',
+    fontSize: '45px',
+    color: 'black',
+  
 }));
 
 const ContentContainer = styled(Box)(({ theme }) => ({
     width: '100%',
-    flex: '1',
-    padding: '10px',
+    height:'100%',
+    marginTop:'50px',
+    padding: '0',
     display: 'flex',
-    justifyContent: 'center',
+    flexDirection:'column',
+    alignItems:'center',
+    justifyContent: 'space-between',
     boxSizing: 'border-box',
-    marginTop: '50px',
+    //marginTop: '50px',
+
+    [theme.breakpoints.up('md')]: {
+        maxWidth:'50%',
+        height:'100vh',
+        justifyContent:'space-between',
+       
+      },
 }));
 
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: '16px',
-    color: 'white',
+    color: 'black',
     textAlign: 'center',
     whiteSpace: 'nowrap',
+  
 }));
 
 const CustomTableContainer = styled(TableContainer)(({ theme }) => ({
     width: '100%',
     maxHeight: '400px',
+    minHeight:'auto',
     overflowY: 'auto',
-    boxSizing: 'border-box',
+    overflowX:'auto',
+    display:'flex',
+    flexDirection:'column',
+    marginTop:'15px',
+    
+ 
+
+
+    [theme.breakpoints.up('md')]: {
+      
+        
+       
+      },
 }));
 
 const PaginationContainer = styled(Box)(({ theme }) => ({
@@ -217,8 +260,7 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
-    marginTop: '20px',
-    marginBottom: '100px',
+  
 }));
 
 

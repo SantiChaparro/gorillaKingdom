@@ -15,14 +15,20 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Cookies from 'js-cookie';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { display } from "@mui/system";
+import { useLocation } from 'react-router-dom'; // Importa el hook
+import { useLogginStore } from "../../store/useLogginStore"; 
 
 const drawerWidth = '240px';
 
-const MasterDrawer = ({ open, onClose }) => {
+const MasterDrawer = ({ open, onClose ,setVerifiedUser}) => {
   const navigate = useNavigate();
   const [navPath, setNavPath] = useState(null);
+  const location = useLocation(); // Hook para obtener la ruta actual
+  const {logout,setLoggin} = useLogginStore();
 
   const isDesktop = useMediaQuery('(min-width:1024px)');
+  const isMasterOrUserRoute = location.pathname.includes('/master') || location.pathname.includes('/user');
+const isDesktopDrawer = isDesktop && isMasterOrUserRoute;
 
   const handleListItemClick = (path) => {
     setNavPath(path);
@@ -31,7 +37,10 @@ const MasterDrawer = ({ open, onClose }) => {
 
   const handleLogout = () => {
     Cookies.remove('token');
+    logout();
+    setLoggin(false);
     onClose();
+    setVerifiedUser("")
     navigate('/');
   };
 
@@ -42,10 +51,14 @@ const MasterDrawer = ({ open, onClose }) => {
     }
   }, [navPath, navigate]);
 
+  if (location.pathname === '/') {
+    return null;
+  }
+
   return (
     <CustomDrawer
-      variant={isDesktop ? 'persistent' : 'temporary'}
-      open={isDesktop || open}
+      variant={isDesktopDrawer ? 'persistent' : 'temporary'}
+      open={isDesktopDrawer || open}
       anchor="left"
       onClose={onClose}
       isDesktop={isDesktop}
