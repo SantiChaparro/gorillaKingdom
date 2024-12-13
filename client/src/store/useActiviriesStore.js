@@ -38,8 +38,7 @@ export const useActivitiesStore = create((set) => ({
     },
 
     cleanUserActivities: async() => {
-      //  const response = await axios.get(`http://localhost:3001/master/currentUserActivities/${dni}`);
-       // console.log(response.data)
+     
         set({userActivities:[]});
        
     }

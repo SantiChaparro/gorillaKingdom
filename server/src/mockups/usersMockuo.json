@@ -210,14 +210,14 @@
       "activo": true
     },
     {
-      "dni": 23456111,
-      "nombre": "Isabel Gómez",
-      "fecha_nacimiento": "1987-07-27",
-      "telefono": "1098765432",
-      "mail": "isabel.gomez@example.com",
-      "domicilio": "Avenida Estrecha 4243",
-      "rol": "Cliente",
-      "password": "password4243",
+      "dni": 28271453,
+      "nombre": "Santiago Chaparro",
+      "fecha_nacimiento": "1980-09-30",
+      "telefono": "3512398743",
+      "mail": "santiago@chaparro.com.ar",
+      "domicilio": "Finocchietto 762",
+      "rol": "Master",
+      "password": "asd123",
       "activo": true
     }
   ]

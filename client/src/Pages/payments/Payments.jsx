@@ -164,7 +164,7 @@ const Payments = () => {
           BUSCAR
         </Button>
       </SearchBox>
-      <TableContainer component={Paper} elevation={4} sx={{ width: '100%', marginTop: 2, backgroundColor: "white",marginBottom:4 }}>
+      <TableContainer component={Paper} elevation={4} sx={{ width: '100%', marginTop: 2, backgroundColor: "white",marginBottom:4 , padding:'5px'}}>
         <Table >
           <TableHead>
             <TableRow sx={{ width: '100%', borderBottom: "2px solid #ca99ef" }}>
@@ -206,9 +206,9 @@ const Payments = () => {
               </TableRow>
             ))}
             <TableRow>
-              <TableCell sx={{ color: 'white', fontSize: '24px', borderBottom: 'none' }}>Total a pagar</TableCell>
+              <TableCell sx={{ color: 'black', fontSize: '24px', borderBottom: 'none' }}>Total a pagar</TableCell>
               <TableCell sx={{ borderBottom: 'none' }}></TableCell>
-              <TableCell sx={{ color: 'white', fontSize: '24px', borderBottom: 'none' }}>${totalAmount}</TableCell>
+              <TableCell sx={{ color: 'black', fontSize: '24px', borderBottom: 'none' }}>${totalAmount}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

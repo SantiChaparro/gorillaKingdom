@@ -17,7 +17,7 @@ import { useUsersStore } from "../../../store/useUsersStore";
 import AddActivity from "../../../Components/addActivity/AddActivity";
 import { useActivitiesStore } from "../../../store/useActiviriesStore";
 import rectangle51 from '../../../assests/imagenes/Rectangle51.png';
-import { borderRadius, boxSizing, display, margin, padding, width } from "@mui/system";
+import { borderRadius, boxSizing, display, height, margin, padding, width } from "@mui/system";
 
 const initialValues = {
   dni: "",
@@ -144,7 +144,7 @@ const NewUserForm = () => {
         <FormControl 
         sx={{
           width:'100%',
-          height:'auto',
+          height:'100%',
          
           
         }}>
@@ -282,9 +282,9 @@ export default NewUserForm;
 // Estilos
 const MainContainer = styled(Box)(({ theme }) => ({
   width: '100vw', 
-  height: '100vh',
+  height: '100%',
   padding: '0',
-  boxSizing: 'border-box',
+  //boxSizing: 'border-box',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -347,12 +347,13 @@ const CustomTitle = styled(Typography)(({}) => ({
 
 const FormContainer = styled(Box)(({theme}) => ({
   width:'100%',
-  height:'auto',
+  height:'800%',
   padding:'30px',
   boxSizing:'border-box',
  
   [theme.breakpoints.up('md')]: {
     width:'100%',
+    height:'100%'
  
     
    
@@ -361,7 +362,7 @@ const FormContainer = styled(Box)(({theme}) => ({
 
 const ImageBackground = styled(Box)(({ theme }) => ({
   width: '100%',
-  height: '100vh', // Ensures it covers the full height of the viewport
+  height: '100%', // Ensures it covers the full height of the viewport
   boxSizing: 'border-box',
   backgroundImage: `url(${rectangle51})`,
   backgroundSize: 'cover', 
@@ -371,6 +372,7 @@ const ImageBackground = styled(Box)(({ theme }) => ({
   
   [theme.breakpoints.up('md')]: {
     width: '100%',
+    height:'100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

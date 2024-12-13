@@ -388,7 +388,7 @@ const textFieldStyles = {
    backgroundColor: 'white',
    borderRadius: '5px',
     '& .MuiInputBase-input': {
-        color: 'white'
+        color: 'black'
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -406,27 +406,7 @@ const textFieldStyles = {
     }
 };
 
-// const textFieldDetailStyles = {
-//     width: '100%',
-//     backgroundColor: 'white',
-//     '& .MuiInputBase-input': {
-//         color: 'white'
-//     },
-//     '& .MuiOutlinedInput-root': {
-//         '& fieldset': {
-//             borderColor: 'black',
-//         },
-//         '&:hover fieldset': {
-//             borderColor: 'black',
-//         },
-//         '&.Mui-focused fieldset': {
-//             borderColor: 'black',
-//         },
-//     },
-//     '& .MuiInputLabel-root': {
-//         color: 'white',
-//     }
-// };
+
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
     fontFamily: "Nunito",
