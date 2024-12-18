@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, TextField, Typography, styled } from '@mui/material';
+import { Box, Button, Paper, TextField, Typography, styled } from '@mui/material';
 import { blue } from "@mui/material/colors";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';  // Importa js-cookie
 import { useLogginStore } from "../../store/useLogginStore";
+import Swal from 'sweetalert2';
 //import { verifyUser } from "../../../../server/src/controllers/logginControllers";
 
 
@@ -20,57 +21,6 @@ const LogginForm = ({setVerifiedUser, setMessage }) => {
     console.log(dni);
     console.log(logginResponse);
  
-    // useEffect(() => {
-    //     const token = Cookies.get('token');
-    //     console.log(token);
-    //     // Obtener la cookie del token si existe
-    //     if (token) {
-    //         try {
-    //             const decodedToken = jwtDecode(token);
-    //             console.log(decodedToken);
-    //             console.log(decodedToken.rol);
-    //             // Decodificar el token
-    //             const currentTime = Date.now() / 1000;
-    //             if (decodedToken.exp > currentTime) {
-    //                 if (decodedToken.rol === 'Master') {
-
-    //                     setVerifiedUser(decodedToken.user);
-    //                     navigate('/master')
-    //                 } else {
-    //                     setVerifiedUser(decodedToken.user);
-    //                     navigate('/usuario')
-    //                 }
-    //                 //  // Establecer el usuario verificado
-    //                 //  navigate('/usuario');  // Redirigir al dashboard del usuario
-    //             }
-    //         } catch (error) {
-    //             console.error("Error al decodificar el token:", error);
-    //             Cookies.remove('token');  // Remover el token si es inválido
-    //         }
-    //     }
-    // }, [navigate, setVerifiedUser,logginResponse,postLoggin]);
-
-    useEffect(() => {
-        if (logginResponse && logginResponse.token) {
-            const token = logginResponse.token;
-            const decodedToken = jwtDecode(token);
-            Cookies.set('token', token, { expires: 1 }); // Guarda la cookie por 1 día
-    
-            if (logginResponse.user) {
-                setVerifiedUser(logginResponse.user);
-    
-                if (decodedToken.rol === "Master") {
-                    navigate("/master");
-                } else {
-                    navigate("/usuario");
-                }
-            } else {
-                setMessage(logginResponse.successMessage);
-            }
-        }
-    }, [logginResponse, setVerifiedUser, navigate, setMessage]);
-
-
     const handleDniChange = (event) => {
         const dni = event.target.value;
         setDni(dni)
@@ -83,35 +33,21 @@ const LogginForm = ({setVerifiedUser, setMessage }) => {
     }
 
     const handleSubmit = async () => {
-        //const response = await axios.post(`http://localhost:3001/loggin/postLoggin`, { dni, password });
-         await postLoggin(dni,password);
-        
+        if(dni !== "" && password !== ""){
+            await postLoggin(dni,password);
+            setLoggin(false);
+        }else{
+            if(dni === "" || password === ""){
+                Swal.fire({
+                          icon: 'error',
+                          title: 'Upss!',
+                          text: 'LLena todos los campos.',
+                          showConfirmButton: true,
+                })
+        }}
+         
         
        
-        //  const token = logginResponse.token;
-        // // console.log(token);
-        
-        // if (token) {
-        //     if (token) {
-        //         const decodedToken = jwtDecode(token);
-        //         Cookies.set('token', token, { expires: 1 });  // La cookie expira en 1 día// Decodificar el token
-        //         console.log('Contenido del token:', decodedToken); // Loguear el contenido
-        //         if (logginResponse.user) {
-        //             await setVerifiedUser(logginResponse.user)
-        //             // navigate('/usuario');
-        //             if (decodedToken.rol === "Master") {
-        //                 navigate("/master");
-        //             } else {
-        //                 navigate("/usuario")
-        //             }
-
-        //         } else {
-        //             await setMessage(logginResponse.successMessage)
-        //         }
-        //     }
-        // }
-
-        setLoggin(false);
 
     };
 
@@ -122,6 +58,7 @@ const LogginForm = ({setVerifiedUser, setMessage }) => {
                     label='dni'
                     value={dni}
                     onChange={handleDniChange}
+                    required
                     InputProps={{
                         style: {
                             borderColor: 'white',
@@ -129,17 +66,17 @@ const LogginForm = ({setVerifiedUser, setMessage }) => {
                     }}
                     sx={{
                         '& .MuiInputBase-root': {
-                            color: 'white', // Text color inside the input field
+                            color: 'black', // Text color inside the input field
                         },
                         '& .MuiInputLabel-root': {
-                            color: 'white', // Label color
+                            color: 'black', // Label color
                         },
                         '& .MuiOutlinedInput-root': {
                             '& fieldset': {
-                                borderColor: 'white', // Border color
+                                borderColor: 'black', // Border color
                             },
                             '&:hover fieldset': {
-                                borderColor: 'white', // Border color on hover
+                                borderColor: 'black', // Border color on hover
                             },
                         },
                     }}
@@ -148,24 +85,26 @@ const LogginForm = ({setVerifiedUser, setMessage }) => {
                     label='clave'
                     value={password}
                     onChange={handlePasswordChange}
+                    required
                     InputProps={{
                         style: {
                             borderColor: 'white',
                         },
                     }}
                     sx={{
+                        width:'70%',
                         '& .MuiInputBase-root': {
-                            color: 'white', // Text color inside the input field
+                            color: 'black', // Text color inside the input field
                         },
                         '& .MuiInputLabel-root': {
-                            color: 'white', // Label color
+                            color: 'black', // Label color
                         },
                         '& .MuiOutlinedInput-root': {
                             '& fieldset': {
-                                borderColor: 'white', // Border color
+                                borderColor: 'black', // Border color
                             },
                             '&:hover fieldset': {
-                                borderColor: 'white', // Border color on hover
+                                borderColor: 'black', // Border color on hover
                             },
                         },
                     }}
@@ -180,11 +119,11 @@ const LogginForm = ({setVerifiedUser, setMessage }) => {
 
 export default LogginForm;
 
-const LogginMainContainer = styled(Box)(({ theme }) => ({
-    width: "50%",
-    height: "500px",
+const LogginMainContainer = styled(Paper)(({ theme }) => ({
+    width: "auto",
+    height: "auto",
     boxSizing: "border-box",
-    //padding: '15px',
+    borderRadius:'15px',
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -194,8 +133,8 @@ const LogginMainContainer = styled(Box)(({ theme }) => ({
 }));
 
 const FormContainer = styled(Box)(({ theme }) => ({
-    width: '300px',
-    height: '200px',
+    width: '500px',
+    height: '400px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -205,8 +144,9 @@ const FormContainer = styled(Box)(({ theme }) => ({
     borderRadius: '15px',
     boxShadow: '0px 4px 8px rgba(255, 255, 255, 0.5)', // Light shadow for elevation
     padding: '20px',
+    backgroundColor:'white'
 }));
 
 const CustomtextField = styled(TextField)(({ theme }) => ({
     width: '80%'
-}));
+}))

@@ -31,7 +31,8 @@ const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeClose
     const [selectedFontSize, setSelectedFontSize] = useState([]);
      const [openDrawer, setOpendrawer] = useState(false);
      const {LogginFormOpen,logginResponse} = useLogginStore()
-
+    console.log(logginResponse);
+    
     const navigate = useNavigate();
     console.log('desde la landing',verifiedUser);
     
@@ -112,6 +113,17 @@ const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeClose
     // }, [sections]);
 
     // // Show SweetAlert when message changes
+
+    useEffect(()=>{
+        if(logginResponse.error !== "" && logginResponse.error !== null){
+            Swal.fire({
+                title: 'Error',
+                text: `${logginResponse.error}`,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+        })
+    }},[logginResponse])
+
     useEffect(() => {
         if (message) {
             Swal.fire({
