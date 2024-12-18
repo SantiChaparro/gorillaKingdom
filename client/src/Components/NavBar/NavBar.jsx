@@ -111,6 +111,7 @@ const NavBarContainer = styled(Box)(({ theme }) => ({
   }));
 
   const LogoContainer = styled(Box)(({ theme }) => ({
+    padding:'0',
     width: 'auto',
     height: '68px', 
     display:'flex',
@@ -125,6 +126,7 @@ const NavBarContainer = styled(Box)(({ theme }) => ({
   const Logo = styled(Box)(({ theme }) => ({
     width:'auto',
     height:'100%',
+    padding:'0',
     display: 'flex',
     flexDirection:'row',
     alignItems:'center',

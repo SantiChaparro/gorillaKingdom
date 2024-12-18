@@ -154,25 +154,15 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
         <CustomTypography variant='h3'>¿Qué entrenamos hoy?</CustomTypography>
       </TitleContainer>
       <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-        <CustomInputLabel id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
+        <CustomInputLabel sx={{color:'black'}} id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
         <CustomSelect
           labelId="day-select-label"
           id="day-select"
           value={option}
           onChange={handleChange}
           label="¿Qué día vas a entrenar?"
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                bgcolor: 'black',
-                '& .MuiMenuItem-root': {
-                  textAlign: 'center',
-                  fontSize: '1.2rem',
-                  color: 'white',
-                },
-              },
-            },
-          }}
+          sx={textFieldStyles}
+  
         >
           {routine?.routine?.DayOfWeeks && routine.routine.DayOfWeeks.map((day) => (
             <MenuItem  key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
@@ -188,13 +178,13 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
             return (
               <Exercise key={index}>
                 <ExcercieDescription>
-                  <Typography variant='body1' color='white'>
+                  <CustoTypografi variant='body1' color='white'>
                     {exercise.nombre}
-                  </Typography>
+                  </CustoTypografi>
                   {details && (
-                    <Typography variant='body2' color='gray'>
+                    <CustoTypografi sx={{color:'gray'}}>
                       {details.setsAndReps}
-                    </Typography>
+                    </CustoTypografi>
                   )}
                 </ExcercieDescription>
                 <ExerciseLoad>
@@ -205,6 +195,27 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
                     variant="outlined"
                     value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ""}
                     onChange={(e) => handleTextFieldChange(exercise.id, weekIndex, e.target.value)}
+                    sx={{
+                      ...textFieldStyles,
+                      maxWidth:'45px',
+                      input: {
+                        color: 'black', // Texto negro por defecto
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: 'black', // Borde negro por defecto
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#C004FF', // Borde violeta en hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#C004FF', // Borde violeta en focus
+                        },
+                        '&.Mui-focused input': {
+                          color: 'black', // Texto negro en focus
+                        }
+                      }
+                    }}
                   />
                   ))}
                 </ExerciseLoad>
@@ -224,14 +235,15 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
 export default UserRoutine;
 
 const MainContainer = styled(Box)(({ theme }) => ({
-  margin: 0,
+ // margin: 0,
   padding: '15px',
   width: '100vw',
-  height: 'auto',
+  minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: 'black',
+ 
+  backgroundColor: 'white',
   boxSizing: 'border-box'
 }));
 
@@ -246,21 +258,23 @@ const TitleContainer = styled(Box)(({ theme }) => ({
 }));
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
-  width: '100%',
-  fontFamily: 'Bebas Neue',
-  fontWeight: '400',
-  fontStyle: 'normal',
-  color: 'white',
-  marginBottom: '40px'
+  fontFamily: "Nunito",
+  //fontWeight: '400',
+  fontSize: '35px',
+  color: 'black',
+  textAlign: 'center',
+  marginBottom:'30px',
+  fontWeight: 'bold',
 }));
 
 const CustomInputLabel = styled(InputLabel)(({ theme }) => ({
-  color: 'white',
+  color: 'black', // color base negro
   textAlign: 'left',
   width: '100%',
   transformOrigin: 'left',
   '&.Mui-focused': {
-    transformOrigin: 'left',
+    color: 'black', // color cuando está en foco
+    //transformOrigin: 'left',
   },
 }));
 
@@ -269,22 +283,28 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   height: 'auto',
   color: 'white',
   '.MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'black',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'black',
   },
   '.MuiSvgIcon-root': {
-    color: 'white',
+    color: 'black',
   },
+  // '.MuiInputBase-input': {
+  //   textAlign: 'center', // Centrar el texto dentro del InputBase
+  // },
 }));
 
 const ExerciseContainer = styled(Box)(({ theme }) => ({
   width: '100%',
-  height: 'auto',
-  marginTop: '100px',
+  height: '470px',
+  marginTop: '25px',
   display: 'flex',
   flexDirection: 'column',
+  //justifyContent:'center',
+  overflowY: 'auto',
+  
 }));
 
 const Exercise = styled(Box)(({ theme }) => ({
@@ -292,7 +312,7 @@ const Exercise = styled(Box)(({ theme }) => ({
   height: 'auto',
   padding: '15px 0',
   marginBottom: '5px',
-  borderBottom: '3px solid #0028ff',
+  borderBottom: '3px solid #C004FF',
   display: 'flex',
   justifyContent: 'space-between',
   gap: '10px'
@@ -355,11 +375,14 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  width: '100%',
+  width: ' calc(100vw - 20px)',
   height: '60px',
   color: 'white',
-  backgroundColor: '#0028ff',
-  marginTop: '150px',
+  background: 'linear-gradient(45deg, #C004FF, #730399)',
+  position:'absolute',
+  bottom:'0px',
+  //marginTop:'150px',
+  marginBottom:'15px',
   '&:hover': {
     backgroundColor: '#0028ff',
   },
@@ -369,4 +392,33 @@ const CustomButton = styled(Button)(({ theme }) => ({
   '&:focus': {
     backgroundColor: '#0028ff',
   },
+}));
+
+const textFieldStyles = {
+  width: '100%',
+ backgroundColor: 'white',
+ borderRadius: '5px',
+  '& .MuiInputBase-input': {
+      color: 'black'
+  },
+  '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+          borderColor: 'black',
+      },
+      '&:hover fieldset': {
+          borderColor: 'black',
+      },
+      '&.Mui-focused fieldset': {
+          borderColor: 'black',
+      },
+  },
+  '& .MuiInputLabel-root': {
+      color: 'white',
+  }
+};
+
+const CustoTypografi = styled(Typography)(({ theme }) => ({
+ fontFamily:'nunito',
+ color:'black',
+ fontWeight:'bold'
 }));
