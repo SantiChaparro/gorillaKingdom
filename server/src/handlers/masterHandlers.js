@@ -24,7 +24,8 @@ const {
     addActivityToUser,
     findUserActivities,
     deleteActivity,
-    getPaymentsWithFilters
+    getPaymentsWithFilters,
+    updateExistingSection 
 } = require('../controllers/masterControllers');
 
 const Routine = require('../models/Routine');
@@ -365,19 +366,16 @@ const getAllPosts = async(req,res) => {
         res.status(500).send({ error: error.message });
     }
 };
-
 const addSection = async (req, res) => {
-    const { name, titulo, subTitulo, orden, cuerpo , sectionStyle} = req.body;
+    const { name, titulo, subTitulo, orden, cuerpo, sectionStyle } = req.body;
     const multimedia = req.files; // Obtiene los archivos subidos
- 
-    console.log('addsection',name);
-    console.log('addsection',titulo);
-    console.log('addsection',subTitulo);
-    console.log('addsection',orden);
-    console.log('addsection',cuerpo);
-    console.log('addsection',multimedia);
+
+    console.log('addSection', name);
+    console.log('addSection', titulo);
+    console.log('addSection', subTitulo);
+    console.log('addSection', orden);
+    console.log('addSection', cuerpo);
     console.log('addSection', sectionStyle);
-    
 
     try {
         // Subir las imágenes a Cloudinary utilizando el servicio
@@ -400,28 +398,27 @@ const addSection = async (req, res) => {
             }
         }
 
-        const settings = {
+        const newSettings = {
             titulo,
             subTitulo,
             orden,
             cuerpo,
-            sectionStyle
-        }
-
-        console.log('settings',settings);
-     
-        const updatedSettings = {
-            ...settings, 
+            sectionStyle,
             imagenes: uploadedImages,
         };
 
-        console.log('updatedsettings',updatedSettings);
-        
-        
-        const newSection = await postSection(name, updatedSettings);
+        console.log('newSettings', newSettings);
 
-        if (newSection) {
-            res.status(200).json(newSection);
+        // Llama al controlador para verificar si existe la sección
+        const existingSection = await updateExistingSection(name, newSettings);
+
+        if (existingSection) {
+            // Si la sección existe, se ha actualizado
+            return res.status(200).json(existingSection);
+        } else {
+            // Si no existe, crea una nueva sección
+            const newSection = await postSection(name, newSettings);
+            return res.status(200).json(newSection);
         }
     } catch (error) {
         res.status(500).send({ error: error.message });

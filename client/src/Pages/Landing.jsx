@@ -24,11 +24,10 @@ import Cookies from 'js-cookie';
 const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeCloseDrawer,}) => {
     const { getPost, posts } = usePostStore();
     const { getSections, sections } = useSectionStore();
-    const [orderedSections, setOrderedSections] = useState([]);
+    
   //  const [loggin, setLoggin] = useState(false);
     const [message, setMessage] = useState("");
-    const [selectedFont, setSelectedFont] = useState([]); // Estado para la fuente seleccionada
-    const [selectedFontSize, setSelectedFontSize] = useState([]);
+    
      const [openDrawer, setOpendrawer] = useState(false);
      const {LogginFormOpen,logginResponse} = useLogginStore()
     console.log(logginResponse);
@@ -108,9 +107,7 @@ const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeClose
     //     getPost();
     // }, [getSections, getPost]);
 
-    // useEffect(() => {
-    //     handleSections();
-    // }, [sections]);
+   
 
     // // Show SweetAlert when message changes
 
@@ -747,7 +744,7 @@ const ContactFormContainer = styled(Box)(({ theme }) => ({
 
 {/* <ContentContainer>
 
-{orderedSections.length > 0 && orderedSections.map((section, index) => (
+{sections.length > 0 && orderedSections.map((section, index) => (
     <SectionBox id={`${section.id}`} key={section.id}>
         <Typography sx={{
             width: '100%',

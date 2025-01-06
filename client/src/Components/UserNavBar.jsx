@@ -61,6 +61,14 @@ const CustomAppBar = styled(AppBar)(({ theme }) => ({
   position: 'fixed', // Siempre fijo en la parte superior
   top: 0, // Asegura que esté en la parte superior
   zIndex: 1201, // Por encima del drawer
+
+  [theme.breakpoints.up('md')]: {
+    maxWidth: "100%",
+   
+    //padding:'0 120px'
+    
+  },
+
 }));
 
 const ToolBarContent = styled(Box)(({ theme }) => ({

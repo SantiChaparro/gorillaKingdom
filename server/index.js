@@ -17,6 +17,7 @@ conn.sync({force: true}).then(async ()=>{
 
     try {
         
+       
         excersiceLoader();
         daysLoader();
         usersLoader();

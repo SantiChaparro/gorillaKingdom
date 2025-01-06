@@ -475,18 +475,41 @@ const getPosts = async() => {
 
 };
 
-const postSection = async(name,settings) => {
-    console.log('desde controller',name);
-    console.log('desde controller',settings);
-
-    const newsection = await Section.create({
-        name:name,
-        settings:settings
-    })
-
-    return newsection;
+const postSection = async (name, settings) => {
+    console.log('postSection - creando nueva sección con nombre:', name);
     
+    const newSection = await Section.create({
+        name: name,
+        settings: [settings], // Guardar settings como un array
+    });
+
+    return newSection;
 };
+
+const updateExistingSection = async (name, newSettings) => {
+    console.log('updateExistingSection - buscando sección con nombre:', name);
+    
+    // Buscar si existe una sección con el mismo nombre
+    const section = await Section.findOne({ where: { name } });
+
+    if (section) {
+        // Si la sección ya existe, actualizar los settings
+        console.log('La sección existe. Actualizando los settings...');
+
+        const currentSettings = section.settings ? section.settings : [];
+        const updatedSettings = [...currentSettings, newSettings]; // Añadir nuevos settings al array existente
+
+        // Actualizar la sección con los nuevos settings
+        section.settings = updatedSettings;
+        await section.save();
+
+        return section;
+    }
+
+    // Si no existe la sección, devolver null para que el handler cree una nueva
+    return null;
+};
+
 
 const allSections = async() => {
     const sections = await Section.findAll();
@@ -594,4 +617,4 @@ const deleteActivity = async(dni,activityId) => {
 
 
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments,getAllExercises,postExercise,deleteExercise,createNewExercise,createNewDay,removeDay,createNewPost,getPosts,postSection,allSections,createActivity,allActivities,addActivityToUser,findUserActivities,deleteActivity,getPaymentsWithFilters};
+module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments,getAllExercises,postExercise,deleteExercise,createNewExercise,createNewDay,removeDay,createNewPost,getPosts,postSection,allSections,createActivity,allActivities,addActivityToUser,findUserActivities,deleteActivity,getPaymentsWithFilters,updateExistingSection };
