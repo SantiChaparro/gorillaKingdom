@@ -1,56 +1,91 @@
-const { User , Routine , Exercise , DayOfWeek ,ExerciseDayOfWeek} = require('../db');
+const { User , Routine , Exercise , DayOfWeek ,ExerciseDayOfWeek, UserTenantRoutine,UserActivities,Activity} = require('../db');
 const { Op } = require('sequelize');
 
-const getRoutineByUserId = async (dni) => {
+const getRoutineByUserId = async (dni, selectedTenant) => {
     try {
-        const user = await User.findByPk(dni, {  // Cambié 'id' por 'dni' para que coincida con el parámetro
-            include: [{
-                model: Routine,
-                attributes: ['id', 'routineDetail'],
-                include: [
-                    {
-                        model: DayOfWeek,
-                        attributes: ['id'],
-                        through: {
-                            attributes: [],
-                        },
-                        include: [
-                            {
-                                model: Exercise,
-                                attributes: ['nombre', 'id'],
-                                through: {
-                                    attributes: [],
-                                }
-                            }
-                        ]
+
+        const activities = await UserActivities.findAll({
+            where:{
+                UserDni: dni,
+                activo: true,
+                isPaid: false
+            },
+            include:[
+                {
+                    model: Activity,
+                    as: 'activity',
+                    where:{
+                     TenantId: selectedTenant,
+                    
                     }
-                ]
-            }],
-            attributes: [] 
+                }
+            ]
+        });
+        console.log('desde controller getroutinebyid', activities);
+        
+
+        if(activities.length >0){
+            return {message: 'Pago pendiente', showAlert: true
+            };
+        }else{
+
+               // Buscar la relación entre el usuario, el tenant, y la rutina
+        const userRoutine = await UserTenantRoutine.findOne({  
+            where: {
+                UserDni: dni,
+                TenantId: selectedTenant
+            },
         });
 
-        if (user) {
-        
-            const routine = user.Routine;
-            const routineId = user.Routine.id;  // Ajuste para acceder al ID de la rutina
-
-            const filteredExercises = await ExerciseDayOfWeek.findAll({ // Cambio de 'ExerciseDayOfWeeks' a 'ExerciseDayOfWeek'
-                where: {
-                    RoutineId: routineId,
-                    activo: true
-                }
-            });
-
-            return { routine, filteredExercises }; // Ajuste en la estructura del objeto devuelto
-        } else {
-            console.log('Usuario no encontrado');
-            return null;
+        if (!userRoutine) {
+            return { message: 'No se encontró la rutina para este usuario' };
         }
+
+        // Obtener la rutina y sus días de la semana con los ejercicios asociados
+        const routine = await Routine.findByPk(userRoutine.routineId, {
+            include: [
+                {
+                    model: DayOfWeek,  // Relación con DayOfWeek
+                    through: { attributes: [] }, // No necesitas atributos de la tabla intermedia
+                    include: [
+                        {
+                            model: Exercise,  // Relación con los ejercicios
+                            through: { attributes: [] }, // No necesitas atributos de la tabla intermedia ExerciseDayOfWeek
+                        },
+                    ],
+                },
+            ],
+        });
+
+        if (!routine) {
+            return { message: 'No se encontró la rutina' };
+        }
+
+        // Filtrar los ejercicios activos para la rutina si es necesario
+        const filteredExercises = await ExerciseDayOfWeek.findAll({ 
+            where: {
+                RoutineId: routine.id,  // Asegúrate de usar el id correcto
+                activo: true,
+            },
+        });
+
+        console.log('desde controller routine', routine);
+        console.log('desde controller filteredExercises', filteredExercises);
+        
+        return { routine, filteredExercises };  // Retornar rutina y ejercicios filtrados
+
+
+
+        }
+        
+     
     } catch (error) {
         console.error('Error al obtener la rutina del usuario:', error);
         throw error;
     }
 };
+
+
 
 
 

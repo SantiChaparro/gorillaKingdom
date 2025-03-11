@@ -1,125 +1,334 @@
-const { User, Payment, Routine, DayOfWeek, Exercise, sequelize , ExerciseDayOfWeek , RoutineDayOfWeek,Posts,Section,Activity,UserActivities,PaymentActivities} = require('../db');
+const { User, Payment, Routine, DayOfWeek, Exercise, sequelize, ExerciseDayOfWeek, RoutineDayOfWeek, Posts, Section, Activity, UserActivities, PaymentActivities, Tenants, UserTenantRoutine,Subscriptions } = require('../db');
 const { Sequelize, Op, where } = require('sequelize');
-const {hashPassword} = require('../functions/hasPassword');
+const { hashPassword } = require('../functions/hasPassword');
 
-const postNewUser = async (dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password) => {
+//const UserTenantRoutine = require('../models/UserTenantRoutine');
 
-    const hashedPassword = await hashPassword(password);
+const postNewUser = async (dni, nombre, fecha_nacimiento, telefono, mail, domicilio, rol, password, TenantId) => {
+    console.log('tenantid desde controller', TenantId);
+    console.log('dni desde controler postnewuser', dni);
 
+    const existingUser = await User.findByPk(dni);
 
-    const newUser = await User.create({dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password:hashedPassword});
-
-    return newUser;
-};
-
-const getAllUsers = async () => {
-    const users = await User.findAll({
-        order: [
-            ['nombre', 'ASC'] 
-    ]});
-    return users;
-};
-
-
-const getUser = async (name) => {
-    const user = await User.findAll({
-        where: {
-            nombre: {
-                [Op.iLike]: `%${name}%`,
-            },
-        },
-    });
-    
-    return user;
-};
-
-const getUserByPk = async (dni) => {
-    console.log(dni);
-    
-   try {
-    const user = await User.findByPk(dni, {
-        include: [
-            {
-                model: Payment,
-                attributes: ['fecha_pago', 'monto']
-            },
-            {
-                model: Routine,
-                attributes: ['id', 'routineDetail'],
-                include: [
-                    {
-                        model: DayOfWeek,
-                        attributes: ['id'],
-                        through: {
-                            attributes: []
-                        },
-                        include: [
-                            {
-                                model: Exercise,
-                                attributes: ['nombre', 'id'],
-                                through: {
-                                    model: ExerciseDayOfWeek,
-                                    where: { activo: true },
-                                    attributes: []
-                                }
-                            }
-                        ]
-                    }
-                ]
+    if (existingUser) {
+        // Verificar si el usuario ya está registrado para este tenant en la tabla intermedia
+        const existingUserTenant = await UserTenantRoutine.findOne({
+            where: {
+                UserDni: dni,
+                TenantId
             }
-        ]
-    });
-    console.log(user);
-    return user;
-   } catch (error) {
-    console.error('error desde controller', error);
-    throw error;
-   }
-    
+        });
+        if (existingUserTenant) {
+            return {
+                status: 400,
+                message: 'Usuario ya registrado para este Tenant'
+            };
+        } else {
+            // Si el usuario existe pero no tiene relación, crearla
+            await UserTenantRoutine.create({ TenantId, UserDni: dni, RoutineId: null });
+            return {
+                status: 200,
+                message: 'Usuario relacionado al Tenant exitosamente'
+            };
+        }
+    } else {
+        // Si el usuario no existe, crearlo y luego registrar la relación
+        const hashedPassword = await hashPassword(password);
+
+        const newUser = await User.create({
+            dni,
+            nombre,
+            fecha_nacimiento,
+            telefono,
+            mail,
+            domicilio,
+            rol,
+            password: hashedPassword
+        });
+
+        if (newUser) {
+            // Crear la relación con el tenant
+            await UserTenantRoutine.create({ TenantId, UserDni: dni, RoutineId: null });
+        }
+
+        return {
+            status: 200,
+            message: 'Usuario creado y registrado al Tenant exitosamente',
+            newUser
+        };
+    }
 };
 
-const newPayment = async (dni, fecha_pago , monto, medio_pago, activityIds ) => {
+const getAllUsers = async (tenantId) => {
+    try {
+        const tenant = await Tenants.findByPk(tenantId);
+
+        // Si el tenant existe
+        if (tenant) {
+            const tenantDni = tenant.dni;
+
+            // Filtramos los usuarios para no traer al mismo tenant
+            const users = await UserTenantRoutine.findAll({
+                where: {
+                    TenantId: tenantId,
+                },
+            });
+
+            // Función para obtener todos los detalles de los usuarios
+            const usersArray = async (users) => {
+                try {
+                    // Ejecutamos todas las promesas de forma paralela
+                    const allusers = await Promise.all(
+                        users.map(async (user) => {
+                            return await User.findByPk(user.UserDni);
+                        })
+                    );
+                    return allusers;
+                } catch (error) {
+                    console.error('Error en usersArray:', error);
+                    throw error; // Re-lanzamos el error para que lo capture el bloque de `catch` principal
+                }
+            };
+
+            // Llamamos a usersArray para obtener los usuarios
+            const allUsersDetails = await usersArray(users);
+
+            // Logueamos los detalles de los usuarios
+            console.log('Usuarios desde controller:', allUsersDetails);
+
+            return allUsersDetails; // Devolvemos los detalles de los usuarios
+        } else {
+            throw new Error('Tenant no encontrado');
+        }
+    } catch (error) {
+        console.error('Error en getAllUsers:', error);
+        throw error; // Lanzamos el error para que lo maneje quien llame a esta función
+    }
+};
+
+
+
+const getUser = async (name, tenantId) => {
+    try {
+        console.log('tenantId desde búsqueda por nombre:', tenantId);
+
+        const user = await User.findAll({
+            where: {
+                nombre: {
+                    [Op.iLike]: `%${name}%`,
+                },
+                TenantId: tenantId, // Asegúrate de que el nombre del campo sea correcto
+            },
+        });
+
+        return user;
+    } catch (error) {
+        console.error('Error en la búsqueda de usuario:', error);
+        throw error; // O maneja el error como prefieras
+    }
+};
+
+const getUserByPk = async (dni, tenantId) => {
+    console.log('DNI:', dni);
+    console.log('Tenant ID desde controlador getUserByPk:', tenantId);
 
     try {
-        const user = await User.findByPk(dni);  
+        const user = await User.findByPk(dni)
+        // Buscar el usuario por DNI y TenantId
+        const userTenant = await UserTenantRoutine.findOne({
+            where: {
+                UserDni: dni,
+                TenantId: tenantId
+            },
+        });
+
+        // Si no se encuentra el usuario, lanzar un error o retornar null
+        if (!user) {
+            console.log('Usuario no encontrado');
+            return null; // O lanzar un error si lo prefieres
+        }
+
+        // Buscar la rutina asociada si existe el usuario
+        const routine = await Routine.findByPk(userTenant.routineId, {
+            attributes: ['id', 'routineDetail'],
+            include: [
+                {
+                    model: DayOfWeek,
+                    attributes: ['id'],
+                    through: { attributes: [] }, // No incluir atributos del through
+                    include: [
+                        {
+                            model: Exercise,
+                            required: false,
+                            where:{
+                                TenantId: tenantId
+                            },
+                            attributes: ['nombre', 'id'],
+                            through: {
+                                model: ExerciseDayOfWeek,
+                                where: { activo: true },
+                                attributes: [] // No incluir atributos del through
+                            }
+                        }
+                    ]
+                },
+            ]
+        });
+
+        console.log('dias recuperados desde controlador:',routine.DayOfWeeks);
         
-        if (!user || user === null) {
-           
+        return { user, routine };
+
+    } catch (error) {
+        console.error('Error desde controlador:', error);
+        throw error;
+    }
+};
+
+const newPayment = async (dni, fecha_pago, monto, medio_pago, subscriptions, tenantId) => {
+    try {
+        // Buscar al usuario por su dni
+        const user = await User.findByPk(dni);
+        if (!user) {
             throw new Error('Usuario no encontrado');
         }
 
-        const payment = await Payment.create({ fecha_pago, monto, medio_pago });
-        
+        // Crear el registro de pago
+        const payment = await Payment.create({
+            fecha_pago,
+            monto,
+            medio_pago,
+            TenantId: tenantId
+        });
+
         if (!payment) {
-          
             throw new Error('Error al crear el pago');
         }
 
+        // Asociar el pago al usuario
         await user.addPayment(payment);
 
-        for (let id of activityIds) {
-            await PaymentActivities.create({ PaymentId: payment.id, ActivityId: id });
+        // Función para calcular la fecha de vencimiento
+        const calcularFechaVencimiento = (fechaPago, duracionMeses) => {
+            const fecha = new Date(fechaPago); // Convertir la fecha de pago en un objeto Date
+            fecha.setMonth(fecha.getMonth() + duracionMeses); // Sumar la duración en meses
+            return fecha;
+        };
+
+        // Procesar cada suscripción dentro de subscriptions
+        for (const [activityId, subscription] of Object.entries(subscriptions)) {
+            // Crear la relación entre Payment y Activity en PaymentActivities
+            const paymentActivity = await PaymentActivities.create({
+                PaymentId: payment.id,
+                ActivityId: activityId,
+                fecha_vencimiento: calcularFechaVencimiento(fecha_pago, subscription.duration) // Fecha calculada según la duración
+            });
+
+            // Asegurarse de que la actividad del usuario esté asociada y actualizada en UserActivities
+            const userActivity = await UserActivities.findOne({
+                where: {
+                    UserDni: dni,
+                    ActivityId: activityId,
+                },
+            });
+
+            if (userActivity) {
+                // Si la relación ya existe, actualizar el estado de 'isPaid' a true
+                await userActivity.update({ isPaid: true });
+            } else {
+                // Si no existe, crear la relación entre el usuario y la actividad
+                await UserActivities.create({
+                    UserDni: dni,
+                    ActivityId: activityId,
+                    isPaid: true,
+                });
+            }
         }
 
-        return payment; 
-        
+        return payment;
+
     } catch (error) {
-       
         throw new Error(`Error al crear el pago: ${error.message}`);
     }
 };
 
 
 
-const createRoutine = async (routineObj) => {
+
+// const newPayment = async (dni, fecha_pago, monto, medio_pago, subscriptions, tenantId) => {
+//     try {
+//       // Buscar al usuario
+//       const user = await User.findByPk(dni);
+//       if (!user) {
+//         throw new Error('Usuario no encontrado');
+//       }
+  
+//       // Crear el pago
+//       const payment = await Payment.create({ 
+//         fecha_pago, 
+//         monto, 
+//         medio_pago, 
+//         TenantId: tenantId 
+//       });
+  
+//       if (!payment) {
+//         throw new Error('Error al crear el pago');
+//       }
+  
+//       // Asociar el pago al usuario
+//       await user.addPayment(payment);
+  
+//       // Crear la relación entre el pago y las actividades
+//       for (let id of activityIds) {
+//         // Crear la asociación entre Payment y Activity en PaymentActivities
+//         await PaymentActivities.create({ PaymentId: payment.id, ActivityId: id });
+  
+//         // Asegurarse de que UserActivities está correctamente asociada y actualizada
+//         // Aquí estamos asumiendo que la relación entre el usuario y las actividades está definida
+//         const userActivity = await UserActivities.findOne({
+//           where: {
+//             UserDni: dni,
+//             ActivityId: id,
+//           },
+//         });
+  
+//         if (userActivity) {
+//           // Si la relación ya existe, actualizamos el estado de 'isPaid' a 'true'
+//           console.log(userActivity);
+          
+//          await userActivity.update({ isPaid: true });
+//         } else {
+//           // Si no existe, creamos la relación entre el usuario y la actividad
+//           await UserActivities.create({
+//             UserDni: dni,
+//             ActivityId: id,
+//             isPaid: true,
+//           });
+//         }
+//       }
+  
+//       return payment;
+  
+//     } catch (error) {
+//       throw new Error(`Error al crear el pago: ${error.message}`);
+//     }
+//   };
+  
+
+const createRoutine = async (routineObj, TenantId) => {
     try {
         const userId = routineObj.userId;
-        const user = await User.findByPk(userId);
+        const user = await UserTenantRoutine.findOne({
+            where: {
+                UserDni: userId,
+                TenantId
+            }
+        });
 
         if (!user) {
             throw new Error('Usuario no encontrado');
         }
-        
+
         const newRoutine = await Routine.create();
         await user.setRoutine(newRoutine);
 
@@ -148,7 +357,7 @@ const createRoutine = async (routineObj) => {
                             });
 
                             if (!existingRecord) {
-                               
+
                                 await ExerciseDayOfWeek.create({
                                     DayOfWeekId: dayId,
                                     ExerciseId: exerciseId,
@@ -180,67 +389,67 @@ const createRoutine = async (routineObj) => {
 
 
 
- const modifyUser = async (updatedData,dni) => {
+const modifyUser = async (updatedData, dni) => {
 
     const user = await User.findByPk(dni);
-   // console.log('desde el controller',user)
+    // console.log('desde el controller',user)
     // console.log('desde el controller',updatedData)
 
-    const {values} = updatedData;
-    console.log('desde el controller destructurando',values);
-    
-    if(user){
+    const { values } = updatedData;
+    console.log('desde el controller destructurando', values);
+
+    if (user) {
         const updatedUser = await user.update(values);
-       // console.log(updatedUser)
+        // console.log(updatedUser)
         return updatedUser;
-    }else{
+    } else {
         throw new Error('Usuario no encontrado');
     }
 
- };
- const modifyRoutine = async (routineId, updateData) => {
+};
+const modifyRoutine = async (routineId, updateData) => {
     // console.log('desde controller', routineId);
     // console.log('updatedata desde controller', updateData);
 
     try {
-   
+
         const routineIdNumber = parseInt(routineId, 10);
         if (isNaN(routineIdNumber)) {
             throw new Error("Routine ID is not a valid number");
         }
 
-       
+
         const routine = await Routine.findByPk(routineIdNumber);
         if (!routine) {
             throw new Error("Routine not found");
         }
 
-        
+
         let routineDetails = routine.routineDetail || [];
         // console.log('routinedetail desde controller', routineDetails);
 
-        
+
         const { exerciseId, setsAndReps } = updateData;
-        const exerciseIdNumber = parseInt(exerciseId, 10); 
-        
+        const exerciseIdNumber = parseInt(exerciseId, 10);
+
         const detailIndex = routineDetails.findIndex(detail => detail.id === exerciseIdNumber);
         if (detailIndex !== -1) {
-            
+
             routineDetails[detailIndex].setsAndReps = setsAndReps;
         } else {
-            
+
             // console.log(`Detail with id ${exerciseIdNumber} not found, skipping update.`);
         }
 
         // console.log('routineDetails actualizados:', routineDetails);
 
-        
+
         await Routine.update(
             { routineDetail: routineDetails },
-            { where: { id: routineIdNumber } } 
+            { where: { id: routineIdNumber } }
         );
 
-        
+
         return await Routine.findByPk(routineIdNumber);
     } catch (error) {
         // console.error(`Failed to update routine: ${error.message}`);
@@ -248,26 +457,26 @@ const createRoutine = async (routineObj) => {
     }
 };
 
-const deleteExercise = async(routineId,exerciseId) => {
+const deleteExercise = async (routineId, exerciseId) => {
 
-   try {
-    // console.log('desde controller id rutina',routineId);
-    // console.log('desde controller id ehercicio',exerciseId);
+    try {
+        // console.log('desde controller id rutina',routineId);
+        // console.log('desde controller id ehercicio',exerciseId);
 
-    const exercise = await ExerciseDayOfWeek.update({activo:false},{
-        where:{
-            RoutineId:routineId,
-            ExerciseId:exerciseId
-        }
-    })
-    console.log('actualizacion exitosa desde controlador',exercise);
-    return exercise;
-    
-    
-   } catch (error) {
-        console.error('error',error)
+        const exercise = await ExerciseDayOfWeek.update({ activo: false }, {
+            where: {
+                RoutineId: routineId,
+                ExerciseId: exerciseId
+            }
+        })
+        console.log('actualizacion exitosa desde controlador', exercise);
+        return exercise;
+
+
+    } catch (error) {
+        console.error('error', error)
         throw error
-   }
+    }
 
 
 };
@@ -288,7 +497,7 @@ const createNewExercise = async (routineId, dayId, exerciseId, routineDetail) =>
                 ExerciseId: exerciseId
             }
         });
-        
+
         if (existingExercise) {
             await existingExercise.update({ activo: true });
 
@@ -300,7 +509,7 @@ const createNewExercise = async (routineId, dayId, exerciseId, routineDetail) =>
                 { routineDetail: newDetail },
                 { where: { id: routineId }, returning: true }
             );
-            
+
             // console.log("Updated Routine:", updatedRoutine);
 
             return existingExercise;
@@ -308,7 +517,7 @@ const createNewExercise = async (routineId, dayId, exerciseId, routineDetail) =>
             const response = await ExerciseDayOfWeek.create({
                 DayOfWeekId: dayId,
                 ExerciseId: exerciseId,
-                RoutineId: routineId 
+                RoutineId: routineId
             });
 
             if (response) {
@@ -319,9 +528,9 @@ const createNewExercise = async (routineId, dayId, exerciseId, routineDetail) =>
                     { routineDetail: newDetail },
                     { where: { id: routineId }, returning: true }
                 );
-                
+
                 // console.log("Updated Routine:", updatedRoutine);
-                
+
                 return { response, routine: updatedRoutine };
             }
         }
@@ -345,80 +554,90 @@ const getPaymentsWithFilters = async (filters) => {
     });
 };
 
-const getAllPayments = async() => {
+const getAllPayments = async (tenantId) => {
+    console.log('tenantid desde getallpayments', tenantId);
 
-     try {
+    try {
         const payments = await Payment.findAll({
-          include: [
-            {
-              model: User,  // Incluye la tabla de usuarios
-              attributes: ['dni', 'nombre'], // Trae los campos que necesites del usuario
+            where: {
+                TenantId: tenantId,
             },
-            {
-              model: Activity,  // Incluye la tabla de actividades a través de PaymentActivities
-              attributes: ['nombre','costo'], // Trae los campos que necesites de la actividad
-              through: {
-                attributes: [],  // Si no necesitas los campos de la tabla intermedia PaymentActivities
-              },
-            },
-          ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['dni', 'nombre'],
+
+                },
+                {
+                    model: Activity,
+                    attributes: ['nombre', 'costo'],
+                    through: {
+                        attributes: [],
+                    },
+                },
+            ],
         });
-    
+
         return payments;
-      } catch (error) {
+    } catch (error) {
         console.error("Error fetching payments with user and activities:", error);
         throw error;
-      }
+    }
 
 };
 
-const getAllExercises = async () => {
+const getAllExercises = async (TenantId) => {
 
     const allExercises = await Exercise.findAll({
-        attributes:['id','nombre','grupo_muscular']
+        where: {
+            TenantId
+        },
+        attributes: ['id', 'nombre', 'grupo_muscular']
     });
 
-    if(allExercises){
+    if (allExercises) {
         return allExercises;
-    }else{
+    } else {
         throw new Error('Error al cargar los ejercicios')
     }
 };
 
-const postExercise = async (nombre,grupo_muscular,descripcion) => {
+const postExercise = async (nombre, grupo_muscular, descripcion, TenantId) => {
+    console.log('tenantid desde controller', TenantId);
 
-    const newExercise = await Exercise.create({nombre,grupo_muscular,descripcion})
+    const newExercise = await Exercise.create({ nombre, grupo_muscular, descripcion })
 
-    if(newExercise){
+    if (newExercise) {
+        await newExercise.setTenant(TenantId);
         return newExercise;
-    }else{
+    } else {
         throw new Error('Error al crear el ejercicio');
     }
 
 };
 
-const createNewDay = async (routineId,day) => {
+const createNewDay = async (routineId, day) => {
     // console.log(routineId);
     // console.log('desde controller dayToAdd',day);
-    
-    
+
+
     const routine = await Routine.findByPk(routineId);
-    console.log('rutina desde controler addDay',routine);
-    
-    if(routine){
+    console.log('rutina desde controler addDay', routine);
+
+    if (routine) {
         const dayId = await DayOfWeek.findByPk(day);
         console.log(day);
-        
-        if(day){
-           return await routine.addDayOfWeek(day);
+
+        if (day) {
+            return await routine.addDayOfWeek(day);
         }
     }
 };
 
-const removeDay = async(routineId, day) => {
+const removeDay = async (routineId, day) => {
 
-    // console.log(routineId);
-    // console.log(day);
+     console.log('desde delete day rouitineid',routineId);
+     console.log(day);
 
     const routine = await Routine.findByPk(routineId);
     const dayToRemove = await DayOfWeek.findByPk(day);
@@ -450,7 +669,7 @@ const createNewPost = async (titulo, subTitulo, cuerpo, uploadedImages) => {
     // console.log(subTitulo);
     // console.log(cuerpo);
     // console.log(uploadedImages);
-    
+
     try {
         // Crear el nuevo post en la base de datos
         const newPost = await Posts.create({
@@ -467,17 +686,17 @@ const createNewPost = async (titulo, subTitulo, cuerpo, uploadedImages) => {
     }
 };
 
-const getPosts = async() => {
+const getPosts = async () => {
 
     const response = await Posts.findAll();
-    
+
     return response;
 
 };
 
 const postSection = async (name, settings) => {
     console.log('postSection - creando nueva sección con nombre:', name);
-    
+
     const newSection = await Section.create({
         name: name,
         settings: [settings], // Guardar settings como un array
@@ -488,7 +707,7 @@ const postSection = async (name, settings) => {
 
 const updateExistingSection = async (name, newSettings) => {
     console.log('updateExistingSection - buscando sección con nombre:', name);
-    
+
     // Buscar si existe una sección con el mismo nombre
     const section = await Section.findOne({ where: { name } });
 
@@ -511,81 +730,99 @@ const updateExistingSection = async (name, newSettings) => {
 };
 
 
-const allSections = async() => {
+const allSections = async () => {
     const sections = await Section.findAll();
     return sections
 };
 
-const createActivity = async(nombre,costo) => {
+const createActivity = async (nombre, costo, descripcion, TenantId) => {
     console.log(nombre);
     console.log(costo);
-    
-    
-    const activity = await Activity.create({nombre,costo});
-    console.log(activity);
-    
-    return activity;
+    console.log('tenantid desde createactivity controller', TenantId);
+
+    const tenant = await Tenants.findByPk(TenantId);
+
+    if (tenant) {
+
+        const activity = await Activity.create({ nombre, costo, descripcion });
+        if (activity) {
+            await activity.setTenant(TenantId);
+            console.log(activity);
+
+            return activity;
+        }
+    }
+
+
 
 };
 
-const allActivities = async() => {
-    const activities = await Activity.findAll();
+const allActivities = async (TenantId) => {
+    const activities = await Activity.findAll({
+        where: {
+            TenantId: TenantId
+        }
+    });
     return activities;
 };
 
 const addActivityToUser = async (dni, activityId) => {
     console.log(dni);
     console.log(activityId);
-    
-    
+
+
     try {
 
         const existingUserActivity = await UserActivities.findOne({
-            where:{
+            where: {
                 UserDni: dni,
                 ActivityId: activityId
             }
         });
-        if(existingUserActivity){
-            existingUserActivity.update({activo:true});
-        }else{
+        if (existingUserActivity) {
+            existingUserActivity.update({ activo: true });
+        } else {
 
             const user = await User.findByPk(dni);
 
-        if (user) {
-            const activityToAdd = await Activity.findByPk(activityId);
+            if (user) {
+                const activityToAdd = await Activity.findByPk(activityId);
 
-            if (activityToAdd) {
-                await user.addActivity(activityToAdd);
-                
-                return { message: 'Actividad agregada con éxito' };
+                if (activityToAdd) {
+                    await user.addActivity(activityToAdd);
+
+                    return { message: 'Actividad agregada con éxito' };
+                } else {
+                    throw new Error('Actividad no encontrada');
+                }
             } else {
-                throw new Error('Actividad no encontrada');
+                throw new Error('Usuario no encontrado');
             }
-        } else {
-            throw new Error('Usuario no encontrado');
-        }
 
         };
 
-        
+
     } catch (error) {
         console.error(error);
         throw error;
     }
 };
 
-const findUserActivities = async(dni) => {
-    console.log('dni desde controller',dni);
-    
+const findUserActivities = async (dni,TenantId) => {
+    console.log('dni desde controller', dni);
+
     try {
         const userActivities = await UserActivities.findAll({
-            where:{
+            where: {
                 UserDni: dni,
-                activo: true
-            }
+                activo: true,
+                
+            },
+           
         });
-        return userActivities;
+        
+       return userActivities;
+       
     } catch (error) {
         console.error(error);
         throw error;
@@ -593,28 +830,95 @@ const findUserActivities = async(dni) => {
 
 };
 
-const deleteActivity = async(dni,activityId) => {
+const deleteActivity = async (dni, activityId) => {
 
     console.log(dni);
     console.log(activityId);
 
     try {
-        const activity = await UserActivities.update({activo:false},{
-            where:{
+        const activity = await UserActivities.update({ activo: false }, {
+            where: {
                 UserDni: dni,
                 ActivityId: activityId
             }
         });
-        return{message: 'Actividad eliminada con éxito',activity}
+        return { message: 'Actividad eliminada con éxito', activity }
     } catch (error) {
         console.error(error);
         throw error;
     }
-    
-    
+
+
 
 };
 
+const createSubscription = async (duration, discount, tenantId) => {
+    console.log('duration: desde codntroller ccreate', duration);   
+    console.log('discount: desde codntroller ccreate', discount);
+    console.log('tenantId: desde codntroller ccreate', tenantId);
+    
+
+    try {
+        const existingSubscription = await Subscriptions.findOne({
+            where: {
+                duration,
+                TenantId: tenantId
+            }
+        });
+
+        if (existingSubscription) {
+            throw new Error('Ya existe una suscripción con esa duración');
+        }
+        const newSubscription = await Subscriptions.create({
+            duration,
+            discount,
+            TenantId: tenantId
+        });
+
+        return newSubscription;
+    } catch (error) {
+        console.error('Error al crear la suscripción:', error);
+        throw error;
+    }
+};
+
+const allSubscriptions = async (tenantId) => {
+    // console.log('tenantId desde controller', tenantId);
+
+    try {
+        const subscriptions = await Subscriptions.findAll({
+            where: {
+                TenantId: tenantId
+            }
+        });
+
+        return subscriptions;
+    } catch (error) {
+        console.error('Error al buscar las suscripciones:', error);
+        throw error;
+    }
+};
+
+const modifySubscription = async (subscriptionId, updateData) => {
+     console.log('subscriptionId:', subscriptionId);
+     console.log('updateData:', updateData);
+
+    try {
+        const subscription = await Subscriptions.findByPk(subscriptionId);
+
+        if (!subscription) {
+            throw new Error('Suscripción no encontrada');
+        }
+
+        const updatedSubscription = await subscription.update(updateData);
+
+        return updatedSubscription;
+    } catch (error) {
+        console.error('Error al modificar la suscripción:', error);
+        throw error;
+    }
+}
 
 
-module.exports = {postNewUser,getAllUsers,getUser,getUserByPk,newPayment,createRoutine,modifyUser,modifyRoutine,getAllPayments,getAllExercises,postExercise,deleteExercise,createNewExercise,createNewDay,removeDay,createNewPost,getPosts,postSection,allSections,createActivity,allActivities,addActivityToUser,findUserActivities,deleteActivity,getPaymentsWithFilters,updateExistingSection };
+
+module.exports = { postNewUser, getAllUsers, getUser, getUserByPk, newPayment, createRoutine, modifyUser, modifyRoutine, getAllPayments, getAllExercises, postExercise, deleteExercise, createNewExercise, createNewDay, removeDay, createNewPost, getPosts, postSection, allSections, createActivity, allActivities, addActivityToUser, findUserActivities, deleteActivity, getPaymentsWithFilters, updateExistingSection, createSubscription, allSubscriptions,modifySubscription };

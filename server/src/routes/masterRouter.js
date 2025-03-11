@@ -1,5 +1,6 @@
 const {Router} = require("express");
 const upload = require('../config/multerConfig');
+const {authenticateToken} = require('../middleWare/authenticateToken ');
 
 
 const { postUser,
@@ -24,6 +25,9 @@ const { postUser,
         addActivity,
         getUserActivities,
         removeUserActivity,
+        getSubscriptions,
+        postSubscription,
+        upDateSubscription
         
         
        
@@ -59,7 +63,10 @@ masterRouter.post('/newActivity',postActivity);
 masterRouter.get('/allActivities',getActivities);
 masterRouter.post('/addSctivityByUserId/:dni',addActivity);
 masterRouter.get('/currentUserActivities/:dni',getUserActivities);
-masterRouter.patch('/removeUserActivity/:dni',removeUserActivity)
+masterRouter.patch('/removeUserActivity/:dni',removeUserActivity);
+masterRouter.get('/allSubscriptions',getSubscriptions);
+masterRouter.post('/newSubscription',postSubscription);
+masterRouter.patch('/updateSubscription/:id',upDateSubscription);
 
 
 

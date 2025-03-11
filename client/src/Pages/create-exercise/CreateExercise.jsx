@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 import { useExercisesStore } from "../../store/useExercisesStore";
 import { useFormik } from "formik";
 import {
@@ -15,6 +15,8 @@ import Swal from 'sweetalert2';
 import { border, boxSizing, display, height, maxWidth, padding, width } from "@mui/system";
 import picture from '../../../src/assests/imagenes/createExercise.png'
 import zIndex from "@mui/material/styles/zIndex";
+import { jwtDecode } from "jwt-decode";
+import Cookies from 'js-cookie';
 
 const initialValues = {
   nombre: "",
@@ -40,27 +42,31 @@ const validate = (values) => {
   return errors;
 };
 
-const handleSubmit = async (values, newExercise, resetForm) => {
+const handleSubmit = async (values, newExercise, resetForm,TenantId) => {
   const { nombre, grupo_muscular, descripcion } = values;
-  const exercise = newExercise(nombre, grupo_muscular, descripcion);
-  resetForm();
-  if(exercise){
-    Swal.fire({
-        icon: 'success',
-        title: 'Excelente!',
-        text: 'Ejercisio creado exitosamente.',
-        showConfirmButton: true,
-       // timer: 2000
-    });
-}else{
-    Swal.fire({
-        icon: 'error',
-        title: 'Upss!',
-        text: 'Hubo un problema, intenta de nuevo.',
-        showConfirmButton: true,
-       // timer: 2000
-    });
-}
+  if(TenantId){
+    const exercise = newExercise(nombre, grupo_muscular, descripcion,TenantId);
+    
+    if(exercise){
+      Swal.fire({
+          icon: 'success',
+          title: 'Excelente!',
+          text: 'Ejercisio creado exitosamente.',
+          showConfirmButton: true,
+         // timer: 2000
+      });
+      resetForm();
+  }else{
+      Swal.fire({
+          icon: 'error',
+          title: 'Upss!',
+          text: 'Hubo un problema, intenta de nuevo.',
+          showConfirmButton: true,
+         // timer: 2000
+      });
+  }
+  }
+ 
 };
 
 const MainContainer = styled(Box)(({ theme }) => ({
@@ -238,12 +244,41 @@ const textFieldStyles = {
 
 
 const CreateExercise = () => {
+  const [TenantId, setTenantId] = useState("");
   const { newExercise } = useExercisesStore();
+
+   useEffect(() => {
+         
+          const token = Cookies.get('token');  
+        
+          
+  
+          if (token) {
+              try {
+                  // Decodificar el token usando jwt-decode
+                  const decodedToken = jwtDecode(token);
+                 
+                  
+                  
+                  // Extraer el tenantId (asegúrate de que 'tenantId' esté en el token)
+                  const tenantIdFromToken = decodedToken.TenantId;
+                  console.log('tenantId desde crear ejercicio',tenantIdFromToken);
+                  
+                  
+                  // Guardar tenantId en el estado
+                  setTenantId(tenantIdFromToken);
+              } catch (error) {
+                  console.error('Error decodificando el token:', error);
+              }
+          } else {
+              console.warn('Token no encontrado en la cookie.');
+          }
+      }, []);
 
   const formik = useFormik({
     initialValues,
     onSubmit: (values, { resetForm }) => {
-      handleSubmit(values, newExercise, resetForm);
+      handleSubmit(values, newExercise,resetForm,TenantId);
     },
     validate,
   });

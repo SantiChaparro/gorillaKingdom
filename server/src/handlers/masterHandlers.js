@@ -25,7 +25,10 @@ const {
     findUserActivities,
     deleteActivity,
     getPaymentsWithFilters,
-    updateExistingSection 
+    updateExistingSection,
+    createSubscription,
+    allSubscriptions,
+    modifySubscription 
 } = require('../controllers/masterControllers');
 
 const Routine = require('../models/Routine');
@@ -37,32 +40,45 @@ const { json } = require('sequelize');
 
 const postUser = async (req,res)=>{
     console.log(req.body);
-    const {dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password} = req.body;
-    const existingUser = await User.findByPk(dni);
-    
-    if(existingUser){
-        res.send('Usuario ya registrado');
+    const {dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password,TenantId} = req.body;
+    console.log('desde handler tenantid',TenantId);
+
+    try {
+
+        const newUser = await postNewUser(dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password,TenantId);
+
+        res.status(200).json({ message: 'Usuario creado', newUser});
+
+    } catch (error) {
+        res.status(500).json({error:error.message});
     }
-    else{
-
-        try {
-
-            const newUser = await postNewUser(dni,nombre,fecha_nacimiento,telefono,mail,domicilio,rol,password);
-
-            res.status(200).json({ message: 'Usuario creado', newUser});
     
-        } catch (error) {
-            res.status(500).json({error:error.message});
-        }
+    // const existingUser = await User.findByPk(dni);
+    
+    // if(existingUser){
+    //     res.send('Usuario ya registrado');
+    // }
+    // else{
 
-    }
+       
+
+    // }
 
 };
 
 
 const getUsers = async (req, res) => {
     const { name } = req.query;
-    const { dni } = req.params;
+    const {tenantId} = req.query;
+    const { dni  } = req.params;
+    console.log('req.user desde getusers',req.query);
+    
+   // const tenantId = req.user.TenantId;
+   console.log('tenantId desde params get users', tenantId);
+   
+
+   // console.log('tenantId desde token get users', tenantId);
+    
 
     console.log(dni);
 
@@ -70,11 +86,11 @@ const getUsers = async (req, res) => {
         let user;
 
         if (name) {
-            user = await getUser(name);
+            user = await getUser(name,tenantId);
         } else if (dni) {
-            user = await getUserByPk(dni);
+            user = await getUserByPk(dni,tenantId);
         } else {
-            user = await getAllUsers();
+            user = await getAllUsers(tenantId);
         }
 
         if (user !== null && (Array.isArray(user) ? user.length > 0 : true)) {
@@ -91,16 +107,18 @@ const getUsers = async (req, res) => {
 
 const postPayment = async (req,res) => {
     const paymentData = req.body;
+    const {TenantId} = req.query;
     console.log(paymentData);
+    console.log('tenantdid desde postpayment',TenantId);
     
-    const { dni , fecha_pago , monto, medio_pago ,activityIds } = paymentData;
-    console.log(dni,fecha_pago,monto,medio_pago);
+    const { dni , fecha_pago , monto, medio_pago ,subscriptions } = paymentData;
+    console.log(dni,fecha_pago,monto,medio_pago,subscriptions);
     
     
 
     try {
         
-        const payment = await newPayment(dni, fecha_pago , monto, medio_pago,activityIds )
+        const payment = await newPayment(dni, fecha_pago , monto, medio_pago,subscriptions,TenantId); 
 
         res.status(200).json(payment);
 
@@ -113,12 +131,15 @@ const postPayment = async (req,res) => {
 const postRoutine = async (req,res) => {
 
     const {routineObj} = req.body;
+    const {TenantId} = req.query;
     console.log('desde handler',req.body)
     console.log('desde el handler',routineObj);
+    console.log('tenantId desde handler postroutine',TenantId);
+    
 
     try {
         
-        const newRoutine = await createRoutine(routineObj);
+        const newRoutine = await createRoutine(routineObj,TenantId);
 
         if(newRoutine){
             const successMessage = "Rutina creada con éxito"
@@ -190,8 +211,11 @@ const removeExercise = async (req,res) => {
 };
 
 const getPayments = async (req, res) => {
-    const { month, dni } = req.query; // Cambiado a req.query para obtener parámetros de consulta
-    console.log('Received params:', { month, dni });
+    const { month, dni, tenantId } = req.query; // Cambiado a req.query para obtener parámetros de consulta
+    console.log('Received params:', { month, dni , tenantId});
+    console.log('tenantId desde getpayments handler',tenantId);
+    console.log('req desde getpayments handler',req);
+    
 
     try {
         // Construir objeto de filtros dinámicos
@@ -201,12 +225,14 @@ const getPayments = async (req, res) => {
 
         let allPayments;
 
+        allPayments = await getAllPayments(tenantId);
+
         // Si no hay filtros, obtener todos los pagos
-        if (Object.keys(filters).length === 0) {
-            allPayments = await getAllPayments(); // Llama a getAllPayments si no hay filtros
-        } else {
-            allPayments = await getPaymentsWithFilters(filters); // Obtén pagos con filtros si los hay
-        }
+        // if (Object.keys(filters).length === 0) {
+        //     allPayments = await getAllPayments(tenantId); // Llama a getAllPayments si no hay filtros
+        // } else {
+        //     allPayments = await getPaymentsWithFilters(filters); // Obtén pagos con filtros si los hay
+        // }
 
         res.status(200).json(allPayments);
     } catch (error) {
@@ -215,10 +241,13 @@ const getPayments = async (req, res) => {
 };
 
 const getExercises = async (req,res) => {
+    const {TenantId} = req.query;
+    console.log('tenantId desde getexercises handler',TenantId);
+    
 
     try {
 
-        const foundExercises = await getAllExercises();
+        const foundExercises = await getAllExercises(TenantId);
         res.status(200).json(foundExercises);
 
     } catch (error) {
@@ -230,11 +259,14 @@ const getExercises = async (req,res) => {
 };
 
 const createExercise = async (req,res) => {
+    const {TenantId} = req.query;
+    console.log('tenantId desde createexercise handler',TenantId);
+    
     const {nombre,grupo_muscular,descripcion} = req.body;
 
     try {
         
-        const newExercise = await postExercise(nombre,grupo_muscular,descripcion);
+        const newExercise = await postExercise(nombre,grupo_muscular,descripcion,TenantId);
 
         res.status(200).json(newExercise);
 
@@ -296,7 +328,7 @@ const addDay = async(req,res) => {
     const{routineId} = req.params;
     const{day} = req.body;
     console.log('desde handler body',req.body);
-    console.log((routineId));
+    console.log(('desde addday',routineId));
     console.log(day);
     
     
@@ -437,14 +469,19 @@ const getAllSections = async(req,res) => {
 };
 
 const postActivity = async(req,res) => {
-    const {nombre , costo} = req.body;
+    const {nombre , costo, descripcion} = req.body;
+    const {Tenantid} = req.query;	
     console.log(nombre);
     console.log(costo);
+    console.log(descripcion);
+    console.log('tenantid desde postactivity handler',Tenantid);
+    
+    
     
     
 
     try {
-        const newActivity = await createActivity(nombre,costo);
+        const newActivity = await createActivity(nombre,costo,descripcion,Tenantid);
         res.status(200).json(newActivity);
     } catch (error) {
         res.status(500).send({error:error.message})
@@ -452,9 +489,14 @@ const postActivity = async(req,res) => {
 };
 
 const getActivities = async(req,res) => {
+    const { TenantId } = req.query;
+    console.log('req.query desde getactivities handler',req.query);
+    
+    console.log('tenantId desde getactivities handler',TenantId);
+    
 
     try {
-        const activities = await allActivities();
+        const activities = await allActivities(TenantId);
         res.status(200).json(activities);
     } catch (error) {
         res.status(500).send({error:error.message})
@@ -479,9 +521,11 @@ const addActivity = async(req,res) => {
 
 const getUserActivities = async(req,res) => {
     const {dni} = req.params;
+    const {Tenantid} = req.query;
+    console.log('tenantId desde getuseractivities handler',Tenantid);
 
     try {
-        const userActivities = await findUserActivities(dni);
+        const userActivities = await findUserActivities(dni,Tenantid);
         res.status(200).json(userActivities);
     } catch (error) {
         res.status(500).send({error:error.message});
@@ -502,6 +546,53 @@ const removeUserActivity = async(req,res) => {
 
 };
 
+const postSubscription = async(req,res) => {
+    const {tenantId} = req.query;
+    const {duration,discount} = req.body;
+    console.log('body desde postsubscription handler',req.body);
+    
+    console.log('tenantId desde postsubscription handler',tenantId);
+    console.log('duration desde postsubscription handler',duration);
+    console.log('discount desde postsubscription handler',discount);
+    
+
+    try {
+        const newSubscription = await createSubscription(duration,discount,tenantId);
+        res.status(200).json(newSubscription);
+    } catch (error) {
+        res.status(500).send({error:error.message});
+    }
+};
+
+const getSubscriptions = async(req,res) => {
+    const {tenantId} = req.query;
+    console.log('tenantId desde getsubscriptions handler',tenantId);
+
+    try {
+        const subscriptions = await allSubscriptions(tenantId);
+        res.status(200).json(subscriptions);
+    } catch (error) {
+        res.status(500).send({error:error.message});
+    }
+};
+
+const upDateSubscription = async(req,res) => {
+    const {id} = req.params;
+    const updateData = req.body;
+    console.log('body desde handler updatesubscription',req.body);
+    
+    console.log('id desde handler',id);
+    console.log('updateData desde handler updatesubscription',updateData);
+    
+
+    try {
+        const updatedSubscription = await modifySubscription(id,updateData);
+        res.status(200).json(updatedSubscription);
+    } catch (error) {
+        res.status(500).send({error:error.message});
+    }
+};
 
 
-module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine,getPayments,getExercises,createExercise,removeExercise,addExercise,addDay,deleteDay,newPost,getAllPosts,addSection,getAllSections,postActivity,getActivities,addActivity,getUserActivities,removeUserActivity};
+
+module.exports = {postUser,getUsers,postPayment,postRoutine,updateUser,updateRoutine,getPayments,getExercises,createExercise,removeExercise,addExercise,addDay,deleteDay,newPost,getAllPosts,addSection,getAllSections,postActivity,getActivities,addActivity,getUserActivities,removeUserActivity,postSubscription,getSubscriptions,upDateSubscription};

@@ -17,8 +17,12 @@ import Settings from './Pages/settings/Settings';
 import UserNavBar from './Components/UserNavBar';
 import Payments from './Pages/payments/Payments';
 import AllPayments from './Pages/payments/AllPayments';
+import CreateActivity from './Pages/activities/CreateActivity';
+import UpdateActivity from './Pages/activities/UpdateActivity';
 import { useLocation } from 'react-router-dom';
 import Features from './Pages/features/Features';
+import Onboarding from './Pages/OnBoarding';
+import Subscriptions from './Pages/subscriptions/Subscriptions';
 
 
 
@@ -27,7 +31,13 @@ function App() {
   const [openMasterdrawere , setOpenMasterdrawer] = useState(false);
   const [verifiedUser , setVerifiedUser] = useState("");
   const [openLandingDrawer, setOpenLandingDrawer] = useState(false);
+  const [userTenants, setUserTenants] = useState([]);
+   const [selectedTenants, setSelectedTenants] = useState(userTenants.length === 1 ? userTenants[0].id : '');
   console.log(verifiedUser);
+  console.log('array de tenants',userTenants);
+  console.log('tenant elegido',selectedTenants);
+  
+  
   
 
   const handleMenuClick = () => {
@@ -56,17 +66,18 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser} setOpenLandingDrawer={setOpenLandingDrawer} hanldeCloseDrawer={hanldeCloseDrawer} openLandingDrawer={openLandingDrawer} />} />
         <Route path="/features" element={<Features />} />
+        <Route path="/onboarding" element={<Onboarding/>}/>
         <Route
           path="/master"
           element={<Dashboard />}
         />
         <Route
           path="/usuario"
-          element={<UserDashBoard verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser}/>}
+          element={<UserDashBoard verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser} selectedTenants={selectedTenants} setSelectedTenants={setSelectedTenants} userTenants={userTenants} setUserTenants={setUserTenants} />}
         />
         <Route
           path="/usuario-rutina"
-          element={<UserRoutine verifiedUser={verifiedUser}/>}
+          element={<UserRoutine verifiedUser={verifiedUser} selectedTenants={selectedTenants}/>}
         />
          <Route
         path='/master/crear-rutina'
@@ -88,6 +99,14 @@ function App() {
         path='/master/crear-ejercicio'
         element={<CreateExercise/>}
         />
+        <Route
+        path='/master/crear-actividad'
+        element={<CreateActivity/>}
+        />
+        <Route
+        path='/master/editar-actividad'
+        element={<UpdateActivity/>}
+        />
          <Route
         path='/master/posts'
         element={<Posts/>}
@@ -104,6 +123,12 @@ function App() {
         path='/master/all-payments'
         element={<AllPayments/>}
         />
+       <Route
+        path='/master/subscriptions'
+        element={<Subscriptions/>}
+       />
+        <Route path="/success" element={<Landing/>} />
+        <Route path="/pending" element={<Landing/>} />
       </Routes>
       <UserDrawer open={opendrawer} onClose={closeUserDrawer }setVerifiedUser={setVerifiedUser} />
       <MasterDrawer open={openMasterdrawere} onClose={closeMasterdrawer} setVerifiedUser={setVerifiedUser}/>

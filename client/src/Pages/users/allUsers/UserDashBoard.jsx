@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
-import { Box, styled, Typography } from '@mui/material';
+import { Box, styled, TextField, Typography,MenuItem} from '@mui/material';
 import {jwtDecode} from 'jwt-decode';  // jwtDecode no necesita destructuring
 import Cookies from 'js-cookie';  // Importa js-cookie
 import { usePostStore } from '../../../store/usePostStore';
@@ -10,26 +10,38 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import Loader from '../../../Components/loader/Loader';  // Asegúrate de que el componente loader esté en mayúsculas
 import { boxSizing, fontSize, height, textAlign } from '@mui/system';
 
-const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser, setVerifiedUser }) => {
+const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser, setVerifiedUser,selectedTenant,setSelectedTenants,userTenants,setUserTenants }) => {
    const { getPost, posts } = usePostStore();
    const { getSections, sections } = useSectionStore();
    const [loading, setLoading] = useState(true);
    const [orderedSections, setOrderedSections] = useState([]);
    const [selectedFont, setSelectedFont] = useState([]); // Estado para la fuente seleccionada
    const [selectedFontSize, setSelectedFontSize] = useState([]);
-   console.log(posts);
-   console.log(sections);
-   console.log(orderedSections);
-   console.log(selectedFont);
-   console.log(selectedFontSize);
+  // const [userTenants, setUserTenants] = useState([]);
+   //const [selectedTenant, setSelectedTenant] = useState(userTenants.length === 1 ? userTenants[0].id : '');
+  // console.log(posts);
+  // console.log(sections);
+  // console.log(orderedSections);
+ //  console.log(selectedFont);
+ //  console.log(selectedFontSize);
+ console.log('user tenants desde userdasboard',userTenants);
+ console.log('selected tenant desde userdasboard',selectedTenant);
+ console.log(userTenants.length);
+ 
+ 
+ 
    
    
    
    
   useEffect(() => {
     getPost();
-    getSections();
-  }, []);
+    if(userTenants.length === 1){
+      setSelectedTenants(userTenants[0].id);
+
+    }
+   // getSections();
+  }, [selectedTenant,userTenants]);
 
   useEffect(() => {
     if (posts.length > 0 || sections.length > 0) {
@@ -50,14 +62,19 @@ const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser, set
         console.log(decodedToken);
         const currentTime = Date.now() / 1000;  // Obtener la hora actual en formato UNIX
         if (decodedToken.exp > currentTime) {   // Comparar con el tiempo de expiración
-          setVerifiedUser(decodedToken.user);  // Establecer el usuario verificado
+          setVerifiedUser(decodedToken.user);
+          console.log(decodedToken.tenantsData);
+            // Establecer el usuario verificado
+          if(decodedToken.tenantsData.length > 0){
+            setUserTenants(decodedToken.tenantsData);  // Establecer los inquilinos del usuario
+          };  // Establecer los inquilinos del usuario
         }
       } catch (error) {
         console.error("Error al decodificar el token:", error);
         Cookies.remove('token');  // Remover el token si es inválido
       }
     }
-  }, [setVerifiedUser]);
+  }, [setVerifiedUser,setSelectedTenants]);
 
   const handleSections = () => {
     if (sections && sections.length > 0) {
@@ -114,96 +131,57 @@ const UserDashBoard = ({ handleMenuClick, onClose, opendrawer, verifiedUser, set
       setOrderedSections(sortedSections); // Guarda las secciones ordenadas y con estilos parseados
     }
   };
+
+  const handleTenantChange = (event) => {
+    setSelectedTenants(event.target.value);
+    
+  };
   
 
-  useEffect(() => {
-    selectedFont.forEach(font => {
-      const link = document.createElement('link');
-      link.href = `https://fonts.googleapis.com/css2?family=${font.replace(' ', '+')}&display=swap`;
-      link.rel = 'stylesheet';
-      document.head.appendChild(link);
+  // useEffect(() => {
+  //   selectedFont.forEach(font => {
+  //     const link = document.createElement('link');
+  //     link.href = `https://fonts.googleapis.com/css2?family=${font.replace(' ', '+')}&display=swap`;
+  //     link.rel = 'stylesheet';
+  //     document.head.appendChild(link);
 
-      return () => {
-        document.head.removeChild(link);
-      };
-    });
-  }, [selectedFont]);
+  //     return () => {
+  //       document.head.removeChild(link);
+  //     };
+  //   });
+  // }, [selectedFont]);
 
   return (
     <MainContainer>
-      <UserNavBar handleMenuClick={handleMenuClick} opendrawer={opendrawer} />
+      <UserNavBar handleMenuClick={handleMenuClick} opendrawer={opendrawer} userTenants = {userTenants}/>
       <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Typography sx={{ color: 'black', marginTop: '100px', marginBottom: '50px', fontFamily: 'nunito', fontWeight: '600', fontSize: '25px' }}>
           {`bienveni@ ${verifiedUser?.nombre}`}
         </Typography>
       </Box>
 
-      {loading ? (
-        <Loader />  // Asegúrate de que el componente loader esté en mayúsculas
+     
+      <Box>
+      {userTenants.length > 1 ? (
+        <TextField
+          select
+          fullWidth
+          label="Selecciona tu gimnasio"
+          value={selectedTenant}
+          onChange={handleTenantChange}
+        >
+          {userTenants.map((tenant) => (
+            <MenuItem key={tenant.id} value={tenant.id}>
+              {tenant.nombre}
+            </MenuItem>
+          ))}
+        </TextField>
       ) : (
-        sections.length > 0 && orderedSections.map((section, sectionIndex) => (
-          <SectionBox id={`${section.id}`} key={section.id}>
-            <SectionName>{`${section.name}`}</SectionName>
-            <SectionContainer>
-            {section.settings.map((setting, index) => (
-             
-              <SectionContentContainer key={index}>
-                <SectionTextContainer>
-                <Typography 
-                    sx={{
-                      width: '100%',
-                      color: setting.sectionStyle?.titulo?.color || 'black',
-                      fontFamily: selectedFont.includes(section.sectionStyle?.titulo?.fontFamily) 
-                        ? setting.sectionStyle?.titulo?.fontFamily 
-                        : 'nunito',
-                      fontSize: {
-                        xs: '18px',  // Tamaño de fuente para pantallas pequeñas
-                        sm: setting.sectionStyle?.titulo?.fontSize || '24px',
-                        md:   '30px'
-                      },
-                      textAlign:'center',
-                    }} 
-                   // variant="h5"
-                  >
-                    {setting.titulo || 'Default Titulo'}
-                  </Typography>
-                {/* Renderizamos el subtitulo */}
-                <Typography sx={{
-                  width: '100%',
-                  color: setting.sectionStyle?.subTitulo?.color || 'black',
-                  fontFamily: setting.sectionStyle?.subTitulo?.fontFamily || 'nunito',
-                  fontSize: setting.sectionStyle?.subTitulo?.fontSize || '24px',
-                }}>{setting.subTitulo || 'Default Subtitulo'}</Typography>
-        
-                <br />
-        
-                {/* Renderizamos el cuerpo */}
-                <Typography sx={{
-                  width: '100%',
-                  color: setting.sectionStyle?.cuerpo?.color || 'black',
-                  fontFamily: setting.sectionStyle?.cuerpo?.fontFamily || 'nunito',
-                  fontSize: setting.sectionStyle?.cuerpo?.fontSize || '24px',
-                }}>{setting.cuerpo || 'Default Cuerpo'}</Typography>
-                  </SectionTextContainer>
-                {/* Renderizamos las imágenes */}
-                <MultimediaContainer>
-                  {setting.imagenes?.map((url, imageIndex) => (
-                    <img
-                      key={imageIndex}
-                      src={url}
-                      alt={`multimedia-${imageIndex}`}
-                      style={{ width: '100%', borderRadius:'10px' }}
-                    />
-                  ))}
-                </MultimediaContainer>
-              </SectionContentContainer>
-             
-            ))}
-            </SectionContainer>
-          </SectionBox>
-        ))
-        
+        <Typography>
+          {`Tu gimnasio es ${userTenants[0]?.nombre}`}
+        </Typography>
       )}
+    </Box>
 
       <Box>
         {posts.map((post) => (
@@ -463,4 +441,71 @@ const SectionName = styled(Box)(({ theme }) => ({
    
   },
 }));
+
+ {/* {loading ? (
+        <Loader />  // Asegúrate de que el componente loader esté en mayúsculas
+      ) : (
+        sections.length > 0 && orderedSections.map((section, sectionIndex) => (
+          <SectionBox id={`${section.id}`} key={section.id}>
+            <SectionName>{`${section.name}`}</SectionName>
+            <SectionContainer>
+            {section.settings.map((setting, index) => (
+             
+              <SectionContentContainer key={index}>
+                <SectionTextContainer>
+                <Typography 
+                    sx={{
+                      width: '100%',
+                      color: setting.sectionStyle?.titulo?.color || 'black',
+                      fontFamily: selectedFont.includes(section.sectionStyle?.titulo?.fontFamily) 
+                        ? setting.sectionStyle?.titulo?.fontFamily 
+                        : 'nunito',
+                      fontSize: {
+                        xs: '18px',  // Tamaño de fuente para pantallas pequeñas
+                        sm: setting.sectionStyle?.titulo?.fontSize || '24px',
+                        md:   '30px'
+                      },
+                      textAlign:'center',
+                    }} 
+                   // variant="h5"
+                  >
+                    {setting.titulo || 'Default Titulo'}
+                  </Typography>
+                
+                <Typography sx={{
+                  width: '100%',
+                  color: setting.sectionStyle?.subTitulo?.color || 'black',
+                  fontFamily: setting.sectionStyle?.subTitulo?.fontFamily || 'nunito',
+                  fontSize: setting.sectionStyle?.subTitulo?.fontSize || '24px',
+                }}>{setting.subTitulo || 'Default Subtitulo'}</Typography>
+        
+                <br />
+        
+               
+                <Typography sx={{
+                  width: '100%',
+                  color: setting.sectionStyle?.cuerpo?.color || 'black',
+                  fontFamily: setting.sectionStyle?.cuerpo?.fontFamily || 'nunito',
+                  fontSize: setting.sectionStyle?.cuerpo?.fontSize || '24px',
+                }}>{setting.cuerpo || 'Default Cuerpo'}</Typography>
+                  </SectionTextContainer>
+                
+                <MultimediaContainer>
+                  {setting.imagenes?.map((url, imageIndex) => (
+                    <img
+                      key={imageIndex}
+                      src={url}
+                      alt={`multimedia-${imageIndex}`}
+                      style={{ width: '100%', borderRadius:'10px' }}
+                    />
+                  ))}
+                </MultimediaContainer>
+              </SectionContentContainer>
+             
+            ))}
+            </SectionContainer>
+          </SectionBox>
+        ))
+        
+      )} */}
 

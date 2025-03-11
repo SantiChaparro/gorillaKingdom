@@ -22,6 +22,10 @@ module.exports = (sequelize) => {
         activo: {
             type: DataTypes.BOOLEAN,
             defaultValue: true
+        },
+        isPaid: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     });
 

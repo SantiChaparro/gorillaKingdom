@@ -12,9 +12,10 @@ export const usePaymentsStore = create((set) => ({
         return payments
     },
 
-    fetchAllPayments: async() => {
-
-        const payments = await axios.get('http://localhost:3001/master/payment');
+    fetchAllPayments: async(tenantId) => {
+        console.log('tenantId desde paymentstore',tenantId);
+        
+        const payments = await axios.get('http://localhost:3001/master/payment',{params:{tenantId}});
         set({payments: payments.data});
         return payments
     }

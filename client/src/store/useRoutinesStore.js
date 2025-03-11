@@ -6,11 +6,11 @@ export const useRoutinesStore = create((set) => ({
     succesMessage: "",
     errorMessage: "",
 
-    postRoutine: async (routineObj) => {
+    postRoutine: async (routineObj,TenantId) => {
       console.log(routineObj);
       try {
           console.log('desde store', routineObj);
-          const routine = await axios.post('http://localhost:3001/master/routine', { routineObj });
+          const routine = await axios.post('http://localhost:3001/master/routine', { routineObj },{params:{TenantId}});
           console.log('desde store routine.data', routine.data.successMessage)
           set({ succesMessage: routine.data.successMessage });
           return routine.data;
@@ -33,10 +33,13 @@ export const useRoutinesStore = create((set) => ({
     },
 
 
-    getRoutine: async(dni) => {
+    getRoutine: async(dni,userTenants) => {
+      console.log('desde getroutine del store',dni);
+      console.log('desde getroutine del store',userTenants);
+      
 
        try {
-        const userroutine = await axios.get(`http://localhost:3001/user/routine/${dni}`);
+        const userroutine = await axios.get(`http://localhost:3001/user/routine/${dni}`, {params:{userTenants}});
         console.log('desde el store',userroutine.data);
         set({routines:userroutine.data})
         return userroutine.data;
@@ -92,7 +95,10 @@ export const useRoutinesStore = create((set) => ({
     },
 
     addingNewExercise: async (routineId,addExercise) => {
-
+      console.log(routineId);
+      console.log('desde addingnewexercise',addExercise);
+      
+      
       try {
         const response = await axios.patch(`http://localhost:3001/master/addExercise/${routineId}`,addExercise);
         set({ succesMessage: response.data.successMessage });

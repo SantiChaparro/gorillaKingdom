@@ -14,6 +14,8 @@ import Swal from 'sweetalert2';
 import { boxSizing, color, height, maxHeight, minHeight, width } from "@mui/system";
 import picture1 from '../../../../src/assests/imagenes/editRoutineLeft.png';
 import picture2 from '../../../../src/assests/imagenes/editRoutineRitght.png';
+import Cookies from 'js-cookie';  // Importa js-cookie
+import {jwtDecode} from 'jwt-decode';  // Importa jwt-decode
 
 const UpdateRoutine = () => {
     const { exercises, fetchExercises } = useExercisesStore();
@@ -40,6 +42,40 @@ const UpdateRoutine = () => {
     const [dayToAdd, setDayToAdd] = useState({ day: "" });
     const [dayToRemove, setDayToRemove] = useState({ day: null });
     const [loading, setLoading] = useState(false);
+    const [TenantId, setTenantId] = useState('');
+
+    console.log('desde updateroutine',TenantId);
+    console.log(user);
+    
+    
+
+     useEffect(() => {
+             
+              const token = Cookies.get('token');  
+            
+              
+      
+              if (token) {
+                  try {
+                      // Decodificar el token usando jwt-decode
+                      const decodedToken = jwtDecode(token);
+                     
+                      
+                      
+                      // Extraer el tenantId (asegúrate de que 'tenantId' esté en el token)
+                      const tenantIdFromToken = decodedToken.TenantId;
+                      console.log('tenantIdFromToken',tenantIdFromToken);
+                      
+                      
+                      // Guardar tenantId en el estado
+                      setTenantId(tenantIdFromToken);
+                  } catch (error) {
+                      console.error('Error decodificando el token:', error);
+                  }
+              } else {
+                  console.warn('Token no encontrado en la cookie.');
+              }
+          }, []);
 
     console.log(dayToRemove);
     console.log(isAddingDays);
@@ -69,10 +105,14 @@ const UpdateRoutine = () => {
 
     useEffect(() => {
 
-        setUser(searchedUser);
-        fetchExercises();
+        if(TenantId){
+            setUser(searchedUser);
+            fetchExercises(TenantId);
+        }
 
-    }, [searchedUser, addExercise, getUserById]);
+       
+
+    }, [searchedUser, addExercise, getUserById,TenantId]);
 
     useEffect(() => {
         if (day && currentExercise && detailValue[currentExercise]) {
@@ -91,7 +131,7 @@ const UpdateRoutine = () => {
         if (userId.trim()) {
             setLoading(true);
             try {
-                await getUserById(userId);
+                await getUserById(userId,TenantId);
                 
                 // Simular un retraso de 2 segundos antes de ocultar el loader
                 setTimeout(() => {
@@ -109,7 +149,7 @@ const UpdateRoutine = () => {
     const handleEdit = (dayIndex, exerciseIndex, exerciseId) => {
         setIsAddingDayId(null)
         setEditingIndices({ dayIndex, exerciseIndex });
-        const routineDetail = user.Routine.routineDetail.find(detail => detail.id === exerciseId) || {};
+        const routineDetail = user.routine.routineDetail.find(detail => detail.id === exerciseId) || {};
         setSetsAndReps(routineDetail.setsAndReps || "");
     };
 
@@ -120,7 +160,7 @@ const UpdateRoutine = () => {
 
     const handleSave = async (exerciseId) => {
         console.log('Guardar cambios:', setsAndReps);
-        const id = user.RoutineId;
+        const id = user.routine.id;
 
         const updatedData = {
             exerciseId: exerciseId,
@@ -129,7 +169,7 @@ const UpdateRoutine = () => {
 
         try {
             const modifyRoutine = await masterUpdateRoutine(id, updatedData);
-            await getUserById(userId);
+            await getUserById(userId,TenantId);
             setEditingIndices({ dayIndex: null, exerciseIndex: null });
             if(modifyRoutine){
                 Swal.fire({
@@ -167,7 +207,7 @@ const UpdateRoutine = () => {
 
             const newExercise =await addingNewExercise(routineId, exerciseToAdd);
             setIsAddingDayId(null);
-            await getUserById(userId);
+            await getUserById(userId,TenantId);
             if(newExercise){
                 Swal.fire({
                     icon: 'success',
@@ -198,27 +238,27 @@ const UpdateRoutine = () => {
         try {
             console.log('desde handledelete', user);
 
-            await removeExercise(user.RoutineId, exerciseId);
+            await removeExercise(user.routine.id, exerciseId);
             console.log('a ver si llega aca?');
 
 
             setUser(prevUser => {
 
-                const updatedDays = prevUser.Routine.DayOfWeeks.map(day => ({
+                const updatedDays = prevUser.routine.DayOfWeeks.map(day => ({
                     ...day,
                     Exercises: day.Exercises.filter(exercise => exercise.id !== exerciseId)
                 }));
                 return {
                     ...prevUser,
-                    Routine: {
-                        ...prevUser.Routine,
+                    routine: {
+                        ...prevUser.routine,
                         DayOfWeeks: updatedDays
                     }
                 };
             });
             console.log('dlete/2');
 
-            await getUserById(userId);
+            await getUserById(userId,TenantId);
         } catch (error) {
             console.error('Error en handleDelete:', error);
         }
@@ -299,7 +339,7 @@ const UpdateRoutine = () => {
         console.log(response);
 
         setIsAddingDays(false);
-        getUserById(userId);
+        getUserById(userId,TenantId);
         setDayToAdd(prevState => (
             { ...prevState, day: "" }
         ));
@@ -313,7 +353,7 @@ const UpdateRoutine = () => {
             await deleteDay(routineId, { day: dayId });
 
 
-            await getUserById(userId);
+            await getUserById(userId,TenantId);
         } catch (error) {
             console.error('Error al eliminar el día:', error);
         }
@@ -358,9 +398,9 @@ const UpdateRoutine = () => {
             {loading ? (
                 <Loader />
             ) : (
-                user && user.RoutineId ? (
+                user && user.routine ? (
                     <UserContainer>
-                        <CustomTypography sx={{ marginBottom: '25px' }}>{user.nombre}</CustomTypography>
+                        <CustomTypography sx={{ marginBottom: '25px' }}>{user.user.nombre}</CustomTypography>
                         <Button
                             sx={{  background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', marginBottom: '30px', width:'100%' }}
                             onClick={handleIsAddingDays}
@@ -382,7 +422,7 @@ const UpdateRoutine = () => {
                                 />
                                 <Button
                                     sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', marginTop: '10px', marginBottom: '2px', width: '100%' }}
-                                    onClick={() => { confirmAddDay(user.RoutineId, dayToAdd) }}
+                                    onClick={() => { confirmAddDay(user.routine.id, dayToAdd) }}
                                 >
                                     CONFIRMAR
                                 </Button>
@@ -393,7 +433,7 @@ const UpdateRoutine = () => {
                             </AddnewDayContainer>
                         ) : null}
                         <RoutineContainer >
-                            {user.Routine.DayOfWeeks.map((day, dayIndex) => (
+                            {user.routine.DayOfWeeks.map((day, dayIndex) => (
                                 <RoutineDisplay key={dayIndex}>
                                     <DayMenuContainer>
                                         <CustomTypography>{`Día ${day.id}`}</CustomTypography>
@@ -410,7 +450,7 @@ const UpdateRoutine = () => {
                                         <Tooltip  content="Eliminar día" color="white" placement="top" arrow="true" style={{backgroundColor:'black', borderRadius:'10px',color:'white',padding:'5px',boxShadow:'0 4px 8px rgba(0, 0, 0, 0.15)',fontFamily:'Nunito',transition: 'opacity 0.2s ease, transform 0.2s ease',transitionDelay: '0s'}}>
                                             <span>
                                             <IconButton
-                                                onClick={() => { handleDeleteDay(user.RoutineId, day.id) }}
+                                                onClick={() => { handleDeleteDay(user.routine.id, day.id) }}
                                             >
                                                 <DeleteForeverIcon sx={{ color: 'black', fontSize: '1.5em', marginBottom: '5px', marginLeft: '15px' }} />
                                             </IconButton>
@@ -444,7 +484,7 @@ const UpdateRoutine = () => {
                                                 )}
                                                 <AddExerciseButtonContainer>
                                                     <Button
-                                                        onClick={() => { handleSaveNewExercise(user.RoutineId, addExercise) }}
+                                                        onClick={() => { handleSaveNewExercise(user.routine.id, addExercise) }}
                                                         sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white', width: '100%' }}
                                                     >
                                                         GRABAR CAMBIOS

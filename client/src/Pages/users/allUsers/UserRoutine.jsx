@@ -7,15 +7,26 @@ import {jwtDecode} from "jwt-decode";
 import Swal from 'sweetalert2';
 import trainingImage from '../../../assests/imagenes/womenLift.jpg';
 
-const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
+const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
   const { getRoutine, modifyRoutine, routines } = useRoutinesStore();
   const [option, setOption] = useState("");
   const [selectedDayRoutine, setSelectedDayRoutine] = useState(null);
   const [routine, setRoutine] = useState({});
   const [updateData, setUpdateData] = useState({});
+  const [dni,setDni] = useState("");
+  const [tenant,setTenant] = useState("");
+  console.log('selectedtenant desde userroutine',selectedTenants);
+  
+  console.log('tenantid',tenant);
+  console.log('userdni',dni);
+  console.log(routines);
+  
+  
+  
 
 
-  let dni = verifiedUser.dni;
+
+  //let dni = verifiedUser.dni;
   
   console.log(routine);
   console.log(updateData);
@@ -27,18 +38,35 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
     if(token){
       const decodedToken = jwtDecode(token);
       console.log(decodedToken.user.dni);
-      dni = decodedToken.user.dni
+      console.log(decodedToken);
+      
+      //const dni = decodedToken.user.dni;
+      setDni(decodedToken.user.dni);
+      setTenant(selectedTenants);
+     // const tenant = decodedToken.tenantsData[0].id;
     }
     
   },[])
 
    
   useEffect(() => {
-    handleRoutine(dni);
+    if(dni && tenant){
+      handleRoutine(dni,tenant);
+    }
+    
    
-  }, []);
+  }, [dni,tenant]);
 
-
+  useEffect(() => {
+    if (routine.message === "Pago pendiente") {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Pago pendiente',
+        text: routine.message,
+        showConfirmButton: true,
+      });
+    }
+}, [routine]);
   
   useEffect(() => {
     const updateRoutineDetails = async () => {
@@ -91,9 +119,9 @@ const UserRoutine = ({ handleMenuClick, verifiedUser}) => {
   };
   
 
-  const handleRoutine = async (dni) => {
-   const response = await getRoutine(dni);
-  // console.log(response);
+  const handleRoutine = async (dni,tenant) => {
+   const response = await getRoutine(dni,tenant);
+   console.log(response);
    
     setRoutine(response)
     

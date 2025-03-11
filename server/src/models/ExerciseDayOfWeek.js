@@ -7,7 +7,6 @@ module.exports = (sequelize) => {
             autoIncrement: true,
             primaryKey: true
         },
-
         DayOfWeekId: {
             type: DataTypes.INTEGER,
             references: {
@@ -30,7 +29,15 @@ module.exports = (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: true
         }
+    }, {
+        // Aquí es donde defines la clave única compuesta
+        uniqueKeys: {
+            uniqueDayExerciseRoutine: {
+                fields: ['DayOfWeekId', 'ExerciseId', 'RoutineId']
+            }
+        }
     });
 
-   
-};  
+    return ExerciseDayOfWeek;
+};
+

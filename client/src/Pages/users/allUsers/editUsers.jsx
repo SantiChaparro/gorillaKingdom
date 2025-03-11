@@ -28,6 +28,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { border, boxSizing, display, height, maxWidth, padding, width } from "@mui/system";
 import edituser from '../../../assests/imagenes/edituser1.png';
 import edituser2 from '../../../assests/imagenes/edituser2.png';
+import Cookies from 'js-cookie';
+import {jwtDecode} from 'jwt-decode';
+
+
+
 
 const EditUsers = () => {
     const { users, fetchUsers, modifyUser, searchedUser, getUserByName } = useUsersStore();
@@ -48,16 +53,39 @@ const EditUsers = () => {
     const [loading , setLoading] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState('');
     const [openModal, setOpenModal] = useState(false);  // Controla la visibilidad del modal
+    const [Tenantid, setTenantId] = useState('');
+
+    console.log('tenantId desde edit users',Tenantid);
+    
    
     const fetchData = async () => {
         setLoading(true);
-        await fetchUsers();
+        if((Tenantid)){
+            await fetchUsers(Tenantid);
+        }
+       
         setLoading(false);
     };
 
     useEffect(() => {
-        fetchData();
-    }, [fetchUsers]);
+      //  fetchData();
+        const token = Cookies.get('token');
+        console.log('token desde update users',token);
+        const decoded = jwtDecode(token);
+        console.log('decoded desde update users',decoded);
+        console.log('tenantId desde update users',decoded.TenantId);
+        setTenantId(decoded.TenantId);
+        
+        
+        
+        
+    }, []);
+
+    useEffect(() => {
+        if (Tenantid) {
+            fetchData();  // Llamas a fetchData solo cuando Tenantid ha sido actualizado
+        }
+    }, [Tenantid]); // Esta dependencia solo dispara fetchData cuando Tenantid cambia
 
     useEffect(() => {
         fetchActiveUsers();
@@ -147,7 +175,7 @@ const EditUsers = () => {
 
     const handleSearch = async (name) => {
         setSearchValue(name); 
-        getUserByName(name); 
+        getUserByName(name,Tenantid); 
     };
 
     const handleActivityChange = (event) => {
@@ -198,7 +226,7 @@ const EditUsers = () => {
                 <ContentContainer>
                 <CustomTypography>Editar usuario</CustomTypography>
                 <SearchBarContainer>
-                    <SearchBar handleSearch={handleSearch} resetSearchValue={resetSearchValue} />
+                    <SearchBar handleSearch={handleSearch} resetSearchValue={resetSearchValue} tenantId = {Tenantid}/>
                 </SearchBarContainer>
                 {loading ? (
                     <Loader /> 

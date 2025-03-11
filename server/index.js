@@ -22,7 +22,7 @@ conn.sync({force: true}).then(async ()=>{
         daysLoader();
         usersLoader();
         activityLoader();
-        paymentLoader();
+       // paymentLoader();
         console.log('Ejercicios cargados exitosamente en base de datos');
         console.log('Días cargados con éxito');
 

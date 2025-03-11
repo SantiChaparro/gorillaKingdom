@@ -6,9 +6,10 @@ export const useUsersStore = create((set) => ({
     users: [],
     searchedUser: [],
    
-    fetchUsers: async () => {
+    fetchUsers: async (tenantId) => {
         try {
-            const users = await axios.get('http://localhost:3001/master/findUsers');
+            console.log("tenantId que se está enviando:", tenantId);
+            const users = await axios.get('http://localhost:3001/master/findUsers',{params:{tenantId}});
             console.log(users.data);
             set({ users: users.data });
         } catch (error) {
@@ -16,10 +17,11 @@ export const useUsersStore = create((set) => ({
         }
     },
 
-    getUserById: async(dni) => {
+    getUserById: async(dni,tenantId) => {
         console.log('dni desde store',dni);
+        console.log('tenantid desde store',tenantId);
         try {
-            const response = await axios.get(`http://localhost:3001/master/findUsers/${dni}`)
+            const response = await axios.get(`http://localhost:3001/master/findUsers/${dni}`,{params:{tenantId}});
             console.log('respuesta desde el store',response.data);
             set({searchedUser:response.data});
            
@@ -30,7 +32,7 @@ export const useUsersStore = create((set) => ({
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Usuario no encontrado',
+                    text: 'Usuario no encontrado',   
                 });
             }
         }
@@ -39,7 +41,7 @@ export const useUsersStore = create((set) => ({
     clearSearchedUser: () => set({ searchedUser: [] }), // Método para limpiar el estado
 
     postUser: async(values) => {
-        console.log(values);
+        console.log('valores recibidos en el store',values);
         try {
             const newUser = await axios.post('http://localhost:3001/master',values)
             console.log(newUser);
@@ -61,10 +63,10 @@ export const useUsersStore = create((set) => ({
         }
     },
 
-    getUserByName: async(name)=> {
+    getUserByName: async(name,tenantId)=> {
 
         try {
-            const response = await axios.get(`http://localhost:3001/master/findUsers?name=${name}`);
+            const response = await axios.get(`http://localhost:3001/master/findUsers?name=${name}`,{params:{tenantId}});
             set({ searchedUser: response.data });
         } catch (error) {
             

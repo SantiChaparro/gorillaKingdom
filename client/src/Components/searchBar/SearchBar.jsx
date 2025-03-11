@@ -5,13 +5,18 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 
-const SearchBar = ({ handleSearch, resetSearchValue }) => {
+const SearchBar = ({ handleSearch, resetSearchValue, tenantId }) => {
     const [searchTerm, setSearchTerm] = useState('');
-
+    console.log('tenantId desde searchbar',tenantId);
+    
     const handleChange = (event) => {
         const { value } = event.target;
         setSearchTerm(value);
-        handleSearch(value);
+        if (tenantId) { // Asegúrate de que tenantId esté definido
+            handleSearch(value, tenantId);
+        } else {
+            console.error('TenantId is undefined in SearchBar');
+        }
     };
 
     useEffect(() => {

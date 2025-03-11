@@ -10,6 +10,10 @@ import Swal from 'sweetalert2';
 import { boxSizing, display, height, maxWidth } from "@mui/system";
 import picture1 from '../../../src/assests/imagenes/payment1.png';
 import picture2 from '../../../src/assests/imagenes/payment2.png';
+import Cookies from 'js-cookie';  // Importa js-cookie
+import {jwtDecode} from 'jwt-decode';  // Importa jwt-decode
+import SelectSubscription from "../../Components/selectSubscription/SelectSubscription";
+import { use } from "react";
 
 
 
@@ -24,9 +28,32 @@ const Payments = () => {
   const [amounts, setAmounts] = useState({});
   const [selectedPaymentMode , setSelectedPaymentMode ] = useState("");
   const [paymentDate, setPaymentDate] = useState(new Date()); 
+   const [TenantId, setTenantId] = useState("");
+  // const [selectedSubscription, setSelectedSubscription] = useState(""); este anda
+  const [selectedSubscription, setSelectedSubscription] = useState({});
+   const [subscriptionCost, setSubscriptionCost] = useState({});
+  const [activitiesByUser, setActivitiesByUser] = useState([]);
   console.log(paymentDate);
   console.log(userActivities);
   console.log(searchedUser);
+  console.log(TenantId);
+  console.log(activities);
+  console.log('selectedsubscription',selectedSubscription);
+  console.log('subscriptioncost',subscriptionCost);
+  console.log(totalAmount);
+  console.log('activityuser',activitiesByUser);
+  //console.log('activitibyuserid',activitiesByUser[0].id);
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
 
@@ -34,9 +61,9 @@ const Payments = () => {
     if (userId.trim()) {
       setLoading(true);
       try {
-        await getUserById(userId);
-        if (searchedUser) {
-          fetchUserActivities(userId);
+        await getUserById(userId,TenantId);
+        if (searchedUser && TenantId) {
+          fetchUserActivities(userId,TenantId);
           setLoading(false);
         }
       } catch (error) {
@@ -54,43 +81,92 @@ const Payments = () => {
   };
 
   const filteredActivities = activities.filter(activity =>
-    userActivities.some(userActivity => userActivity.ActivityId === activity.id)
+    userActivities.some(userActivity => userActivity.ActivityId === activity.id && userActivity.isPaid === false)
+    
+    
   );
 
-  const handleAmountChange = (event, activityId) => {
-    const amount = parseFloat(event.target.value) || 0; 
+  useEffect(() => {
+    if(filteredActivities.length > 0){
+    setActivitiesByUser(filteredActivities);
+    }
+  },[userActivities]);
+  console.log(filteredActivities);
 
-    
-    setAmounts((prevAmounts) => ({
-      ...prevAmounts,
-      [activityId]: amount,
-    }));
-
-    
-    setTotalAmount((prevTotalAmount) => {
-      const previousAmount = amounts[activityId] || 0; 
-      return prevTotalAmount - previousAmount + amount; 
-    });
+ 
+  const handleAmountChange = () => {
+    // Verificar que subscriptionCost tenga valores
+    if (Object.keys(subscriptionCost).length > 0) {
+      let newTotalAmount = 0; // Inicializar la variable para almacenar el nuevo total
+  
+      // Recorrer el objeto subscriptionCost para sumar todos los valores
+      for (const subscription in subscriptionCost) {
+        if (subscriptionCost.hasOwnProperty(subscription)) {
+          newTotalAmount += subscriptionCost[subscription]; // Sumar el costo actual al total
+        }
+      }
+  
+      // Actualizar el estado de totalAmount fuera del bucle
+      setTotalAmount(newTotalAmount);
+    }
   };
+  
+  
 
+
+  // aca voy a hacer la funcion para calcular el costo a pagar en funcion de la subscripcion elegida
+  // si no elige subscripcion se le cobra el costo de la actividad
+  // si elige subscripcion se le cobra el costo de la actividad multiplicado por la cantidad de meses de la subscrip. menos el descuento
+
+  // 
+  
+  useEffect(() => {
+    if (selectedSubscription && activitiesByUser) {
+      for (const activity of activitiesByUser) {
+        console.log(activity.cost);
+  
+        // Accediendo a la suscripción específica para la actividad actual
+        const subscription = selectedSubscription[activity.id];
+  
+        if (subscription) {
+          const cost = (activity.costo * subscription.duration) - 
+            ((activity.costo * subscription.duration) * subscription.discount / 100);
+          
+          console.log('cost', cost);
+  
+          // Verificamos si el costo calculado es diferente al que tenemos almacenado
+          if (subscriptionCost[activity.id] !== cost || !subscriptionCost[activity.id]) {
+            setSubscriptionCost((prevSubscriptionCost) => ({
+              ...prevSubscriptionCost,
+              [activity.id]: cost,
+            }));
+          }
+        }
+      }
+    }
+  }, [selectedSubscription, activitiesByUser, userId]);
+  
+  
   const handlePaymentModeChange =(event) => {
     const paymentMode = event.target.value;
     setSelectedPaymentMode(paymentMode);
   };
 
   const handleSubmit = async () => {
-    const activityIds = Object.keys(amounts).filter(activityId => amounts[activityId] > 0);
+   // const activityIds = Object.keys(amounts).filter(activityId => amounts[activityId] > 0);
+   const activityIds = activitiesByUser.map(activity => activity.id);
   
     const paymentData = {
       dni: userId,
       monto: totalAmount,
       medio_pago: selectedPaymentMode,
       fecha_pago: dayjs(paymentDate).format("YYYY-MM-DD"), 
-      activityIds
+     // activityIds
+     subscriptions: selectedSubscription // si no anda volver a poner activityIds
     };
   
     try {
-      const response = await axios.post(`http://localhost:3001/master/postPayment`, paymentData);
+      const response = await axios.post(`http://localhost:3001/master/postPayment`, paymentData,{params:{TenantId}});
       console.log(response.data);
       
      
@@ -130,11 +206,46 @@ const Payments = () => {
       });
     }
   };
+
+   useEffect(() => {
+         
+          const token = Cookies.get('token');  
+        
+          
+  
+          if (token) {
+              try {
+                  // Decodificar el token usando jwt-decode
+                  const decodedToken = jwtDecode(token);
+                 
+                  
+                  
+                  // Extraer el tenantId (asegúrate de que 'tenantId' esté en el token)
+                  const tenantIdFromToken = decodedToken.TenantId;
+                  console.log('tenantIdFromToken',tenantIdFromToken);
+                  
+                  
+                  // Guardar tenantId en el estado
+                  setTenantId(tenantIdFromToken);
+              } catch (error) {
+                  console.error('Error decodificando el token:', error);
+              }
+          } else {
+              console.warn('Token no encontrado en la cookie.');
+          }
+      }, []);
   
 
   useEffect(() => {
-    fetchActivities();
-  }, []);
+    if(TenantId){
+      fetchActivities(TenantId);
+      //fetchUserActivities(userId,TenantId);
+    }
+  }, [TenantId]);
+
+  useEffect(() => {
+    handleAmountChange()
+  },[subscriptionCost])
 
   return (
     <MainContainer>
@@ -169,40 +280,25 @@ const Payments = () => {
           <TableHead>
             <TableRow sx={{ width: '100%', borderBottom: "2px solid #ca99ef" }}>
               <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Actividad</TableCell>
+              <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Subscripcion</TableCell>
               <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Costo</TableCell>
-              <TableCell sx={{ fontSize: '20px', color: "black", borderBottom: "none" }}>Importe</TableCell>
+           
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredActivities.map((activity) => (
               <TableRow key={activity.id} sx={{ borderBottom: "2px solid #ca99ef" }}>
                 <TableCell sx={{ fontSize: '15px', color: "black", borderBottom: "none" }}>{activity.nombre}</TableCell>
-                <TableCell sx={{ color: "black", borderBottom: "none" }}>{`$${activity.costo}`}</TableCell>
                 <TableCell sx={{ borderBottom: "none" }}>
-                  <TextField
-                    type="number"
-                    value={amounts[activity.id] || ''} 
-                    onChange={(event) => handleAmountChange(event, activity.id)}
-                    sx={{
-                      width: "100px",
-                      "& .MuiOutlinedInput-root": {
-                        color: "black",
-                        "& fieldset": {
-                          borderColor: "black",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "black",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "black",
-                        },
-                      },
-                      "& .MuiInputBase-input": {
-                        color: "black",
-                      }
-                    }}
+                  <SelectSubscription
+                    activityId={activity.id}
+                    tenantId={TenantId}
+                    selectedSubscription={selectedSubscription}
+                    setSelectedSubscription={setSelectedSubscription}
                   />
-                </TableCell>
+               </TableCell>
+                <TableCell sx={{ color: "black", borderBottom: "none" }}>{subscriptionCost[activity.id] !== undefined ? `${subscriptionCost[activity.id]}` : null}</TableCell>
+               
               </TableRow>
             ))}
             <TableRow>
@@ -365,3 +461,6 @@ const textFieldStyles = {
       color: 'black',
   }
 };
+
+// import picture1 from '../../../src/assests/imagenes/payment1.png';
+// import picture2 from '../../../src/assests/imagenes/payment2.png';

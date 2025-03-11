@@ -12,6 +12,8 @@ import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { height, maxHeight, maxWidth } from "@mui/system";
+import Cookies from 'js-cookie';  // Importa js-cookie
+import {jwtDecode} from 'jwt-decode';  // Importa jwt-decode
 
 
 // Aquí el resto del código...
@@ -24,14 +26,46 @@ const AllPayments = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filteredPayments, setFilteredPayments] = useState([]);
+    const [TenantId, setTenantId] = useState("");
     console.log(filteredPayments);
     console.log(filters.month);
     console.log(filters.dni);
+    console.log(TenantId);
+    
+
+    useEffect(() => {
+       
+        const token = Cookies.get('token');  
+      
+        
+
+        if (token) {
+            try {
+                // Decodificar el token usando jwt-decode
+                const decodedToken = jwtDecode(token);
+               
+                
+                
+                // Extraer el tenantId (asegúrate de que 'tenantId' esté en el token)
+                const tenantIdFromToken = decodedToken.TenantId;
+                
+                // Guardar tenantId en el estado
+                setTenantId(tenantIdFromToken);
+            } catch (error) {
+                console.error('Error decodificando el token:', error);
+            }
+        } else {
+            console.warn('Token no encontrado en la cookie.');
+        }
+    }, []);
     
     
     useEffect(() => {
-        fetchAllPayments();
-    }, [filters, fetchAllPayments]);
+        if(TenantId){
+            fetchAllPayments(TenantId);
+        }
+        
+    }, [filters, fetchAllPayments,TenantId]);
 
     useEffect(() => {
         const applyFilters = () => {

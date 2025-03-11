@@ -17,6 +17,10 @@ module.exports = (sequelize) => {
         costo:{
             type: DataTypes.FLOAT,
             allowNull: false,
-        }
+        },
+        descripcion:{
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     })
 };
