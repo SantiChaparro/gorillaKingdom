@@ -112,6 +112,26 @@ const isDesktopDrawer = isDesktop && isMasterOrUserRoute;
           </StyledAccordionDetails>
         </StyledAccordion>
 
+        {/* Acordeón de Actividades */} 
+        <StyledAccordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon style={{ color: 'black' }} />}>
+            <ListItemIcon>
+              <GroupIcon style={{ color: 'black' }} />
+            </ListItemIcon>
+            <Typography variant="h6" sx={{ color: 'black' }}>Actividades</Typography>
+          </AccordionSummary>
+          <StyledAccordionDetails>
+            <StyledListItem onClick={() => handleListItemClick('/master/crear-actividad')}>
+              <ListItemIcon><AddIcon fontSize="large" style={{ color: 'black' }} /></ListItemIcon>
+              <ListItemText><Typography variant="h6" sx={{ color: 'black' }}>Crear actividad</Typography></ListItemText>
+            </StyledListItem>
+            <StyledListItem onClick={() => handleListItemClick('/master/editar-actividad')}>
+              <ListItemIcon><EditIcon fontSize="large" style={{ color: 'black' }} /></ListItemIcon>
+              <ListItemText><Typography variant="h6" sx={{ color: 'black' }}>Editar actividad</Typography></ListItemText>
+            </StyledListItem>
+          </StyledAccordionDetails>
+        </StyledAccordion>
+
         {/* Acordeón de Pagos */}
         <StyledAccordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon style={{ color: 'black' }} />}>
@@ -141,6 +161,11 @@ const isDesktopDrawer = isDesktop && isMasterOrUserRoute;
           <ListItemIcon><SettingsIcon fontSize="large" style={{ color: 'black' }} /></ListItemIcon>
           <ListItemText><Typography variant="h6" sx={{ color: 'black' }}>Ajustes</Typography></ListItemText>
         </StyledListItem>
+
+        <StyledListItem onClick={() => handleListItemClick('/master/subscriptions')} sx={{ marginTop: '20px' }}>
+              <ListItemIcon><EditIcon fontSize="large" style={{ color: 'black' }} /></ListItemIcon>
+              <ListItemText><Typography variant="h6" sx={{ color: 'black' }}>Subscripciones</Typography></ListItemText>
+            </StyledListItem>
 
         {/* ListItem para Salir */}
         <StyledListItem onClick={handleLogout} sx={{ marginTop: '20px' }}>

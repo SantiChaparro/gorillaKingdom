@@ -1,21 +1,41 @@
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { useActivitiesStore } from "../../store/useActiviriesStore";
 import { Select, MenuItem, Box, InputLabel, FormControl, Typography, Button,IconButton  } from "@mui/material";
 import Swal from 'sweetalert2';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Cookies from 'js-cookie';  // Importa js-cookie
+import {jwtDecode} from 'jwt-decode';  // Importa jwt-decode
 
 const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChange, userDni , setIsEditing}) => {
+    const [TenantId, setTenantId] = useState('');
     const { activities, fetchActivities, userActivities, fetchUserActivities, deleteUserActivity } = useActivitiesStore();
     console.log(userActivities);
     
     useEffect(() => {
-        fetchActivities();
-    }, [fetchActivities]);
+        const token = Cookies.get('token');
+        console.log('token desde addActivity',token);
+        
+        const decoded = jwtDecode(token);
+        console.log('decoded desde addActivity',decoded);
+        if(decoded){
+            setTenantId(decoded.TenantId);
+        }
+       ;
+
+
+    }, []);
+
+    useEffect(() => {
+        if(TenantId){
+            fetchActivities(TenantId);
+        }
+        
+    }, [fetchActivities,TenantId]);
 
     
     useEffect(() => {
         if (userDni) {
-            fetchUserActivities(userDni);
+            fetchUserActivities(userDni,TenantId);
         }
     }, [fetchUserActivities, userDni]);
 

@@ -15,11 +15,11 @@ module.exports = (sequelize) => {
         },
         fecha_nacimiento:{
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         telefono:{
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         mail:{
             type: DataTypes.STRING,
@@ -30,7 +30,7 @@ module.exports = (sequelize) => {
         },
         domicilio:{
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         rol:{
             type: DataTypes.STRING,

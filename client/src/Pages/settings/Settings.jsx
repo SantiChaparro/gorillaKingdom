@@ -10,6 +10,7 @@ import axios from "axios";
 
 const Settings = () => {
   const { postSection, getSections, sections } = useSectionStore();
+  const [name, setName] = useState("");
   const [titulo, setTitulo] = useState("");
   const [subTitulo, setSubTitulo] = useState("");
   const [cuerpo, setCuerpo] = useState("");
@@ -84,6 +85,7 @@ const Settings = () => {
     }
   };
 
+  const handleName = (event) => setName(event.target.value);
   const handleTitulo = (event) => setTitulo(event.target.value);
   const handleSubTitulo = (event) => setSubTitulo(event.target.value);
   const handleCuerpo = (event) => setCuerpo(event.target.value);
@@ -98,7 +100,7 @@ const Settings = () => {
     const formData = new FormData();
 
     // Añadir los datos del post
-    formData.append('name', titulo);
+    formData.append('name', name);
     formData.append('titulo', titulo);
     formData.append('subTitulo', subTitulo);
     formData.append('cuerpo', cuerpo);
@@ -122,7 +124,7 @@ const Settings = () => {
     getSections();
   };
 
-  const fontKey = 'AIzaSyCyYOAM__29rPzT3IyuQsx4CoqI_P1pGCs';
+  const fontKey = 'AIzaSyCyYOAM__29rPzT3IyuQsx4CoqI_P1pGCs'; //clave publica para hacer fetch de las fuentes
   const fetchFonts = async () => {
     const response = await axios.get(`https://www.googleapis.com/webfonts/v1/webfonts?key=${fontKey}`)
     setFonts(response.data.items);
@@ -149,11 +151,24 @@ const Settings = () => {
     <MainContainer>
       <CustomTitle sx={{ marginTop: '20px', marginTop: '100px', marginBottom: '30px' }}>ajustes</CustomTitle>
 
-      <CustomTitle>TITULO</CustomTitle>
+   
       <StylesEditor setSectionStyle={setSectionStyle} setFontEditing={setFontEditing} fontEditing={fontEditing} fontSizeEditing={fontSizeEditing} setFontSizeEditing={setFontSizeEditing} setColorediting={setColorediting} colorEditing={colorEditing} />
       {fontEditing && <FontSelector fonts={fonts} selectedFont={selectedFont} setSelectedFont={setSelectedFont} />}
       {fontSizeEditing && <FontSizeSelector selectedFontSize={selectedFontSize} setSelectedFontSize={setSelectedFontSize} />}
       {colorEditing && <ColorPicker color={color} setColor={setColor}/>}
+
+
+      <CustomTitle>Nombre secccion</CustomTitle>
+      <TextField
+        value={name}
+        onChange={handleName}
+       
+        sx={{
+          ...textFieldStyles,
+        
+        }}
+      />
+         <CustomTitle>TITULO</CustomTitle>
 
       <TextField
         value={titulo}

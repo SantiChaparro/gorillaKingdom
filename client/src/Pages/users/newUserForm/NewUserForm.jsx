@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useFormik } from "formik";
 import {
   Box,
@@ -18,6 +18,25 @@ import AddActivity from "../../../Components/addActivity/AddActivity";
 import { useActivitiesStore } from "../../../store/useActiviriesStore";
 import rectangle51 from '../../../assests/imagenes/Rectangle51.png';
 import { borderRadius, boxSizing, display, height, margin, padding, width } from "@mui/system";
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
+
+// const token = localStorage.getItem('token');
+// console.log('tokken',token);
+
+
+// let decoded;
+// if (token) {
+//   try {
+//     decoded = jwtDecode(token);
+//     console.log('Decoded token:', decoded);
+//   } catch (error) {
+//     console.error('Error decoding token:', error.message);
+//   }
+// }
+
+
+
 
 const initialValues = {
   dni: "",
@@ -81,11 +100,13 @@ const validate = (values) => {
 };
 
 // Función de manejo del envío del formulario con SweetAlert2
-const handleSubmit = async (values, postUser, formik, selectedActivity, addActivity, setSelectedActivity) => {
-  console.log(values);
+const handleSubmit = async (values, postUser, formik, selectedActivity, addActivity, setSelectedActivity,tenantId) => {
+  console.log('desde handlesubmit', tenantId);
+  console.log('valores enviados en submit',values);
+  
   try {
     // Realiza la llamada al servidor
-    const response = await postUser(values);
+    const response = await postUser({...values,TenantId:tenantId});
     const addedActivity = await addActivity(values.dni, selectedActivity);
     setSelectedActivity('');
     console.log(response);
@@ -122,11 +143,15 @@ const NewUserForm = () => {
   const { postUser } = useUsersStore();
   const [selectedActivity , setSelectedActivity] = useState("");
   const {addActivity} = useActivitiesStore();
+  const [tenantId , setTenantId] = useState("");
+
+  console.log(tenantId);
+  
 
   const formik = useFormik({
     initialValues,
     onSubmit: async (values, { resetForm }) => {
-      handleSubmit(values, postUser, formik,selectedActivity,addActivity,setSelectedActivity);
+      handleSubmit(values, postUser, formik,selectedActivity,addActivity,setSelectedActivity,tenantId);
     },
     validate,
   });
@@ -135,6 +160,20 @@ const NewUserForm = () => {
   const handleActivityChange = (event) => {
     setSelectedActivity(event.target.value);
 };
+
+useEffect(()=>{
+  const token = Cookies.get('token');
+  console.log('Token desde las cookies:', token);
+
+  if(token){
+    const decoded = jwtDecode(token);
+    console.log('Decoded token:', decoded);
+    if(decoded){
+      setTenantId(decoded.TenantId);
+    }
+  }
+
+},[])
 
   return (
     <MainContainer >

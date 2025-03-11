@@ -14,7 +14,9 @@ import RoutineDisplay from "../../../Components/RoutineDisplay";
 import UserNavBar from "../../../Components/UserNavBar";
 import Swal from 'sweetalert2';
 import { border, boxSizing, display, fontFamily, height, padding, width } from "@mui/system";
-import createRoutineImage from '../../../assests/imagenes/createRoutine.png'
+import createRoutineImage from '../../../assests/imagenes/createRoutine.png';
+import { jwtDecode } from "jwt-decode";
+import Cookies from 'js-cookie';
 
 
 
@@ -33,23 +35,56 @@ const CreateRoutine = ({ handleMasterDrawer }) => {
     const [severity, setSeverity] = useState("");
     const [currentExercise, setCurrentExercise] = useState(null);
     const [routineDisplay , setRoutineDisplay] = useState([]);
+    const [TenantId, setTenantId] = useState("");
 
-    console.log(routineObj);
-    console.log('error',errorMessage);
-    console.log(succesMessage);
-    console.log(exercises);
-    console.log('routinedisplay',routineDisplay)
-    console.log(routineDisplay);
+    // console.log(routineObj);
+    // console.log('error',errorMessage);
+    // console.log(succesMessage);
+    // console.log(exercises);
+    // console.log('routinedisplay',routineDisplay)
+    // console.log(routineDisplay);
+    console.log('tenantId desde createroutine',TenantId);
     
+    
+     useEffect(() => {
+             
+              const token = Cookies.get('token');  
+            
+              
+      
+              if (token) {
+                  try {
+                      // Decodificar el token usando jwt-decode
+                      const decodedToken = jwtDecode(token);
+                     
+                      
+                      
+                      // Extraer el tenantId (asegúrate de que 'tenantId' esté en el token)
+                      const tenantIdFromToken = decodedToken.TenantId;
+                      console.log('tenantId desde createroutine',tenantIdFromToken);
+                      
+                      
+                      // Guardar tenantId en el estado
+                      setTenantId(tenantIdFromToken);
+                  } catch (error) {
+                      console.error('Error decodificando el token:', error);
+                  }
+              } else {
+                  console.warn('Token no encontrado en la cookie.');
+              }
+          }, []);
     
     
 
     useEffect(() => {
-        fetchExercises();
-        setRoutineDetail(Object.values(detailValue));
+        if(TenantId){
+            fetchExercises(TenantId);
+            setRoutineDetail(Object.values(detailValue));
+        }
+        
        // handleRoutineDisplay();
         //handleMessage();
-    }, [detailValue,routineObj]);
+    }, [detailValue,routineObj,TenantId]);
 
     useEffect(() => {
         // Observar cambios en los mensajes de éxito o error
@@ -113,7 +148,7 @@ const CreateRoutine = ({ handleMasterDrawer }) => {
     const handleSaveRoutine = async (routineObj) => {
 
         try {
-            const newRoutine = await postRoutine(routineObj);
+            const newRoutine = await postRoutine(routineObj,TenantId);
             console.log(newRoutine.successMessage);
 
          

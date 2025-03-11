@@ -24,14 +24,15 @@ import Cookies from 'js-cookie';
 const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeCloseDrawer,}) => {
     const { getPost, posts } = usePostStore();
     const { getSections, sections } = useSectionStore();
-    const [orderedSections, setOrderedSections] = useState([]);
+    
   //  const [loggin, setLoggin] = useState(false);
     const [message, setMessage] = useState("");
-    const [selectedFont, setSelectedFont] = useState([]); // Estado para la fuente seleccionada
-    const [selectedFontSize, setSelectedFontSize] = useState([]);
+    
      const [openDrawer, setOpendrawer] = useState(false);
      const {LogginFormOpen,logginResponse} = useLogginStore()
-    console.log(logginResponse);
+    console.log('logginresponse',logginResponse);
+    console.log('mensaje',message);
+    
     
     const navigate = useNavigate();
     console.log('desde la landing',verifiedUser);
@@ -41,78 +42,10 @@ const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeClose
         navigate('/features');
     };
 
-    // const hanldeCloseDrawer = () => {
-    //     setOpendrawer(false)
-    // };
+    const navigateToOnBoarding = () => {
+        navigate('/onboarding');
+    };
 
-//    const handleSections = () => {
-//     if (sections && sections.length > 0) {
-//         const sortedSections = sections
-//             .sort((a, b) => a.settings.orden - b.settings.orden)
-//             .map(section => {
-//                 let parsedStyle = {};
-//                 try {
-//                     // Parsear el estilo de la sección
-//                     if (typeof section.settings.sectionStyle === 'string') {
-//                         parsedStyle = JSON.parse(section.settings.sectionStyle);
-//                     }
-//                 } catch (e) {
-//                     console.error("Error parsing sectionStyle:", e);
-//                 }
-
-//                 // Recopilar fuentes y tamaños de fuente para cargar
-//                 const fontsToLoad = [];
-//                 const sizesToLoad = [];
-//                 const colorsToLoad = [];
-//                 for (const style of Object.values(parsedStyle)) {
-//                     if (style.fontFamily && !fontsToLoad.includes(style.fontFamily)) {
-//                         fontsToLoad.push(style.fontFamily);
-//                     }
-//                     if (style.fontSize && !sizesToLoad.includes(style.fontSize)) {
-//                         sizesToLoad.push(style.fontSize); // Aquí capturas el tamaño de la fuente
-//                     }
-//                     if (style.color && !colorsToLoad.includes(style.color)) {
-//                         colorsToLoad.push(style.color);
-//                     }
-//                 }
-
-//                 // Actualizar los estados para las fuentes y tamaños seleccionados
-//                 setSelectedFont(prevFonts => [...new Set([...prevFonts, ...fontsToLoad])]);
-//                 setSelectedFontSize(prevSizes => [...new Set([...prevSizes, ...sizesToLoad])]);
-
-//                 return {
-//                     ...section,
-//                     sectionStyle: parsedStyle // Asegurarte de que los estilos estén bien parseados
-//                 };
-//             });
-//         setOrderedSections(sortedSections);
-//     }
-// };
-// useEffect(() => {
-//     selectedFont.forEach(font => {
-//         const link = document.createElement('link');
-//         link.href = `https://fonts.googleapis.com/css2?family=${font.replace(' ', '+')}&display=swap`;
-//         link.rel = 'stylesheet';
-//         document.head.appendChild(link);
-
-//         // Limpieza: elimina el enlace cuando la fuente cambia o se desmonta el componente
-//         return () => {
-//             document.head.removeChild(link);
-//         };
-//     });
-// }, [selectedFont]);
-
-
-    // useEffect(() => {
-    //     getSections();
-    //     getPost();
-    // }, [getSections, getPost]);
-
-    // useEffect(() => {
-    //     handleSections();
-    // }, [sections]);
-
-    // // Show SweetAlert when message changes
 
     useEffect(()=>{
         if(logginResponse.error !== "" && logginResponse.error !== null){
@@ -132,17 +65,17 @@ const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeClose
                 icon: 'error',
                 confirmButtonText: 'Aceptar'
             }).then(() => {
-                setMessage(""); // Reset the message
+                setMessage(""); 
             });
         }
     }, [message]);
 
-    // Suponiendo que este `useEffect` se encuentra en la Landing Page o un componente principal
+    
 useEffect(() => {
     if (logginResponse && logginResponse.token) {
         const token = logginResponse.token;
         const decodedToken = jwtDecode(token);
-        Cookies.set('token', token, { expires: 1 }); // Guarda la cookie por 1 día
+        Cookies.set('token', token, { expires: 1 }); 
     
         if (logginResponse.user) {
             setVerifiedUser(logginResponse.user);
@@ -153,7 +86,7 @@ useEffect(() => {
                 navigate("/usuario");
             }
         } else {
-            setMessage(logginResponse.successMessage);  // Mostrar mensaje si no hay usuario
+            setMessage(logginResponse.successMessage); 
         }
     }
 }, [logginResponse, navigate, setVerifiedUser, setMessage]); // Asegúrate de que las dependencias estén correctas
@@ -174,7 +107,7 @@ useEffect(() => {
                         <HeroTitle >Gestionar tu negocio jamas fue tan facil.</HeroTitle>
                         <HeroSubTitle>simplifica tareas, multiplica resultados.</HeroSubTitle>
                     </HeroTextContainer>
-                    <CustomButtom>Registrate ahora</CustomButtom>
+                    <CustomButtom onClick={navigateToOnBoarding}>Registrate ahora</CustomButtom>
                 </HeroLeftContainer>
                 <HeroRightContainer>
                     
@@ -747,7 +680,7 @@ const ContactFormContainer = styled(Box)(({ theme }) => ({
 
 {/* <ContentContainer>
 
-{orderedSections.length > 0 && orderedSections.map((section, index) => (
+{sections.length > 0 && orderedSections.map((section, index) => (
     <SectionBox id={`${section.id}`} key={section.id}>
         <Typography sx={{
             width: '100%',

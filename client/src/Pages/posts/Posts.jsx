@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Typography, styled, Button } from '@mui/material';
 import { usePostStore } from "../../store/usePostStore";
+import { maxWidth } from "@mui/system";
+import pluma1 from '../../../src/assests/imagenes/pluma1.jpg';
+import pluma2 from '../../../src/assests/imagenes/pluma2.jpg';
 
 const Posts = () => {
   const [fileArray, setFileArray] = useState([]);  // Estado para almacenar múltiples archivos
@@ -47,17 +50,27 @@ const Posts = () => {
 
   return (
     <MainContainer>
-      <CustomTitle sx={{ marginBottom: '50px',marginTop:'100px' }}>POSTS</CustomTitle>
+      <CustomTitle sx={{ marginBottom: '25px',marginTop:'50px', fontSize:'3em',fontWeight:'700' }}>Posts</CustomTitle>
       <FormContainer>
         <CustomTitle sx={{ fontSize: '2em' }}>Titulo</CustomTitle>
         <TextField value={titulo} onChange={(e) => setTitulo(e.target.value)} sx={{ ...textFieldStyles }} />
-        <CustomTitle sx={{ fontSize: '2em' }}>subtitulo</CustomTitle>
+        <CustomTitle sx={{ fontSize: '2em' }}>Subtitulo</CustomTitle>
         <TextField value={subTitulo} onChange={(e) => setSubTitulo(e.target.value)} sx={{ ...textFieldStyles }} />
         <CustomTitle sx={{ fontSize: '2em' }}>Cuerpo</CustomTitle>
-        <TextField value={cuerpo} onChange={(e) => setCuerpo(e.target.value)} sx={{ ...textFieldStyles, height: '100px' }} />
+        <TextField multiline minRows={5} value={cuerpo} onChange={(e) => setCuerpo(e.target.value)} sx={{ ...textFieldStyles,  }} />
         <CustomTitle sx={{ fontSize: '2em' }}>Carga de archivos</CustomTitle>
-        <input accept="image/*" id="upload-button-file" type="file" multiple onChange={handleFile} />
-        <Button variant="contained" color="primary" onClick={handleUpload} disabled={fileArray.length === 0} style={{ marginTop: 16, backgroundColor: 'blue', width: '100%' }}>
+        <UploadLabel htmlFor="upload-button-file">
+          Elegir archivos
+        </UploadLabel>
+        <input
+          accept="image/*"
+          id="upload-button-file"
+          type="file"
+          multiple
+          onChange={handleFile}
+          style={{ display: 'none' }}
+        />
+        <Button variant="contained" color="primary" onClick={handleUpload} disabled={fileArray.length === 0} style={{ marginTop: 16, width:'100%',height: '50px' ,background: 'linear-gradient(45deg, #C004FF, #730399)', width: '100%' }}>
           postear
         </Button>
       </FormContainer>
@@ -71,20 +84,28 @@ export default Posts;
 
 const MainContainer = styled(Box)(({ theme }) => ({
   width: "100%",
-  height: "100vh",
+  maxHeight: "100vh",
   padding: "15px",
   boxSizing: "border-box",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  backgroundColor: "black",
+  backgroundColor: "white",
+
+  [theme.breakpoints.up('md')]: {
+    width: 'calc(100vw - 240px)',
+    height:'100vh',
+    marginLeft: '240px',
+    padding: '0',
+    
+  },
 }));
 
 const CustomTitle = styled(Typography)(({}) => ({
-  fontFamily: "Bebas Neue",
+  fontFamily: "Nunito",
   fontWeight: "400",
-  fontSize: "3em",
-  color: "white",
+  fontSize: "40px",
+  color: "black",
   marginBottom: "1px",
   
 }));
@@ -96,27 +117,76 @@ const FormContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  backgroundColor: "black",
+  backgroundColor: "white",
+
+  [theme.breakpoints.up('md')]: {
+    maxWidth:'40%',
+    margin:'auto'
+    
+  },
 }));
+
+// const textFieldStyles = {
+//   width: '100%',
+//   marginBottom: '20px',
+//   '& .MuiInputBase-input': {
+//     color: 'white'
+//   },
+//   '& .MuiOutlinedInput-root': {
+//     '& fieldset': {
+//       borderColor: 'blue',
+//     },
+//     '&:hover fieldset': {
+//       borderColor: 'blue',
+//     },
+//     '&.Mui-focused fieldset': {
+//       borderColor: 'blue',
+//     },
+//   },
+//   '& .MuiInputLabel-root': {
+//     color: 'white',
+//   }
+// };
+
+const UploadLabel = styled('label')({
+ background: 'linear-gradient(45deg, #C004FF, #730399)',
+  color: 'white',
+  padding: '10px 20px',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  display: 'inline-block',
+  fontSize: '1rem',
+  fontFamily:'Nunito',
+  marginTop: '10px',
+  '&:hover': {
+    backgroundColor: '#730399',
+  },
+});
 
 const textFieldStyles = {
   width: '100%',
   marginBottom: '20px',
+ backgroundColor: 'white',
+ borderRadius: '5px',
   '& .MuiInputBase-input': {
-    color: 'white'
+      color: 'black',
+      
   },
   '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'blue',
-    },
-    '&:hover fieldset': {
-      borderColor: 'blue',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'blue',
-    },
+      '& fieldset': {
+          borderColor: 'black',
+         // borderWidth: '2px',
+      },
+      '&:hover fieldset': {
+          borderColor: '#C004FF',
+          borderWidth: '2px',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#C004FF',
+        borderWidth: '2px',
+      },
   },
   '& .MuiInputLabel-root': {
-    color: 'white',
+      color: 'white',
   }
 };
