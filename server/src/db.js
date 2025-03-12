@@ -5,10 +5,12 @@ const fs = require('fs');
 const path = require('path');
 //const TemporaryPayments = require("./models/TemporaryPayments");
 const {
-  DB_USER, DB_PASSWORD, DB_HOST,DB_NAME
+  DB_USER, DB_PASSWORD, DB_HOST,DB_NAME,DATABASE_URL
 } = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`, {
+// `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`
+
+const sequelize = new Sequelize(DATABASE_URL, {
   logging: false, 
   native: false, 
 });
