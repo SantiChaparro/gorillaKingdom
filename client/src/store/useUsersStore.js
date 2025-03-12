@@ -1,22 +1,51 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export const useUsersStore = create((set) => ({
     users: [],
-    fetchUsers: async () => {
+    searchedUser: [],
+   
+    fetchUsers: async (tenantId) => {
         try {
-            const users = await axios.get('http://localhost:3001/master/findUsers');
+            console.log("tenantId que se está enviando:", tenantId);
+            const users = await axios.get('http://localhost:3001/master/findUsers',{params:{tenantId}});
             console.log(users.data);
             set({ users: users.data });
         } catch (error) {
             console.error('Error fetching users:', error);
         }
     },
+
+    getUserById: async(dni,tenantId) => {
+        console.log('dni desde store',dni);
+        console.log('tenantid desde store',tenantId);
+        try {
+            const response = await axios.get(`http://localhost:3001/master/findUsers/${dni}`,{params:{tenantId}});
+            console.log('respuesta desde el store',response.data);
+            set({searchedUser:response.data});
+           
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.log(error.response);
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Usuario no encontrado',   
+                });
+            }
+        }
+    },
+
+    clearSearchedUser: () => set({ searchedUser: [] }), // Método para limpiar el estado
+
     postUser: async(values) => {
-        console.log(values);
+        console.log('valores recibidos en el store',values);
         try {
             const newUser = await axios.post('http://localhost:3001/master',values)
             console.log(newUser);
+            return newUser
         } catch (error) {
             console.error(error);
         }
@@ -32,6 +61,17 @@ export const useUsersStore = create((set) => ({
         } catch (error) {
             console.log(error);
         }
+    },
+
+    getUserByName: async(name,tenantId)=> {
+
+        try {
+            const response = await axios.get(`http://localhost:3001/master/findUsers?name=${name}`,{params:{tenantId}});
+            set({ searchedUser: response.data });
+        } catch (error) {
+            
+        }
     }
 }));
+
 

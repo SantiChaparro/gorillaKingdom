@@ -21,6 +21,10 @@ module.exports = (sequelize) => {
         descripcion:{
             type: DataTypes.STRING,
             allowNull: true,
+        },
+        activo:{
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
         }
     })
 };

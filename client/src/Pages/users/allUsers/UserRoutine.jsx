@@ -1,43 +1,138 @@
 import React, { useState, useEffect } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
-import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button } from '@mui/material';
+import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress,Card,CardMedia } from '@mui/material';
 import { useRoutinesStore } from '../../../store/useRoutinesStore';
+import Cookies from 'js-cookie';
+import {jwtDecode} from "jwt-decode";
+import Swal from 'sweetalert2';
+import trainingImage from '../../../assests/imagenes/womenLift.jpg';
 
-const UserRoutine = ({ handleMenuClick }) => {
-  const { getRoutine, modifyRoutine } = useRoutinesStore();
+const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
+  const { getRoutine, modifyRoutine, routines } = useRoutinesStore();
   const [option, setOption] = useState("");
   const [selectedDayRoutine, setSelectedDayRoutine] = useState(null);
   const [routine, setRoutine] = useState({});
   const [updateData, setUpdateData] = useState({});
+  const [dni,setDni] = useState("");
+  const [tenant,setTenant] = useState("");
+  console.log('selectedtenant desde userroutine',selectedTenants);
+  
+  console.log('tenantid',tenant);
+  console.log('userdni',dni);
+  console.log(routines);
+  
+  
+  
 
-  const dni = 28271453;
-  const routineId = routine.id;
+
+
+  //let dni = verifiedUser.dni;
+  
+  console.log(routine);
+  console.log(updateData);
+  console.log(verifiedUser);
+  
+  
+  useEffect(()=>{
+    const token = Cookies.get("token")
+    if(token){
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken.user.dni);
+      console.log(decodedToken);
+      
+      //const dni = decodedToken.user.dni;
+      setDni(decodedToken.user.dni);
+      setTenant(selectedTenants);
+     // const tenant = decodedToken.tenantsData[0].id;
+    }
+    
+  },[])
+
+   
+  useEffect(() => {
+    if(dni && tenant){
+      handleRoutine(dni,tenant);
+    }
+    
+   
+  }, [dni,tenant]);
+
+  useEffect(() => {
+    if (routine.message === "Pago pendiente") {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Pago pendiente',
+        text: routine.message,
+        showConfirmButton: true,
+      });
+    }
+}, [routine]);
+  
+  useEffect(() => {
+    const updateRoutineDetails = async () => {
+      // Verificar si routine y routine.routine están definidos
+      if (routine?.routine?.routineDetail?.length > 0) {
+        console.log(routine.routine.routineDetail);
+
+        const initialUpdateData = {};
+        routine.routine.routineDetail.forEach(detail => {
+          initialUpdateData[detail.id] = detail.weights;
+          console.log(initialUpdateData);
+          
+        });
+
+        // Actualiza updateData con los detalles de rutina
+        setUpdateData(prevState => ({
+          ...prevState,
+          ...initialUpdateData
+        }));
+      }
+    };
+
+    updateRoutineDetails();
+  }, [routine]);
 
   const handleChange = (event) => {
     const selectedDay = event.target.value;
     setOption(selectedDay);
-    const dayRoutine = routine.DayOfWeeks.find(day => day.id === selectedDay);
-    setSelectedDayRoutine(dayRoutine);
+  
+    // Encuentra el día de la rutina seleccionado
+    const dayRoutine = routine.routine.DayOfWeeks.find(day => day.id === selectedDay);
+    
+    // Imprime el día de la rutina seleccionado
+ 
+    if (dayRoutine) {
+      // Obtén los IDs de los ejercicios filtrados
+      const filteredExerciseIds = routine.filteredExercises.map(exercise => exercise.ExerciseId);
+        
+      // Filtra los ejercicios de `dayRoutine` basándote en los IDs filtrados
+      const filteredExercisesForDay = dayRoutine.Exercises.filter(exercise => 
+        filteredExerciseIds.includes(exercise.id)
+      );
+  
+      // Actualiza el estado con los ejercicios filtrados
+      setSelectedDayRoutine({
+        ...dayRoutine,
+        Exercises: filteredExercisesForDay
+      });
+    }
   };
+  
 
-  const handleRoutine = async (dni) => {
-    const userRoutine = await getRoutine(dni);
-    setRoutine(userRoutine);
-
-    // Inicializa updateData con los datos actuales de routineDetail
-    const initialUpdateData = {};
-    userRoutine.routineDetail.forEach(detail => {
-      initialUpdateData[detail.id] = detail.weights;
-    });
-    setUpdateData(initialUpdateData);
+  const handleRoutine = async (dni,tenant) => {
+   const response = await getRoutine(dni,tenant);
+   console.log(response);
+   
+    setRoutine(response)
+    
   };
-
-  useEffect(() => {
-    handleRoutine(dni);
-  }, []);
 
   const getExerciseDetails = (exerciseId) => {
-    return routine.routineDetail.find(detail => detail.id === exerciseId);
+    const detail = routine.routine.routineDetail.find(detail => detail.id === exerciseId);
+    console.log('detalle rutina',detail);
+
+    return detail
+    
   };
 
   const handleTextFieldChange = (exerciseId, weekIndex, value) => {
@@ -51,14 +146,35 @@ const UserRoutine = ({ handleMenuClick }) => {
   };
 
   const handleSaveChanges = async () => {
+    
     const updatedRoutine = {
-      id: routineId,
+      id: routine.routine.id, 
       updateData
     };
 
-    await modifyRoutine(updatedRoutine);
-  };
+    const newRoutine = await modifyRoutine(updatedRoutine);
 
+    if(newRoutine){
+      Swal.fire({
+          icon: 'success',
+          title: 'Excelente!',
+          text: 'Se guardaron tus cambios.',
+          showConfirmButton: true,
+         // timer: 2000
+      });
+      
+     }else{
+      Swal.fire({
+          icon: 'error',
+          title: 'Upss!',
+          text: 'Hubo un problema, intenta de nuevo.',
+          showConfirmButton: true,
+         // timer: 2000
+      });
+     }
+  };
+  console.log(selectedDayRoutine);
+  
   return (
     <MainContainer>
       <UserNavBar handleMenuClick={handleMenuClick} />
@@ -66,28 +182,18 @@ const UserRoutine = ({ handleMenuClick }) => {
         <CustomTypography variant='h3'>¿Qué entrenamos hoy?</CustomTypography>
       </TitleContainer>
       <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-        <CustomInputLabel id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
+        <CustomInputLabel sx={{color:'black'}} id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
         <CustomSelect
           labelId="day-select-label"
           id="day-select"
           value={option}
           onChange={handleChange}
           label="¿Qué día vas a entrenar?"
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                bgcolor: 'black',
-                '& .MuiMenuItem-root': {
-                  textAlign: 'center',
-                  fontSize: '1.2rem',
-                  color: 'white',
-                },
-              },
-            },
-          }}
+          sx={textFieldStyles}
+  
         >
-          {routine.DayOfWeeks && routine.DayOfWeeks.map((day) => (
-            <MenuItem key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
+          {routine?.routine?.DayOfWeeks && routine.routine.DayOfWeeks.map((day) => (
+            <MenuItem  key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
           ))}
         </CustomSelect>
       </FormControl>
@@ -95,16 +201,18 @@ const UserRoutine = ({ handleMenuClick }) => {
         {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ? (
           selectedDayRoutine.Exercises.map((exercise, index) => {
             const details = getExerciseDetails(exercise.id);
+            console.log(details);
+            
             return (
               <Exercise key={index}>
                 <ExcercieDescription>
-                  <Typography variant='body1' color='white'>
+                  <CustoTypografi variant='body1' color='white'>
                     {exercise.nombre}
-                  </Typography>
+                  </CustoTypografi>
                   {details && (
-                    <Typography variant='body2' color='gray'>
+                    <CustoTypografi sx={{color:'gray'}}>
                       {details.setsAndReps}
-                    </Typography>
+                    </CustoTypografi>
                   )}
                 </ExcercieDescription>
                 <ExerciseLoad>
@@ -113,8 +221,29 @@ const UserRoutine = ({ handleMenuClick }) => {
                     key={weekIndex}
                     size="small"
                     variant="outlined"
-                    value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ''}
+                    value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ""}
                     onChange={(e) => handleTextFieldChange(exercise.id, weekIndex, e.target.value)}
+                    sx={{
+                      ...textFieldStyles,
+                      maxWidth:'45px',
+                      input: {
+                        color: 'black', // Texto negro por defecto
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: 'black', // Borde negro por defecto
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#C004FF', // Borde violeta en hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#C004FF', // Borde violeta en focus
+                        },
+                        '&.Mui-focused input': {
+                          color: 'black', // Texto negro en focus
+                        }
+                      }
+                    }}
                   />
                   ))}
                 </ExerciseLoad>
@@ -125,7 +254,8 @@ const UserRoutine = ({ handleMenuClick }) => {
           <Typography variant='body1' color='white'>No hay ejercicios para el día seleccionado</Typography>
         )}
       </ExerciseContainer>
-      <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton>
+      {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ?
+      <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton> : null}
     </MainContainer>
   );
 };
@@ -133,14 +263,15 @@ const UserRoutine = ({ handleMenuClick }) => {
 export default UserRoutine;
 
 const MainContainer = styled(Box)(({ theme }) => ({
-  margin: 0,
+ // margin: 0,
   padding: '15px',
   width: '100vw',
-  height: 'auto',
+  minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: 'black',
+ 
+  backgroundColor: 'white',
   boxSizing: 'border-box'
 }));
 
@@ -155,21 +286,23 @@ const TitleContainer = styled(Box)(({ theme }) => ({
 }));
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
-  width: '100%',
-  fontFamily: 'Bebas Neue',
-  fontWeight: '400',
-  fontStyle: 'normal',
-  color: 'white',
-  marginBottom: '40px'
+  fontFamily: "Nunito",
+  //fontWeight: '400',
+  fontSize: '35px',
+  color: 'black',
+  textAlign: 'center',
+  marginBottom:'30px',
+  fontWeight: 'bold',
 }));
 
 const CustomInputLabel = styled(InputLabel)(({ theme }) => ({
-  color: 'white',
+  color: 'black', // color base negro
   textAlign: 'left',
   width: '100%',
   transformOrigin: 'left',
   '&.Mui-focused': {
-    transformOrigin: 'left',
+    color: 'black', // color cuando está en foco
+    //transformOrigin: 'left',
   },
 }));
 
@@ -178,22 +311,28 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   height: 'auto',
   color: 'white',
   '.MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'black',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'black',
   },
   '.MuiSvgIcon-root': {
-    color: 'white',
+    color: 'black',
   },
+  // '.MuiInputBase-input': {
+  //   textAlign: 'center', // Centrar el texto dentro del InputBase
+  // },
 }));
 
 const ExerciseContainer = styled(Box)(({ theme }) => ({
   width: '100%',
-  height: 'auto',
-  marginTop: '100px',
+  height: '470px',
+  marginTop: '25px',
   display: 'flex',
   flexDirection: 'column',
+  //justifyContent:'center',
+  overflowY: 'auto',
+  
 }));
 
 const Exercise = styled(Box)(({ theme }) => ({
@@ -201,7 +340,7 @@ const Exercise = styled(Box)(({ theme }) => ({
   height: 'auto',
   padding: '15px 0',
   marginBottom: '5px',
-  borderBottom: '3px solid #0028ff',
+  borderBottom: '3px solid #C004FF',
   display: 'flex',
   justifyContent: 'space-between',
   gap: '10px'
@@ -264,11 +403,14 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  width: '100%',
+  width: ' calc(100vw - 20px)',
   height: '60px',
   color: 'white',
-  backgroundColor: '#0028ff',
-  marginTop: '150px',
+  background: 'linear-gradient(45deg, #C004FF, #730399)',
+  position:'absolute',
+  bottom:'0px',
+  //marginTop:'150px',
+  marginBottom:'15px',
   '&:hover': {
     backgroundColor: '#0028ff',
   },
@@ -278,4 +420,33 @@ const CustomButton = styled(Button)(({ theme }) => ({
   '&:focus': {
     backgroundColor: '#0028ff',
   },
+}));
+
+const textFieldStyles = {
+  width: '100%',
+ backgroundColor: 'white',
+ borderRadius: '5px',
+  '& .MuiInputBase-input': {
+      color: 'black'
+  },
+  '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+          borderColor: 'black',
+      },
+      '&:hover fieldset': {
+          borderColor: 'black',
+      },
+      '&.Mui-focused fieldset': {
+          borderColor: 'black',
+      },
+  },
+  '& .MuiInputLabel-root': {
+      color: 'white',
+  }
+};
+
+const CustoTypografi = styled(Typography)(({ theme }) => ({
+ fontFamily:'nunito',
+ color:'black',
+ fontWeight:'bold'
 }));

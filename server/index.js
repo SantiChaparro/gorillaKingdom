@@ -4,6 +4,8 @@ require('dotenv').config();
 const excersiceLoader   = require('./src/controllers/mockUpLoader');
 const daysLoader = require('./src/controllers/dayLoader');
 const usersLoader = require('./src/controllers/usersLoader');
+const activityLoader = require('./src/controllers/activitiesLoader');
+const paymentLoader = require('./src/controllers/paymentsLoader');
 //const PORT = 3001;
 const PORT = process.env.PORT
 
@@ -15,9 +17,12 @@ conn.sync({force: true}).then(async ()=>{
 
     try {
         
+       
         excersiceLoader();
         daysLoader();
         usersLoader();
+        activityLoader();
+       // paymentLoader();
         console.log('Ejercicios cargados exitosamente en base de datos');
         console.log('Días cargados con éxito');
 
