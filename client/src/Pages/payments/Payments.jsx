@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';  // Importa js-cookie
 import {jwtDecode} from 'jwt-decode';  // Importa jwt-decode
 import SelectSubscription from "../../Components/selectSubscription/SelectSubscription";
 import { use } from "react";
+import apiUrl from './config';
 
 
 
@@ -166,7 +167,7 @@ const Payments = () => {
     };
   
     try {
-      const response = await axios.post(`http://localhost:3001/master/postPayment`, paymentData,{params:{TenantId}});
+      const response = await axios.post(`${apiUrl}/master/postPayment`, paymentData,{params:{TenantId}});
       console.log(response.data);
       
      

@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import apiUrl from './config';
 
 export const useSubscriptionsStore = create((set) => ({
     subscriptions: [],
@@ -11,7 +12,7 @@ export const useSubscriptionsStore = create((set) => ({
         console.log('tenantId',tenantId);
         
         try {
-          const response = await axios.post('http://localhost:3001/master/newSubscription', {duration, discount}, {
+          const response = await axios.post(`${apiUrl}/master/newSubscription`, {duration, discount}, {
             params:{tenantId},
             headers: {
               'Content-Type': 'application/json', // Deja que el navegador maneje el boundary de multipart
@@ -31,7 +32,7 @@ export const useSubscriptionsStore = create((set) => ({
   getAllSubscriptions: async(tenantId) => {
 
     try {
-        const response = await axios.get('http://localhost:3001/master/allSubscriptions',{params:{tenantId}});
+        const response = await axios.get(`${apiUrl}/master/allSubscriptions`,{params:{tenantId}});
         console.log(response.data);
         
         set({subscriptions:response.data})
@@ -50,7 +51,7 @@ export const useSubscriptionsStore = create((set) => ({
     
 
     try {
-        const response = await axios.patch(`http://localhost:3001/master/updateSubscription/${subscriptionId}`,updateData,{params:{tenantId}});
+        const response = await axios.patch(`${apiUrl}/master/updateSubscription/${subscriptionId}`,updateData,{params:{tenantId}});
         console.log(response.data);
         
        return response.data;

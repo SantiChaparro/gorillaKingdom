@@ -5,10 +5,22 @@ const fs = require('fs');
 const path = require('path');
 //const TemporaryPayments = require("./models/TemporaryPayments");
 const {
-  DB_USER, DB_PASSWORD, DB_HOST,DB_NAME
+  DB_USER, DB_PASSWORD, DB_HOST,DB_NAME,DATABASE_URL,NODE_ENV
 } = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`, {
+let urlDataBase;
+
+// `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`
+console.log(NODE_ENV);
+
+if (NODE_ENV === 'production') {
+  urlDataBase = DATABASE_URL;
+} else {
+  urlDataBase = `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+}
+
+
+const sequelize = new Sequelize(urlDataBase, {
   logging: false, 
   native: false, 
 });

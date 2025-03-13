@@ -9,7 +9,7 @@ const paymentLoader = require('./src/controllers/paymentsLoader');
 //const PORT = 3001;
 const PORT = process.env.PORT
 
-conn.sync({force: true}).then(async ()=>{
+conn.sync({force: false}).then(async ()=>{
 
     server.listen(PORT,()=>{
         console.log(`Listening to port ${PORT}`);
@@ -18,10 +18,10 @@ conn.sync({force: true}).then(async ()=>{
     try {
         
        
-        excersiceLoader();
-        daysLoader();
-        usersLoader();
-        activityLoader();
+       // excersiceLoader();
+      //  daysLoader();
+        //usersLoader();
+       // activityLoader();
        // paymentLoader();
         console.log('Ejercicios cargados exitosamente en base de datos');
         console.log('Días cargados con éxito');
