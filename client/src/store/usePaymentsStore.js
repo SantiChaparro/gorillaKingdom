@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import apiUrl from './config';
 
 export const usePaymentsStore = create((set) => ({
     payments: [],
@@ -7,7 +8,7 @@ export const usePaymentsStore = create((set) => ({
 
     fetchPayments: async(filters) => {
 
-        const payments = await axios.get('http://localhost:3001/master/payment',{params:filters});
+        const payments = await axios.get(`${apiUrl}/master/payment`,{params:filters});
         set({payments: payments.data});
         return payments
     },
@@ -15,7 +16,7 @@ export const usePaymentsStore = create((set) => ({
     fetchAllPayments: async(tenantId) => {
         console.log('tenantId desde paymentstore',tenantId);
         
-        const payments = await axios.get('http://localhost:3001/master/payment',{params:{tenantId}});
+        const payments = await axios.get(`${apiUrl}/master/payment`,{params:{tenantId}});
         set({payments: payments.data});
         return payments
     }
