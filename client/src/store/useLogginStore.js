@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import apiUrl from '../configUrl';
 
 export const useLogginStore = create((set) => ({
     logginResponse: {
@@ -12,7 +13,7 @@ export const useLogginStore = create((set) => ({
 
     postLoggin: async (dni, password) => {
         try {
-            const response = await axios.post('http://localhost:3001/loggin/postLoggin', { dni, password });
+            const response = await axios.post(`${apiUrl}/loggin/postLoggin`, { dni, password });
             
             console.log("Respuesta del servidor:", response.data);  // Verificar la respuesta
 

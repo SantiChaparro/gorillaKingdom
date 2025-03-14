@@ -3,6 +3,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, MenuItem, Box, styled, Typography } from "@mui/material";
 import axios from "axios";
+//import apiUrl from "../configUrl";
+
+console.log('apiurl',apiUrl);
+console.log('hola mundo');
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const Onboarding = ()=>{
   const [plans , setPlans] = useState([]);
@@ -40,7 +46,7 @@ const Onboarding = ()=>{
       });
 
       const handleSubmit = async (values) => {
-        const response = await axios.post(`http://localhost:3001/tenant-payment/create-preference/`,values)
+        const response = await axios.post(`${apiUrl}/tenant-payment/create-preference/`,values)
         console.log(response);
 
         const { init_point } = response.data;
@@ -52,8 +58,10 @@ const Onboarding = ()=>{
       };
 
       const getPlans = async()=>{
+        
 
-        const response = await axios.get('http://localhost:3001/plans-router/plans');
+        // const response = await axios.get(`${apiUrl}/plans-router/plans`);
+        const response = await axios.get(`${apiUrl}/plans-router/plans`);
 
         if(response){
           setPlans(response.data);

@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import apiUrl from '../configUrl';
 
 export const useSectionStore = create((set) => ({
     sections: [],
@@ -7,7 +8,7 @@ export const useSectionStore = create((set) => ({
     postSection: async(formData) => {
 
         try {
-            const section = await axios.post('http://localhost:3001/master/newSection',formData,{
+            const section = await axios.post(`${apiUrl}/master/newSection`,formData,{
                 headers: {
                     'Content-Type': 'multipart/form-data', // Deja que el navegador maneje el boundary de multipart
                   },
@@ -24,7 +25,7 @@ export const useSectionStore = create((set) => ({
     getSections: async() => {
 
         try {
-            const section = await axios.get('http://localhost:3001/master/allSections')
+            const section = await axios.get(`${apiUrl}/master/allSections`)
             set({sections:section.data})
         } catch (error) {
             console.log(error)

@@ -1,6 +1,7 @@
 import {create} from 'zustand';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import apiUrl from '../configUrl';
 
 export const useUsersStore = create((set) => ({
     users: [],
@@ -9,7 +10,7 @@ export const useUsersStore = create((set) => ({
     fetchUsers: async (tenantId) => {
         try {
             console.log("tenantId que se está enviando:", tenantId);
-            const users = await axios.get('http://localhost:3001/master/findUsers',{params:{tenantId}});
+            const users = await axios.get(`${apiUrl}/master/findUsers`,{params:{tenantId}});
             console.log(users.data);
             set({ users: users.data });
         } catch (error) {
@@ -21,7 +22,7 @@ export const useUsersStore = create((set) => ({
         console.log('dni desde store',dni);
         console.log('tenantid desde store',tenantId);
         try {
-            const response = await axios.get(`http://localhost:3001/master/findUsers/${dni}`,{params:{tenantId}});
+            const response = await axios.get(`${apiUrl}/master/findUsers/${dni}`,{params:{tenantId}});
             console.log('respuesta desde el store',response.data);
             set({searchedUser:response.data});
            
@@ -43,7 +44,7 @@ export const useUsersStore = create((set) => ({
     postUser: async(values) => {
         console.log('valores recibidos en el store',values);
         try {
-            const newUser = await axios.post('http://localhost:3001/master',values)
+            const newUser = await axios.post(`${apiUrl}/master`,values)
             console.log(newUser);
             return newUser
         } catch (error) {
@@ -55,7 +56,7 @@ export const useUsersStore = create((set) => ({
         console.log('dni desde el store',dni)
 
         try {
-            const updatedUser = await axios.patch(`http://localhost:3001/master/updateUser/${dni}`,{values})
+            const updatedUser = await axios.patch(`${apiUrl}/master/updateUser/${dni}`,{values})
             console.log(updatedUser);
             return updatedUser
         } catch (error) {
@@ -66,7 +67,7 @@ export const useUsersStore = create((set) => ({
     getUserByName: async(name,tenantId)=> {
 
         try {
-            const response = await axios.get(`http://localhost:3001/master/findUsers?name=${name}`,{params:{tenantId}});
+            const response = await axios.get(`${apiUrl}/master/findUsers?name=${name}`,{params:{tenantId}});
             set({ searchedUser: response.data });
         } catch (error) {
             

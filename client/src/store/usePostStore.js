@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import apiUrl from '../configUrl';
 
 export const usePostStore = create((set) => ({
     posts: [],
@@ -7,7 +8,7 @@ export const usePostStore = create((set) => ({
 
     addPost: async (formData) => {
         try {
-          const response = await axios.post('http://localhost:3001/master/newPost', formData, {
+          const response = await axios.post(`${apiUrl}/master/newPost`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data', // Deja que el navegador maneje el boundary de multipart
             },
@@ -25,7 +26,7 @@ export const usePostStore = create((set) => ({
   getPost: async() => {
 
     try {
-        const response = await axios.get('http://localhost:3001/master/allPosts');
+        const response = await axios.get(`${apiUrl}/master/allPosts`);
         console.log(response.data);
         
         set({posts:response.data})

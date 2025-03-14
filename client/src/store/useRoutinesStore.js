@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import apiUrl from '../configUrl';
 
 export const useRoutinesStore = create((set) => ({
     routines: [],
@@ -10,7 +11,7 @@ export const useRoutinesStore = create((set) => ({
       console.log(routineObj);
       try {
           console.log('desde store', routineObj);
-          const routine = await axios.post('http://localhost:3001/master/routine', { routineObj },{params:{TenantId}});
+          const routine = await axios.post(`${apiUrl}/master/routine`, { routineObj },{params:{TenantId}});
           console.log('desde store routine.data', routine.data.successMessage)
           set({ succesMessage: routine.data.successMessage });
           return routine.data;
@@ -39,7 +40,7 @@ export const useRoutinesStore = create((set) => ({
       
 
        try {
-        const userroutine = await axios.get(`http://localhost:3001/user/routine/${dni}`, {params:{userTenants}});
+        const userroutine = await axios.get(`${apiUrl}/user/routine/${dni}`, {params:{userTenants}});
         console.log('desde el store',userroutine.data);
         set({routines:userroutine.data})
         return userroutine.data;
@@ -56,7 +57,7 @@ export const useRoutinesStore = create((set) => ({
         console.log('desde el store',updateData);
         try {
           
-          const response = await axios.patch(`http://localhost:3001/user/updateRoutine/${id}`, {updateData} );
+          const response = await axios.patch(`${apiUrl}/user/updateRoutine/${id}`, {updateData} );
           console.log('Routine updated successfully:', response.data);
           set({ succesMessage: response.data.successMessage });
           return response.data
@@ -70,7 +71,7 @@ export const useRoutinesStore = create((set) => ({
         //const { id, updateData } = updatedRoutine;
         console.log('desde el store', id);
         try {
-            const response = await axios.patch(`http://localhost:3001/master/updateRoutine/${id}`, { updateData });
+            const response = await axios.patch(`${apiUrl}/master/updateRoutine/${id}`, { updateData });
             console.log('Routine updated successfully:', response.data);
             set({ succesMessage: response.data.successMessage });
             return response.data // agregue esto para que me devuelva y confirmar desde el front
@@ -83,7 +84,7 @@ export const useRoutinesStore = create((set) => ({
     removeExercise: async (routineId,exerciseId) => {
 
       try {
-        const response = await axios.patch(`http://localhost:3001/master/routine/${routineId}/deleteExercise/${exerciseId}`)
+        const response = await axios.patch(`${apiUrl}/master/routine/${routineId}/deleteExercise/${exerciseId}`)
         console.log('Routine updated successfully:', response.data);
         set({ succesMessage: response.data.successMessage });
       } catch (error) {
@@ -100,7 +101,7 @@ export const useRoutinesStore = create((set) => ({
       
       
       try {
-        const response = await axios.patch(`http://localhost:3001/master/addExercise/${routineId}`,addExercise);
+        const response = await axios.patch(`${apiUrl}/master/addExercise/${routineId}`,addExercise);
         set({ succesMessage: response.data.successMessage });
         return response.data
       } catch (error) {
@@ -118,7 +119,7 @@ export const useRoutinesStore = create((set) => ({
       
       
       try {
-        const response = await axios.post(`http://localhost:3001/master/addNewday/${routineId}`,dayToAdd);
+        const response = await axios.post(`${apiUrl}/master/addNewday/${routineId}`,dayToAdd);
         set({ succesMessage: response.data.successMessage });
       } catch (error) {
         set({ errorMessage: error.message });
@@ -132,7 +133,7 @@ export const useRoutinesStore = create((set) => ({
       console.log(data);
       
       try {
-        const response = await axios.delete(`http://localhost:3001/master/removeDay/${routineId}`, { data });
+        const response = await axios.delete(`${apiUrl}/master/removeDay/${routineId}`, { data });
         set({ successMessage: response.data.successMessage });
       } catch (error) {
         set({ errorMessage: error.message });
