@@ -8,9 +8,9 @@ import axios from "axios";
 
 console.log('hola mundo');
 
-//const apiUrl = process.env.REACT_APP_API_URL;
+  
 const apiUrl =`https://gympall.onrender.com`;
-//const apiUrl = 'http://localhost:3001';
+
 console.log('apiurl',apiUrl);
 const Onboarding = ()=>{
   const [plans , setPlans] = useState([]);
