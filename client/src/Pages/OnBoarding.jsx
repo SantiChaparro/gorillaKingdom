@@ -3,12 +3,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, MenuItem, Box, styled, Typography } from "@mui/material";
 import axios from "axios";
-import apiUrl from "../configUrl";
+//import apiUrl from "../configUrl";
 
 console.log('apiurl',apiUrl);
 console.log('hola mundo');
 
-
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const Onboarding = ()=>{
   const [plans , setPlans] = useState([]);

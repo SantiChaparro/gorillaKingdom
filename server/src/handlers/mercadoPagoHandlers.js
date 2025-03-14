@@ -40,9 +40,9 @@ const createPreference = async(req,res) => {
             body: {
               items, // Asignamos los items que creamos antes
               back_urls: {
-                success: "http://localhost:3001/tenant-payment/success",  // URL de éxito
-                failure: "http://localhost:3001/tenant-payment/failure",  // URL de fallo
-                pending: "http://localhost:3001/tenant-payment/pending",  // URL de pendiente
+                success: "https://gympall.onrender.com/tenant-payment/success",  // URL de éxito
+                failure: "https://gympall.onrender.com/tenant-payment/failure",  // URL de fallo
+                pending: "https://gympall.onrender.com/tenant-payment/pending",  // URL de pendiente
               },
               auto_return: "approved", // Opción de auto-retorno
             },
