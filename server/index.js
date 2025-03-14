@@ -7,7 +7,7 @@ const usersLoader = require('./src/controllers/usersLoader');
 const activityLoader = require('./src/controllers/activitiesLoader');
 const paymentLoader = require('./src/controllers/paymentsLoader');
 //const PORT = 3001;
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3001;
 
 conn.sync({force: false}).then(async ()=>{
 
