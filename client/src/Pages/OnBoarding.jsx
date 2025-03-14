@@ -61,7 +61,7 @@ const Onboarding = ()=>{
         
 
         // const response = await axios.get(`${apiUrl}/plans-router/plans`);
-        const response = await axios.get(`https://gympall.onrender.com/plans-router/plans`);
+        const response = await axios.get(`${apiUrl}/plans-router/plans`);
 
         if(response){
           setPlans(response.data);
