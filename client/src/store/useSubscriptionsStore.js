@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
-import apiUrl from './config';
+import apiUrl from '../configUrl';
 
 export const useSubscriptionsStore = create((set) => ({
     subscriptions: [],
