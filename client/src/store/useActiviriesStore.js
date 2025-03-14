@@ -8,7 +8,7 @@ export const useActivitiesStore = create((set) => ({
 
     fetchActivities: async(TenantId) => {
 
-        const activities = await axios.get(`${apiUrl}master/allActivities`,{params:{TenantId}});
+        const activities = await axios.get(`${apiUrl}/master/allActivities`,{params:{TenantId}});
         console.log(activities);
         set({activities: activities.data});
     },
