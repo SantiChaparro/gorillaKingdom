@@ -11,7 +11,7 @@ const PORT = process.env.PORT
 
 conn.sync({force: false}).then(async ()=>{
 
-    server.listen(PORT,()=>{
+    server.listen(PORT,'0.0.0.0',()=>{
         console.log(`Listening to port ${PORT}`);
     });
 
