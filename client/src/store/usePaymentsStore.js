@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
-import apiUrl from './config';
+import apiUrl from '../configUrl';
 
 export const usePaymentsStore = create((set) => ({
     payments: [],

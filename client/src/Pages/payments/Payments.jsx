@@ -14,7 +14,7 @@ import Cookies from 'js-cookie';  // Importa js-cookie
 import {jwtDecode} from 'jwt-decode';  // Importa jwt-decode
 import SelectSubscription from "../../Components/selectSubscription/SelectSubscription";
 import { use } from "react";
-import apiUrl from './config';
+import apiUrl from '../../configUrl';
 
 
 

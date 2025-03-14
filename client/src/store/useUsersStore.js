@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import apiUrl from './config';
+import apiUrl from '../configUrl';
 
 export const useUsersStore = create((set) => ({
     users: [],
