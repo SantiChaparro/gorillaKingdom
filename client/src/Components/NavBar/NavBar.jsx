@@ -26,37 +26,40 @@ import { height, width } from "@mui/system";
 
 
 
-const NavBar = ({setOpendrawer}) => {
+const NavBar = ({setOpendrawer,menuItems,handleClick,setOpenLandingDrawer,openDrawer}) => {
     const { getSections, sections } = useSectionStore();
     const {setLoggin} = useLogginStore();
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    console.log(sections);
+    console.log(menuItems);
+    console.log(openDrawer);
+    
 
-    const handleClick = () => {
-        const token = Cookies.get('token');
-        if (token) {
-            const decodedToken = jwtDecode(token);
-            if (decodedToken.rol === "Master") {
-                navigate("/master"); // Redirige al dashboard de Master
-            } else {
-                navigate("/usuario"); // Redirige al dashboard de Usuario
-            }
-        } else {
-            // Si no hay token, mostrar el formulario de login
-            setLoggin(true);
-        }
-    };
+    // const handleClick = () => {
+    //     const token = Cookies.get('token');
+    //     if (token) {
+    //         const decodedToken = jwtDecode(token);
+    //         if (decodedToken.rol === "Master") {
+    //             navigate("/master"); // Redirige al dashboard de Master
+    //         } else {
+    //             navigate("/usuario"); // Redirige al dashboard de Usuario
+    //         }
+    //     } else {
+    //         // Si no hay token, mostrar el formulario de login
+    //         setLoggin(true);
+    //     }
+    // };
 
     const handleMenuClick = () => {
         setOpendrawer(true);
+       //setOpenLandingDrawer(true);
     };
 
-    useEffect(() => {
-        getSections();
-    }, [getSections])
+    // useEffect(() => {
+    //     getSections();
+    // }, [getSections])
 
     return (
         <NavBarContainer >
@@ -74,11 +77,16 @@ const NavBar = ({setOpendrawer}) => {
             ) : (
                 <MenuItemsContainer >
                    <MenuItems>
-                    <MenuItem>Inicio</MenuItem>
+                   {menuItems?.map((item)=>{
+                        return(
+                            <MenuItem key={item.label} onClick={item.onClick}>{item.label}</MenuItem>
+                        )
+                   })}
+                    {/* <MenuItem>Inicio</MenuItem>
                     <MenuItem>Sobre nosotros</MenuItem>
                     <MenuItem>Precios</MenuItem>
                     <MenuItem>Registrarse </MenuItem>
-                    <MenuItem onClick={() => { handleClick(setLoggin) }}>Iniciar sesión</MenuItem>
+                    <MenuItem onClick={() => { handleClick(setLoggin) }}>Iniciar sesión</MenuItem> */}
                    </MenuItems>
                    
                 </MenuItemsContainer>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import { Box, Button, Card, TextField, Typography, styled } from '@mui/material';
 import NavBar from "../Components/NavBar/NavBar";
 //import Footer from "../Components/Footer/Footer";
@@ -21,20 +21,51 @@ import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie'; 
 
 
-const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeCloseDrawer,}) => {
+const Landing = forwardRef (({setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeCloseDrawer,openLandingDrawer,openDrawer,setOpendrawer,closeDrawer},refForm) => {
     const { getPost, posts } = usePostStore();
     const { getSections, sections } = useSectionStore();
-    
+     const {setLoggin} = useLogginStore();
   //  const [loggin, setLoggin] = useState(false);
     const [message, setMessage] = useState("");
+    //const formRef = useRef(null);
     
-     const [openDrawer, setOpendrawer] = useState(false);
+    //  const [openDrawer, setOpendrawer] = useState(false);
      const {LogginFormOpen,logginResponse} = useLogginStore()
-    console.log('logginresponse',logginResponse);
-    console.log('mensaje',message);
+    // console.log('logginresponse',logginResponse);
+    // console.log('mensaje',message);
+    // console.log(openLandingDrawer);
+    // console.log(openDrawer);
+console.log(setLoggin);
+
+    const handleClick = () => {
+        const token = Cookies.get('token');
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            console.log(decodedToken);
+            
+            if (decodedToken.rol === "Master") {
+                navigate("/master"); // Redirige al dashboard de Master
+            } else {
+                navigate("/usuario"); // Redirige al dashboard de Usuario
+            }
+        } else {
+            // Si no hay token, mostrar el formulario de login
+            setOpendrawer(false);
+            setLoggin(true);
+        }
+    };
+
+        const menuItems = [
+          { label: 'Inicio', onClick: () => console.log('Inicio') },
+          { label: 'Sobre Nosotros', onClick: () => console.log('Sobre Nosotros') },
+          { label: 'Precios', onClick: () => console.log('Precios') },
+          { label: 'Registrarse', onClick: () => {navigateToOnBoarding()} },
+          { label: 'Iniciar Sesión', onClick: () => handleClick() },
+      ];
     
     
     const navigate = useNavigate();
+   // const refForm = useRef(null);
     console.log('desde la landing',verifiedUser);
     
     
@@ -45,6 +76,10 @@ const Landing = ({ setVerifiedUser,verifiedUser,setOpenLandingDrawer,hanldeClose
     const navigateToOnBoarding = () => {
         navigate('/onboarding');
     };
+
+    // const closeDrawer = () => {
+    //     setOpendrawer(false);    
+    // };
 
 
     useEffect(()=>{
@@ -89,16 +124,33 @@ useEffect(() => {
             setMessage(logginResponse.successMessage); 
         }
     }
-}, [logginResponse, navigate, setVerifiedUser, setMessage]); // Asegúrate de que las dependencias estén correctas
+}, [logginResponse, navigate, setVerifiedUser, setMessage]); 
+
+//funciópn para manjear el cierre del formulario de loggin
+const handleOverlayClick = (e) => {
+   
+    if (refForm.current && !refForm.current.contains(e.target)) {
+        setLoggin(false);  
+    }
+};
+
+useEffect(() => {
+    if (LogginFormOpen) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      }); // Desplaza la ventana a la parte superior
+    }
+  }, [LogginFormOpen]); // Se ejecuta cada vez que 'isOpen' cambie
 
 
     return (
         <LandingMainContainer>
-            <NavBar  setOpendrawer={setOpendrawer} />
-            {openDrawer && <LandingDrawer open={openDrawer} close={hanldeCloseDrawer} sections={sections} />} {/* Renderizado condicional del Drawer */}
+            <NavBar  setOpendrawer={setOpendrawer}openDrawer={openDrawer} menuItems={menuItems} handleClick={handleClick} navigateToOnBoarding={navigateToOnBoarding}setOpenLandingDrawer={setOpenLandingDrawer} />
+            {openDrawer && <LandingDrawer open={openDrawer} close={closeDrawer} menuItems={menuItems} handleClick={handleClick} />} {/* Renderizado condicional del Drawer */}
             {LogginFormOpen && (
-                <LogginFormOverlay>
-                    <LogginForm  setVerifiedUser={setVerifiedUser} setMessage={setMessage} />
+                <LogginFormOverlay onClick={handleOverlayClick}>
+                    <LogginForm ref={refForm}setVerifiedUser={setVerifiedUser} setMessage={setMessage} />
                 </LogginFormOverlay>
             )}
             <HeroContainer>
@@ -201,7 +253,7 @@ useEffect(() => {
                         
         </LandingMainContainer>
     );
-};
+});
 
 export default Landing;
 

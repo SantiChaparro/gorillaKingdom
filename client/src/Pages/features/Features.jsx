@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef,forwardRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../Components/NavBar/NavBar";
 import { Box, Button, Card, TextField, Typography, styled,useMediaQuery, useTheme  } from '@mui/material';
@@ -12,15 +12,22 @@ import LogginForm from "../../Components/logginForm/LogginForm";
 import { useLogginStore } from "../../store/useLogginStore";
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie'; 
+import LandingDrawer from "../../Components/landingDrawer/LandingDrawer";
 
-const Features = ({setOpendrawer}) => {
-  const {logginResponse,postLoggin,LogginFormOpen} = useLogginStore();
+const Features = forwardRef (({setVerifiedUser,handleMenuClick,openDrawer,setOpendrawer,closeDrawer,menuItems,handleClick},refForm) => {
+  const {logginResponse,postLoggin,LogginFormOpen,setLoggin} = useLogginStore();
   const navigate = useNavigate();
-  const location = useLocation();  // Aquí obtienes el objeto location
+  const location = useLocation();
+  const ref = useRef();  
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // Detecta si es pantalla móvil
+  const isMobile = useMediaQuery(theme.breakpoints.down('md')); 
 
-
+  console.log(openDrawer);
+  console.log(menuItems);
+  console.log('referencia',refForm);
+  
+  
+  
   useEffect(() => {
     console.log("Current Pathname:", location.pathname); // Esto imprimirá el pathname actual en la consola
   }, [location]); // Dependemos de location para que se actualice si cambia la ruta
@@ -46,12 +53,29 @@ const Features = ({setOpendrawer}) => {
       }
   }, [logginResponse, navigate]);
 
+  const handleOverlayClick = (e) => {
+     
+      if (refForm.current && !refForm.current.contains(e.target)) {
+          setLoggin(false);  
+      }
+  };
+  
+  useEffect(() => {
+      if (LogginFormOpen) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        }); 
+      }
+    }, [LogginFormOpen]); 
+
   return (
    <FeaturesMainContainer>
-    <NavBar setOpendrawer={setOpendrawer} />
+    <NavBar setOpendrawer={setOpendrawer}menuItems={menuItems}/>
+    {openDrawer && <LandingDrawer open={openDrawer} close={closeDrawer} menuItems={menuItems} handleClick={handleClick} />}
     {LogginFormOpen && (
-                <LogginFormOverlay>
-                    <LogginForm   />
+                <LogginFormOverlay onClick={handleOverlayClick}>
+                    <LogginForm ref={refForm}setVerifiedUser={setVerifiedUser}/>
                 </LogginFormOverlay>
             )}
     <CardsContainer>
@@ -122,7 +146,7 @@ Con una experiencia de usuario optimizada, podrás gestionar tu rutina con facil
    </FeaturesMainContainer>
    
   );
-};
+});
 
 export default Features;
 

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { Box, Button, Paper, TextField, styled } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';  // Importa SweetAlert2
 import { useLogginStore } from "../../store/useLogginStore";
+import { width } from "@mui/system";
 
-const LogginForm = ({ setVerifiedUser, setMessage }) => {
+const LogginForm = forwardRef (({ setVerifiedUser, setMessage },ref) => {
     const { postLoggin, logginResponse, setLoggin } = useLogginStore();
     const [password, setPassword] = useState("");
     const [dni, setDni] = useState("");
@@ -57,7 +58,7 @@ const LogginForm = ({ setVerifiedUser, setMessage }) => {
     }, [logginResponse, navigate]);
 
     return (
-        <LogginMainContainer>
+        <LogginMainContainer ref={ref}>
             <FormContainer>
                 <CustomtextField
                     label='DNI'
@@ -77,7 +78,7 @@ const LogginForm = ({ setVerifiedUser, setMessage }) => {
             </FormContainer>
         </LogginMainContainer>
     );
-};
+});
 
 export default LogginForm;
 
@@ -96,8 +97,8 @@ const LogginMainContainer = styled(Paper)(({ theme }) => ({
 }));
 
 const FormContainer = styled(Box)(({ theme }) => ({
-    width: '500px',
-    height: '400px',
+    width: '400px',
+    height: '250px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -108,6 +109,10 @@ const FormContainer = styled(Box)(({ theme }) => ({
     boxShadow: '0px 4px 8px rgba(255, 255, 255, 0.5)',
     padding: '20px',
     backgroundColor: 'white',
+    
+      [theme.breakpoints.down('lg')]: {
+            width:'350px'
+        },  height:'200px'
 }));
 
 const CustomtextField = styled(TextField)(({ theme }) => ({
@@ -115,7 +120,7 @@ const CustomtextField = styled(TextField)(({ theme }) => ({
 }));
 
 const buttonStyles = {
-    backgroundColor: 'blue',
+    background: 'linear-gradient(45deg, #C004FF, #730399)',
     color: 'white',
     width: '80%',
 };

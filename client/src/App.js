@@ -1,6 +1,6 @@
 import './App.css';
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useState,useRef } from 'react';
+import {  Route, Routes } from 'react-router-dom';
 import Landing from './Pages/Landing';
 import UserDashBoard from './Pages/users/allUsers/UserDashBoard';
 import UserRoutine from './Pages/users/allUsers/UserRoutine';
@@ -23,22 +23,63 @@ import { useLocation } from 'react-router-dom';
 import Features from './Pages/features/Features';
 import Onboarding from './Pages/OnBoarding';
 import Subscriptions from './Pages/subscriptions/Subscriptions';
+import { useLogginStore } from './store/useLogginStore';
+import Cookies from 'js-cookie';
+import {jwtDecode} from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
+
 
 
 
 function App() {
-  const [opendrawer, setOpenDrawer] = useState(false);
+  const [opendrawer, setOpenDrawer] = useState(false);//drawer de usuario
+   const [openDrawer, setOpendrawer] = useState(false);//drawer de la landing
   const [openMasterdrawere , setOpenMasterdrawer] = useState(false);
   const [verifiedUser , setVerifiedUser] = useState("");
   const [openLandingDrawer, setOpenLandingDrawer] = useState(false);
   const [userTenants, setUserTenants] = useState([]);
    const [selectedTenants, setSelectedTenants] = useState(userTenants.length === 1 ? userTenants[0].id : '');
+   const {setLoggin} = useLogginStore();
+     
+      
   console.log(verifiedUser);
   console.log('array de tenants',userTenants);
   console.log('tenant elegido',selectedTenants);
+  console.log(openLandingDrawer);
+  const refForm = useRef(null);
   
   
+  const handleClick = () => {
+          const token = Cookies.get('token');
+          if (token) {
+              const decodedToken = jwtDecode(token);
+              console.log(decodedToken);
+              
+              if (decodedToken.rol === "Master") {
+                  navigate("/master"); // Redirige al dashboard de Master
+              } else {
+                  navigate("/usuario"); // Redirige al dashboard de Usuario
+              }
+          } else {
+              // Si no hay token, mostrar el formulario de login
+              setOpendrawer(false);
+              setLoggin(true);
+          }
+      };
   
+  const menuItems = [
+    { label: 'Inicio', onClick: () => console.log('Inicio') },
+    { label: 'Sobre Nosotros', onClick: () => console.log('Sobre Nosotros') },
+    { label: 'Precios', onClick: () => console.log('Precios') },
+    { label: 'Registrarse', onClick: () => {navigateToOnBoarding()} },
+    { label: 'Iniciar Sesión', onClick: () => handleClick() },
+];
+ 
+    const navigate = useNavigate();
+
+const navigateToOnBoarding = () => {
+  navigate('/onboarding');
+};
 
   const handleMenuClick = () => {
     setOpenDrawer(true);
@@ -60,12 +101,20 @@ function App() {
   const hanldeCloseDrawer = () => {
     setOpenLandingDrawer(false)
 };
+//cierre drawer de la landing
+const closeDrawer = () => {
+  setOpendrawer(false);    
+};
+
+ 
+
+
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser} setOpenLandingDrawer={setOpenLandingDrawer} hanldeCloseDrawer={hanldeCloseDrawer} openLandingDrawer={openLandingDrawer} />} />
-        <Route path="/features" element={<Features />} />
+    <div>
+       <Routes>
+        <Route path="/" element={<Landing ref ={refForm} verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser} setOpenLandingDrawer={setOpenLandingDrawer} hanldeCloseDrawer={hanldeCloseDrawer} openLandingDrawer={openLandingDrawer}setOpendrawer={setOpendrawer}openDrawer={openDrawer}closeDrawer={closeDrawer}/>} />
+        <Route path="/features" element={<Features ref={refForm} verifiedUser={verifiedUser} setVerifiedUser={setVerifiedUser} setOpendrawer={setOpendrawer}closeDrawer={closeDrawer}openDrawer={openDrawer} menuItems={menuItems} />} />
         <Route path="/onboarding" element={<Onboarding/>}/>
         <Route
           path="/master"
@@ -133,7 +182,9 @@ function App() {
       <UserDrawer open={opendrawer} onClose={closeUserDrawer }setVerifiedUser={setVerifiedUser} />
       <MasterDrawer open={openMasterdrawere} onClose={closeMasterdrawer} setVerifiedUser={setVerifiedUser}/>
       <AppContent handleMenuClick={handleMenuClick} handleMasterDrawer={handleMasterDrawer} />
-    </Router>
+
+    </div>
+     
   );
 
   function AppContent({ handleMenuClick, handleMasterDrawer }) {
