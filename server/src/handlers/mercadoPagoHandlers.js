@@ -40,7 +40,7 @@ const createPreference = async(req,res) => {
             body: {
               items, // Asignamos los items que creamos antes
               back_urls: {
-                success: "https://gympall.onrender.com/tenant-payment/success",  // URL de éxito
+                success: "http://localhost:3001/tenant-payment/success",  // URL de éxito
                 failure: "https://gympall.onrender.com/tenant-payment/failure",  // URL de fallo
                 pending: "https://gympall.onrender.com/tenant-payment/pending",  // URL de pendiente
               },
@@ -84,7 +84,7 @@ const successHandler = async(req,res) => {
 
     try {
 
-      console.log('ID de Pago:', payment_id);
+     // console.log('ID de Pago:', payment_id);
       const paymentDetails = await mpPaymentDetails(payment_id);
       const tenantUpdated = await updateTemporaryTenant(preference_id,paymentDetails)
     //  console.log('desde successHandler',tenantUpdated);
@@ -161,25 +161,25 @@ const webHook = async (req,res) => {
   const paymentData = req.body.data;  
    
 
-  console.log('Datos del webhook recibido:', paymentData);
+ // console.log('Datos del webhook recibido:', paymentData);
    const paymentId = paymentData.id; 
 
    const paymentDetails = await mpPaymentDetails(paymentId);
-   console.log('detalles del pago desde webhook',paymentDetails);
+  // console.log('detalles del pago desde webhook',paymentDetails);
 
    const currentStatus = 'approved'// paymentDetails.status;
 
    const temporaryPayment = await findPendingPayment(paymentId,currentStatus);
-   console.log(temporaryPayment);
+  // console.log(temporaryPayment);
    
 
    if(temporaryPayment && currentStatus === 'approved'){
-    console.log(('desde wenhook',temporaryPayment));
+   // console.log(('desde wenhook',temporaryPayment));
    
 
     const newPayment = await newTenantPayment(paymentDetails.id,paymentDetails.status,paymentDetails.transaction_amount,temporaryPayment.TemporaryTenantId);
 
-    console.log(newPayment);
+   // console.log(newPayment);
     
     
    }

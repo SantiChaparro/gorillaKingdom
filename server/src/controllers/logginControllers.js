@@ -6,8 +6,8 @@ const jwtSecretKey = process.env.JWT_SECRET_KEY;
 const {PaymentVerificationController} = require('./PaymentVerificationController');
 
 const verifyUser = async (dni, password) => {
-    console.log('desde controller', dni);
-    console.log('desde controller', password);
+   // console.log('desde controller', dni);
+   // console.log('desde controller', password);
 
     try {
         // Buscar al usuario por su dni
@@ -15,18 +15,18 @@ const verifyUser = async (dni, password) => {
 
         if (!user) {
             // Si no existe el usuario, devolver un mensaje adecuado
-            console.log('Usuario no encontrado');
+           // console.log('Usuario no encontrado');
             return { success: false, message: 'Usuario no encontrado' };
         }
 
-        console.log(dni);
-        console.log('desde loggincontroller', user);
+        //console.log(dni);
+       // console.log('desde loggincontroller', user);
 
         // Comparar la contraseña ingresada con el hash almacenado
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
-            console.log('Contraseña correcta');
+           // console.log('Contraseña correcta');
 
             // Primero verifico si es un usuario o un tenant
             const tenant = await Tenants.findOne({
@@ -56,8 +56,8 @@ const verifyUser = async (dni, password) => {
                 // Fetch tenants data
                 await Promise.all(tenants.map(async (tenant) => {
                     const userTenant = await Tenants.findByPk(tenant.TenantId);
-                    console.log(tenant.TenantId);
-                    console.log('tenant', userTenant);
+                   // console.log(tenant.TenantId);
+                   // console.log('tenant', userTenant);
 
                     if (userTenant) {
                         tenantsData.push(userTenant);
@@ -74,7 +74,7 @@ const verifyUser = async (dni, password) => {
             }
         } else {
             // Si la contraseña no coincide
-            console.log('Contraseña incorrecta');
+            //console.log('Contraseña incorrecta');
             return { success: false, message: 'Contraseña incorrecta' };
         }
     } catch (error) {

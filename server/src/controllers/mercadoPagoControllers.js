@@ -1,10 +1,11 @@
 const axios = require('axios');
 require('dotenv').config(); // Asegúrate de llamar a dotenv.config() al principio
+const{sendTenantWelcomeEmail} = require('../config/mailConfig');
 
 // Reemplaza con tu access_token de Mercado Pago desde el archivo .env
 // const accessToken = process.env.MERCADO_TEST_TOKEN; // Accede a la variab
 const accessToken = "APP_USR-5983609490364166-011712-e97c699ec3e236b870d2e37581a32dc9-2213887143";
-console.log(accessToken);
+//console.log(accessToken);
 
 const {TemporaryTenants,Tenants,Plans,TenantsPayments,TemporaryPayments,User} = require('../db');
 //const {hashpassword} = require ('../functions/hasPassword');
@@ -13,11 +14,11 @@ const { where } = require('sequelize');
 
 
 const createTemporaryTenant = async(dni,nombre,telefono,mail,rol,password,planId,preferenceId) => {
-    console.log('planid antes del create',planId);
+   // console.log('planid antes del create',planId);
     
     try {
         const newTemporaryTenant = await TemporaryTenants.create({dni,nombre,telefono,mail,rol,password,planId,preferenceId});
-        console.log('planid desde controller',planId);
+       // console.log('planid desde controller',planId);
         
         if(newTemporaryTenant){
             return {
@@ -36,7 +37,7 @@ const createTemporaryTenant = async(dni,nombre,telefono,mail,rol,password,planId
 
 
 const mpPaymentDetails = async (paymentId) => {
-  console.log('id pago desde mpPaymentDetails:', paymentId);
+ // console.log('id pago desde mpPaymentDetails:', paymentId);
   
   if(paymentId !== null && paymentId !== undefined){
     try {
@@ -48,7 +49,7 @@ const mpPaymentDetails = async (paymentId) => {
           'Authorization': `Bearer ${accessToken}`,
         },
       });
-      console.log(response);
+      //console.log(response);
       
       // Verificamos si la respuesta es exitosa
       if (!response.ok) {
@@ -57,11 +58,11 @@ const mpPaymentDetails = async (paymentId) => {
   
       // Convertimos la respuesta en formato JSON
       const paymentDetails =  await response.json();
-      console.log('Detalles del pago:', paymentDetails);
+     // console.log('Detalles del pago:', paymentDetails);
   
       // Si necesitas extraer un monto u otra propiedad, puedes hacerlo aquí
       const amount = paymentDetails.transaction_amount; // Ejemplo de monto
-      console.log('Monto del pago:', amount);
+     // console.log('Monto del pago:', amount);
   
       return paymentDetails;
     } catch (error) {
@@ -80,7 +81,7 @@ const updateTemporaryTenant = async (preferenceId,paymentDetails) => {
       preferenceId
     }})
     const {dni,nombre,telefono,mail,rol,password,activo,planId} = temporaryTenant;
-    console.log(temporaryTenant);
+   // console.log(temporaryTenant);
     
     
     const hashedPassword = await hashPassword(password);
@@ -88,8 +89,12 @@ const updateTemporaryTenant = async (preferenceId,paymentDetails) => {
     if(temporaryTenant){
       const newTenant = await Tenants.create({dni,nombre,telefono,mail,rol,password:hashedPassword,activo});
 
+      
+      
       if(newTenant){
+        console.log('desde update temporary tenant',newTenant.mail);
         const tenantPlan = await Plans.findByPk(planId);
+        await sendTenantWelcomeEmail(newTenant.mail);
         if(tenantPlan){
           await newTenant.setPlan(tenantPlan);
         };
@@ -134,7 +139,7 @@ const updateTemporaryTenant = async (preferenceId,paymentDetails) => {
 };
 
 const createtmporaryPayment = async (payment_id,status,amount,preference_id) => {
-  console.log('desde create temporary payment controller',payment_id,status,amount,preference_id);
+  //console.log('desde create temporary payment controller',payment_id,status,amount,preference_id);
   
   try {
     const newTemporaryPayment = await TemporaryPayments.create({payment_id,status,amount});
@@ -207,6 +212,7 @@ const newTenantPayment = async (payment_id, status, amount, TemporaryTenantId) =
           
         })
       }
+      console.log('desde mp controllers',newTenant);
       
       return newTenant;
     }

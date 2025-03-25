@@ -35,8 +35,8 @@ const tenantsPayments = async (preferencesArray) => {
 
     // Aquí obtenemos la ID de la preferencia creada
     const init_point = response.init_point;
-    console.log("Preferencia creada con éxito:", init_point);
-    console.log(response);
+   // console.log("Preferencia creada con éxito:", init_point);
+  //  console.log(response);
     
 
     // Retornar la ID de la preferencia para usarla en el frontend

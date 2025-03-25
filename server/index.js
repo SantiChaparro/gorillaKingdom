@@ -9,7 +9,7 @@ const paymentLoader = require('./src/controllers/paymentsLoader');
 //const PORT = 3001;
 const PORT = process.env.PORT || 3001;
 
-conn.sync({force: false}).then(async ()=>{
+conn.sync({force: true}).then(async ()=>{
 
     server.listen(PORT,'0.0.0.0',()=>{
         console.log(`Listening to port ${PORT}`);

@@ -1,12 +1,13 @@
 const { User, Payment, Routine, DayOfWeek, Exercise, sequelize, ExerciseDayOfWeek, RoutineDayOfWeek, Posts, Section, Activity, UserActivities, PaymentActivities, Tenants, UserTenantRoutine,Subscriptions } = require('../db');
 const { Sequelize, Op, where } = require('sequelize');
 const { hashPassword } = require('../functions/hasPassword');
+const {sendUsertWelcomeEmail,sendPaymentConfirmationEmail} = require('../config/mailConfig')
 
 //const UserTenantRoutine = require('../models/UserTenantRoutine');
 
 const postNewUser = async (dni, nombre, fecha_nacimiento, telefono, mail, domicilio, rol, password, TenantId) => {
-    console.log('tenantid desde controller', TenantId);
-    console.log('dni desde controler postnewuser', dni);
+    //console.log('tenantid desde controller', TenantId);
+    //console.log('dni desde controler postnewuser', dni);
 
     const existingUser = await User.findByPk(dni);
 
@@ -49,6 +50,8 @@ const postNewUser = async (dni, nombre, fecha_nacimiento, telefono, mail, domici
         if (newUser) {
             // Crear la relación con el tenant
             await UserTenantRoutine.create({ TenantId, UserDni: dni, RoutineId: null });
+            const Tenant = await Tenants.findByPk(TenantId);
+            await sendUsertWelcomeEmail(mail, Tenant.nombre);
         }
 
         return {
@@ -94,7 +97,7 @@ const getAllUsers = async (tenantId) => {
             const allUsersDetails = await usersArray(users);
 
             // Logueamos los detalles de los usuarios
-            console.log('Usuarios desde controller:', allUsersDetails);
+            //console.log('Usuarios desde controller:', allUsersDetails);
 
             return allUsersDetails; // Devolvemos los detalles de los usuarios
         } else {
@@ -110,7 +113,7 @@ const getAllUsers = async (tenantId) => {
 
 const getUser = async (name, tenantId) => {
     try {
-        console.log('tenantId desde búsqueda por nombre:', tenantId);
+      //  console.log('tenantId desde búsqueda por nombre:', tenantId);
 
         const user = await User.findAll({
             where: {
@@ -129,8 +132,8 @@ const getUser = async (name, tenantId) => {
 };
 
 const getUserByPk = async (dni, tenantId) => {
-    console.log('DNI:', dni);
-    console.log('Tenant ID desde controlador getUserByPk:', tenantId);
+   // console.log('DNI:', dni);
+  //  console.log('Tenant ID desde controlador getUserByPk:', tenantId);
 
     try {
         const user = await User.findByPk(dni)
@@ -144,7 +147,7 @@ const getUserByPk = async (dni, tenantId) => {
 
         // Si no se encuentra el usuario, lanzar un error o retornar null
         if (!user) {
-            console.log('Usuario no encontrado');
+           // console.log('Usuario no encontrado');
             return null; // O lanzar un error si lo prefieres
         }
 
@@ -175,7 +178,7 @@ const getUserByPk = async (dni, tenantId) => {
             ]
         });
 
-        console.log('dias recuperados desde controlador:',routine.DayOfWeeks);
+        //console.log('dias recuperados desde controlador:',routine.DayOfWeeks);
         
         return { user, routine };
 
@@ -207,6 +210,7 @@ const newPayment = async (dni, fecha_pago, monto, medio_pago, subscriptions, ten
 
         // Asociar el pago al usuario
         await user.addPayment(payment);
+        await sendPaymentConfirmationEmail(user.mail);
 
         // Función para calcular la fecha de vencimiento
         const calcularFechaVencimiento = (fechaPago, duracionMeses) => {
@@ -503,7 +507,7 @@ const createNewExercise = async (routineId, dayId, exerciseId, routineDetail) =>
 
             let newDetail = routine.routineDetail || [];
             newDetail.push(routineDetail);
-            console.log("New Routine Detail:", newDetail);
+           // console.log("New Routine Detail:", newDetail);
 
             const updatedRoutine = await Routine.update(
                 { routineDetail: newDetail },
@@ -555,7 +559,7 @@ const getPaymentsWithFilters = async (filters) => {
 };
 
 const getAllPayments = async (tenantId) => {
-    console.log('tenantid desde getallpayments', tenantId);
+  //  console.log('tenantid desde getallpayments', tenantId);
 
     try {
         const payments = await Payment.findAll({
@@ -603,7 +607,7 @@ const getAllExercises = async (TenantId) => {
 };
 
 const postExercise = async (nombre, grupo_muscular, descripcion, TenantId) => {
-    console.log('tenantid desde controller', TenantId);
+   // console.log('tenantid desde controller', TenantId);
 
     const newExercise = await Exercise.create({ nombre, grupo_muscular, descripcion })
 
@@ -622,11 +626,11 @@ const createNewDay = async (routineId, day) => {
 
 
     const routine = await Routine.findByPk(routineId);
-    console.log('rutina desde controler addDay', routine);
+   // console.log('rutina desde controler addDay', routine);
 
     if (routine) {
         const dayId = await DayOfWeek.findByPk(day);
-        console.log(day);
+       // console.log(day);
 
         if (day) {
             return await routine.addDayOfWeek(day);
@@ -636,8 +640,8 @@ const createNewDay = async (routineId, day) => {
 
 const removeDay = async (routineId, day) => {
 
-     console.log('desde delete day rouitineid',routineId);
-     console.log(day);
+    // console.log('desde delete day rouitineid',routineId);
+    // console.log(day);
 
     const routine = await Routine.findByPk(routineId);
     const dayToRemove = await DayOfWeek.findByPk(day);
@@ -695,7 +699,7 @@ const getPosts = async () => {
 };
 
 const postSection = async (name, settings) => {
-    console.log('postSection - creando nueva sección con nombre:', name);
+   // console.log('postSection - creando nueva sección con nombre:', name);
 
     const newSection = await Section.create({
         name: name,
@@ -706,14 +710,14 @@ const postSection = async (name, settings) => {
 };
 
 const updateExistingSection = async (name, newSettings) => {
-    console.log('updateExistingSection - buscando sección con nombre:', name);
+    //console.log('updateExistingSection - buscando sección con nombre:', name);
 
     // Buscar si existe una sección con el mismo nombre
     const section = await Section.findOne({ where: { name } });
 
     if (section) {
         // Si la sección ya existe, actualizar los settings
-        console.log('La sección existe. Actualizando los settings...');
+      //  console.log('La sección existe. Actualizando los settings...');
 
         const currentSettings = section.settings ? section.settings : [];
         const updatedSettings = [...currentSettings, newSettings]; // Añadir nuevos settings al array existente
@@ -736,9 +740,9 @@ const allSections = async () => {
 };
 
 const createActivity = async (nombre, costo, descripcion, TenantId) => {
-    console.log(nombre);
-    console.log(costo);
-    console.log('tenantid desde createactivity controller', TenantId);
+    //console.log(nombre);
+  //  console.log(costo);
+   // console.log('tenantid desde createactivity controller', TenantId);
 
     const tenant = await Tenants.findByPk(TenantId);
 
@@ -747,7 +751,7 @@ const createActivity = async (nombre, costo, descripcion, TenantId) => {
         const activity = await Activity.create({ nombre, costo, descripcion });
         if (activity) {
             await activity.setTenant(TenantId);
-            console.log(activity);
+            //console.log(activity);
 
             return activity;
         }
@@ -767,8 +771,8 @@ const allActivities = async (TenantId) => {
 };
 
 const addActivityToUser = async (dni, activityId) => {
-    console.log(dni);
-    console.log(activityId);
+   // console.log(dni);
+  //  console.log(activityId);
 
 
     try {
@@ -809,7 +813,7 @@ const addActivityToUser = async (dni, activityId) => {
 };
 
 const findUserActivities = async (dni,TenantId) => {
-    console.log('dni desde controller', dni);
+ //   console.log('dni desde controller', dni);
 
     try {
         const userActivities = await UserActivities.findAll({
@@ -832,8 +836,8 @@ const findUserActivities = async (dni,TenantId) => {
 
 const deleteActivity = async (dni, activityId) => {
 
-    console.log(dni);
-    console.log(activityId);
+    //console.log(dni);
+   // console.log(activityId);
 
     try {
         const activity = await UserActivities.update({ activo: false }, {
@@ -853,9 +857,9 @@ const deleteActivity = async (dni, activityId) => {
 };
 
 const createSubscription = async (duration, discount, tenantId) => {
-    console.log('duration: desde codntroller ccreate', duration);   
-    console.log('discount: desde codntroller ccreate', discount);
-    console.log('tenantId: desde codntroller ccreate', tenantId);
+  //  console.log('duration: desde codntroller ccreate', duration);   
+   // console.log('discount: desde codntroller ccreate', discount);
+   // console.log('tenantId: desde codntroller ccreate', tenantId);
     
 
     try {
@@ -900,8 +904,8 @@ const allSubscriptions = async (tenantId) => {
 };
 
 const modifySubscription = async (subscriptionId, updateData) => {
-     console.log('subscriptionId:', subscriptionId);
-     console.log('updateData:', updateData);
+    // console.log('subscriptionId:', subscriptionId);
+   //  console.log('updateData:', updateData);
 
     try {
         const subscription = await Subscriptions.findByPk(subscriptionId);

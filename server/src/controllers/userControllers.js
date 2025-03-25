@@ -21,7 +21,7 @@ const getRoutineByUserId = async (dni, selectedTenant) => {
                 }
             ]
         });
-        console.log('desde controller getroutinebyid', activities);
+      //  console.log('desde controller getroutinebyid', activities);
         
 
         if(activities.length >0){
@@ -69,8 +69,8 @@ const getRoutineByUserId = async (dni, selectedTenant) => {
             },
         });
 
-        console.log('desde controller routine', routine);
-        console.log('desde controller filteredExercises', filteredExercises);
+      //  console.log('desde controller routine', routine);
+      //  console.log('desde controller filteredExercises', filteredExercises);
         
         return { routine, filteredExercises };  // Retornar rutina y ejercicios filtrados
 
@@ -93,8 +93,8 @@ const getRoutineByUserId = async (dni, selectedTenant) => {
 
 
 const modifyRoutine = async (routineId, updateData) => {
-    console.log('desde controller', routineId);
-    console.log('updatedata desde controller', updateData);
+  //  console.log('desde controller', routineId);
+  //  console.log('updatedata desde controller', updateData);
 
     try {
         const routine = await Routine.findByPk(routineId);
@@ -103,7 +103,7 @@ const modifyRoutine = async (routineId, updateData) => {
         }
 
         let routineDetails = routine.routineDetail || [];
-        console.log('routinedetail desde controller', routineDetails);
+       // console.log('routinedetail desde controller', routineDetails);
 
         // Eliminar duplicados
         const uniqueDetails = [];
@@ -141,7 +141,7 @@ const modifyRoutine = async (routineId, updateData) => {
             }
         }
 
-        console.log('routineDetails actualizados:', routineDetails);
+       // console.log('routineDetails actualizados:', routineDetails);
 
         // Actualizar la rutina con los detalles actualizados
         await Routine.update(
@@ -151,7 +151,7 @@ const modifyRoutine = async (routineId, updateData) => {
 
         return await Routine.findByPk(routineId); // Devolver la rutina actualizada
     } catch (error) {
-        console.error(`Failed to update routine: ${error.message}`);
+        //console.error(`Failed to update routine: ${error.message}`);
         throw new Error(`Failed to update routine: ${error.message}`);
     }
 };

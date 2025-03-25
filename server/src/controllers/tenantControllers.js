@@ -4,11 +4,15 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const {hashPassword} = require('../functions/hasPassword');
 const {tenantsPayments} = require('../functions/tenantsPayments');
+const {sendTenantWelcomeEmail,sendUsertWelcomeEmail} = require('../config/mailConfig');
+console.log(sendTenantWelcomeEmail);
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 const createNewTenant = async (dni,nombre,telefono,mail,rol,password,plan) => {
     console.log('desde controller', dni);
     console.log(password);
+    console.log('createnewtenant',mail);
+    
     
     // const productos = [
     //     { name: "Producto 1", quantity: 2, price: 100 },
@@ -17,8 +21,8 @@ const createNewTenant = async (dni,nombre,telefono,mail,rol,password,plan) => {
 
     try {
         const hashedPassword = await hashPassword(password)
-        console.log(hashedPassword);
-        console.log(nombre);
+       // console.log(hashedPassword);
+        //console.log(nombre);
 
          const existingTenant = await Tenants.findOne({ where: { dni } });
         if (existingTenant) {
@@ -30,6 +34,11 @@ const createNewTenant = async (dni,nombre,telefono,mail,rol,password,plan) => {
         const newTenant = await Tenants.create({dni,nombre,telefono,mail,rol,password:hashedPassword,plan})
 
              if(newTenant){
+                console.log('mail del newtenant',mail);
+                
+                await sendTenantWelcomeEmail(newTenant.mail);
+                await sendUsertWelcomeEmail(mail,nombre)
+
                  const newUser = await User.create({dni,nombre,telefono,mail,rol,password:hashedPassword,TenantId:newTenant.id})
                  
                  if (newUser){
