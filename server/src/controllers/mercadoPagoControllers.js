@@ -81,7 +81,7 @@ const updateTemporaryTenant = async (preferenceId,paymentDetails) => {
       preferenceId
     }})
     const {dni,nombre,telefono,mail,rol,password,activo,planId} = temporaryTenant;
-   // console.log(temporaryTenant);
+    console.log(temporaryTenant);
     
     
     const hashedPassword = await hashPassword(password);

@@ -19,7 +19,7 @@ conn.sync({force: true}).then(async ()=>{
         
        
        // excersiceLoader();
-      //  daysLoader();
+        daysLoader();
         //usersLoader();
        // activityLoader();
        // paymentLoader();

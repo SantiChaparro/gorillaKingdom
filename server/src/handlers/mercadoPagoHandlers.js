@@ -40,7 +40,7 @@ const createPreference = async(req,res) => {
             body: {
               items, // Asignamos los items que creamos antes
               back_urls: {
-                success: "https://gympall.onrender.com/tenant-payment/success",  // URL de éxito
+                success: "http://localhost:3001/tenant-payment/success",  // URL de éxito
                 failure: "https://gympall.onrender.com/tenant-payment/failure",  // URL de fallo
                 pending: "https://gympall.onrender.com/tenant-payment/pending",  // URL de pendiente
               },
@@ -78,7 +78,7 @@ const createPreference = async(req,res) => {
 
 const successHandler = async(req,res) => {
     const { payment_id, status, merchant_order_id, preference_id } = req.query;
-    //console.log('querys desde succeshandler',req.query);
+    console.log('querys desde succeshandler',req.query);
    // console.log('body desde succeshandler',req.body);
     
 
@@ -91,8 +91,8 @@ const successHandler = async(req,res) => {
       
      // console.log('desde successhandler',paymentDetails);
    
-    const redirectUrl = `https://gympall.vercel.app/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
-   // const redirectUrl = `http://localhost:3000/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
+   // const redirectUrl = `https://gympall.vercel.app/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
+    const redirectUrl = `http://localhost:3000/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
     
     res.redirect(redirectUrl);
     
@@ -162,7 +162,7 @@ const webHook = async (req,res) => {
   const paymentData = req.body.data;  
    
 
- // console.log('Datos del webhook recibido:', paymentData);
+  console.log('Datos del webhook recibido:', paymentData);
    const paymentId = paymentData.id; 
 
    const paymentDetails = await mpPaymentDetails(paymentId);

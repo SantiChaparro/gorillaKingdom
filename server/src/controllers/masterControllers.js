@@ -320,6 +320,8 @@ const newPayment = async (dni, fecha_pago, monto, medio_pago, subscriptions, ten
   
 
 const createRoutine = async (routineObj, TenantId) => {
+    console.log('desde controller create routine routine obj',routineObj.days[0].routineDetail);
+    
     try {
         const userId = routineObj.userId;
         const user = await UserTenantRoutine.findOne({
