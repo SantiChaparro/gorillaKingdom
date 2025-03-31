@@ -40,7 +40,8 @@ const createPreference = async(req,res) => {
             body: {
               items, // Asignamos los items que creamos antes
               back_urls: {
-                success: "http://localhost:3001/tenant-payment/success",  // URL de éxito
+                success: "https://gympall.onrender.com/tenant-payment/success",
+                //success: "http://localhost:3001/tenant-payment/success",  // URL de éxito local
                 failure: "https://gympall.onrender.com/tenant-payment/failure",  // URL de fallo
                 pending: "https://gympall.onrender.com/tenant-payment/pending",  // URL de pendiente
               },
@@ -91,8 +92,8 @@ const successHandler = async(req,res) => {
       
      // console.log('desde successhandler',paymentDetails);
    
-   // const redirectUrl = `https://gympall.vercel.app/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
-    const redirectUrl = `http://localhost:3000/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
+    const redirectUrl = `https://gympall.vercel.app/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
+    //const redirectUrl = `http://localhost:3000/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
     
     res.redirect(redirectUrl);
     
@@ -166,9 +167,9 @@ const webHook = async (req,res) => {
    const paymentId = paymentData.id; 
 
    const paymentDetails = await mpPaymentDetails(paymentId);
-  // console.log('detalles del pago desde webhook',paymentDetails);
+   console.log('detalles del pago desde webhook',paymentDetails);
 
-   const currentStatus = 'approved'// paymentDetails.status;
+   const currentStatus = paymentDetails.status;
 
    const temporaryPayment = await findPendingPayment(paymentId,currentStatus);
   // console.log(temporaryPayment);
