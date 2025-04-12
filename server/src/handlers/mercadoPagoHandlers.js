@@ -6,6 +6,24 @@ require('dotenv').config();
 
 const { MERCADO_PAGO_ACCES_TOKEN,MERCADO_TEST_TOKEN } = process.env;
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// cuando este listo el sistema descomenta esto 
+// const MERCADO_PAGO_ACCESS_TOKEN = isProduction 
+//   ? process.env.MERCADO_PAGO_ACCESS_TOKEN 
+//   : process.env.MERCADO_TEST_TOKEN;
+
+const BASE_URL = isProduction 
+  ? process.env.DEPLOY_URL 
+  : process.env.LOCAL_URL;
+
+const FRONTEND_URL = isProduction 
+  ? process.env.FRONTEND_URL 
+  : process.env.LOCAL_FRONTEND_URL;
+
+
+
+
 // Crear una nueva instancia de MercadoPagoConfig con el token de acceso
 const client = new MercadoPagoConfig({
   accessToken: MERCADO_TEST_TOKEN, 
@@ -33,17 +51,17 @@ const createPreference = async(req,res) => {
       // Creamos una instancia de Preference
       const preference = new Preference(client);
       
-    
+    //BASE_URL
 
     try {
         const response = await preference.create({
             body: {
               items, // Asignamos los items que creamos antes
               back_urls: {
-                success: "https://gympall.onrender.com/tenant-payment/success",
+                success: `${BASE_URL}/tenant-payment/success`,
                 //success: "http://localhost:3001/tenant-payment/success",  // URL de éxito local
-                failure: "https://gympall.onrender.com/tenant-payment/failure",  // URL de fallo
-                pending: "https://gympall.onrender.com/tenant-payment/pending",  // URL de pendiente
+                failure: `${BASE_URL}/tenant-payment/failure`,  // URL de fallo
+                pending: `${BASE_URL}/tenant-payment/pending`,  // URL de pendiente
               },
               auto_return: "approved", // Opción de auto-retorno
             },
@@ -92,7 +110,7 @@ const successHandler = async(req,res) => {
       
      // console.log('desde successhandler',paymentDetails);
    
-    const redirectUrl = `https://gympall.vercel.app/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
+    const redirectUrl = `${FRONTEND_URL}/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
     //const redirectUrl = `http://localhost:3000/success?payment_id=${payment_id}&status=${status}&merchant_order_id=${merchant_order_id}&preference_id=${preference_id}`;
     
     res.redirect(redirectUrl);

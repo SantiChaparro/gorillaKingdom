@@ -21,7 +21,7 @@ import apiUrl from '../../configUrl';
 
 
 const Payments = () => {
-  const { getUserById, searchedUser } = useUsersStore();
+  const { getUserById, searchedUser, clearSearchedUser } = useUsersStore();
   const { fetchActivities, fetchUserActivities, activities, userActivities,cleanUserActivities } = useActivitiesStore();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState("");
@@ -34,14 +34,15 @@ const Payments = () => {
   const [selectedSubscription, setSelectedSubscription] = useState({});
    const [subscriptionCost, setSubscriptionCost] = useState({});
   const [activitiesByUser, setActivitiesByUser] = useState([]);
-  console.log(paymentDate);
-  console.log(userActivities);
-  console.log(searchedUser);
-  console.log(TenantId);
-  console.log(activities);
-  console.log('selectedsubscription',selectedSubscription);
-  console.log('subscriptioncost',subscriptionCost);
-  console.log(totalAmount);
+  const [alertShown, setAlertShown] = useState(false);
+  // console.log(paymentDate);
+  // console.log(userActivities);
+  // console.log(searchedUser);
+  // console.log(TenantId);
+  // console.log(activities);
+  // console.log('selectedsubscription',selectedSubscription);
+  // console.log('subscriptioncost',subscriptionCost);
+  // console.log(totalAmount);
   console.log('activityuser',activitiesByUser);
   //console.log('activitibyuserid',activitiesByUser[0].id);
   
@@ -53,7 +54,11 @@ const Payments = () => {
   
   
   
-  
+  const filteredActivities = activities.filter(activity =>
+    userActivities.some(userActivity => userActivity.ActivityId === activity.id && userActivity.isPaid === false)
+    
+    
+  );
   
   
   
@@ -61,10 +66,11 @@ const Payments = () => {
   const handleSearch = async () => {
     if (userId.trim()) {
       setLoading(true);
+      setAlertShown(false); // Resetear la alerta al iniciar una nueva búsqueda
       try {
-        await getUserById(userId,TenantId);
+        await getUserById(userId, TenantId);
         if (searchedUser && TenantId) {
-          fetchUserActivities(userId,TenantId);
+          fetchUserActivities(userId, TenantId);
           setLoading(false);
         }
       } catch (error) {
@@ -81,11 +87,27 @@ const Payments = () => {
     setUserId(id);
   };
 
-  const filteredActivities = activities.filter(activity =>
-    userActivities.some(userActivity => userActivity.ActivityId === activity.id && userActivity.isPaid === false)
-    
-    
-  );
+  useEffect(() => {
+    if (userId && userActivities.length > 0) {
+      const filtered = activities.filter(activity =>
+        userActivities.some(userActivity => userActivity.ActivityId === activity.id && !userActivity.isPaid)
+      );
+  
+      setActivitiesByUser(filtered);
+  
+      if (filtered.length === 0 && !alertShown) {
+        Swal.fire({
+          title: 'El usuario no presenta pagos pendientes.',
+          icon: 'info',
+          confirmButtonText: 'Aceptar'
+        });
+        setAlertShown(true); // Marcar la alerta como mostrada
+        setUserId(""); // Limpiar el campo de búsqueda
+      }
+    }
+  }, [userActivities, activities, userId, alertShown]);
+
+
 
   useEffect(() => {
     if(filteredActivities.length > 0){
@@ -185,6 +207,8 @@ const Payments = () => {
           setAmounts({});
           setSelectedPaymentMode("");
           setPaymentDate(new Date());
+          setSubscriptionCost({});
+          setSelectedSubscription({});
           
         });
       } else {
@@ -247,6 +271,13 @@ const Payments = () => {
   useEffect(() => {
     handleAmountChange()
   },[subscriptionCost])
+
+  useEffect(() => {
+    return () => {
+      clearSearchedUser(); // Se ejecuta al desmontar el componente
+      console.log("Componente desmontado y usuario limpiado.");
+    };
+  }, []);
 
   return (
     <MainContainer>
