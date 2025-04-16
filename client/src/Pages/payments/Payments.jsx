@@ -168,11 +168,28 @@ const Payments = () => {
       }
     }
   }, [selectedSubscription, activitiesByUser, userId]);
+
+  useEffect(() => {
+    return () => {
+      resetPagoState(); // limpia cuando salís del componente
+    };
+  }, []);
   
   
   const handlePaymentModeChange =(event) => {
     const paymentMode = event.target.value;
     setSelectedPaymentMode(paymentMode);
+  };
+
+  const resetPagoState = () => {
+    cleanUserActivities(); 
+    setUserId("");
+    setTotalAmount(0);
+    setAmounts({});
+    setSelectedPaymentMode("");
+    setPaymentDate(new Date());
+    setSubscriptionCost({});
+    setSelectedSubscription({});
   };
 
   const handleSubmit = async () => {
@@ -201,14 +218,15 @@ const Payments = () => {
           confirmButtonText: 'Aceptar'
         }).then(() => {
           // Limpiar los estados e inputs
-          cleanUserActivities(); 
-          setUserId("");
-          setTotalAmount(0);
-          setAmounts({});
-          setSelectedPaymentMode("");
-          setPaymentDate(new Date());
-          setSubscriptionCost({});
-          setSelectedSubscription({});
+          // cleanUserActivities(); 
+          // setUserId("");
+          // setTotalAmount(0);
+          // setAmounts({});
+          // setSelectedPaymentMode("");
+          // setPaymentDate(new Date());
+          // setSubscriptionCost({});
+          // setSelectedSubscription({});
+          resetPagoState();
           
         });
       } else {

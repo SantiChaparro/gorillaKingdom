@@ -1,4 +1,4 @@
-const { User , Routine , Exercise , DayOfWeek ,ExerciseDayOfWeek, UserTenantRoutine,UserActivities,Activity} = require('../db');
+const { User , Routine , Exercise , DayOfWeek ,ExerciseDayOfWeek, UserTenantRoutine,UserActivities,Activity,PaymentActivities} = require('../db');
 const { Op } = require('sequelize');
 
 const getRoutineByUserId = async (dni, selectedTenant) => {
@@ -156,10 +156,58 @@ const modifyRoutine = async (routineId, updateData) => {
     }
 };
 
+const getDuesDatesByUserId = async (dni, tenantId) => {
+    try {
+      const actividades = await UserActivities.findAll({
+        where: {
+          UserDni: dni,
+          activo: true
+        },
+        include: [
+          {
+            model: Activity,
+            as: 'activity',
+            where: { TenantId: tenantId },
+            attributes: ['nombre'],
+            include: [
+              {
+                model: PaymentActivities,
+                as: 'paymentActivities',
+                attributes: ['fechaVencimiento'],
+                required: false // Por si aún no tiene pagos
+              }
+            ]
+          }
+        ],
+        attributes: [],
+        logging: console.log
+      });
+  
+      console.log('Fechas de vencimiento obtenidas:', actividades);
+  
+      const resultado = actividades.map((ua) => {
+        const nombreActividad = ua.activity?.nombre || null;
+        const primerPago = ua.activity?.paymentActivities?.[0]; // o con .find si tenés lógica adicional
+  
+        return {
+          nombreActividad,
+          fechaVencimiento: primerPago?.fechaVencimiento || null
+        };
+      });
+  
+      return resultado;
+    } catch (error) {
+      console.error('Error al obtener fechas de vencimiento:', error);
+      return [];
+    }
+  };
+  
+  
+
 module.exports = { modifyRoutine };
 
 
 module.exports = { modifyRoutine };
 
 
-module.exports = {getRoutineByUserId,modifyRoutine};
+module.exports = {getRoutineByUserId,modifyRoutine,getDuesDatesByUserId};

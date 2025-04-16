@@ -54,7 +54,7 @@ const AddActivity = ({ selectedActivity, setSelectedActivity, handleActivityChan
             await fetchUserActivities(userDni);
            }
            
-            await setIsEditing(false);
+           // await setIsEditing(false);
         } catch (error) {
             console.error("Error deleting user activity:", error);
         }

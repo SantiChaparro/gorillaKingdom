@@ -1,6 +1,7 @@
 import {create} from 'zustand';
 import axios from 'axios';
 import apiUrl from '../configUrl';
+//import { param } from '../../../server/src/routes';
 
 export const useRoutinesStore = create((set) => ({
     routines: [],
@@ -81,10 +82,12 @@ export const useRoutinesStore = create((set) => ({
         }
     },
 
-    removeExercise: async (routineId,exerciseId) => {
+    removeExercise: async (routineId,exerciseId,dayId) => {
+      console.log('dayid antes de entrar a peticion',dayId);
+      
 
       try {
-        const response = await axios.patch(`${apiUrl}/master/routine/${routineId}/deleteExercise/${exerciseId}`)
+        const response = await axios.patch(`${apiUrl}/master/routine/${routineId}/deleteExercise/${exerciseId}`,null,{params:{dayId}});
         console.log('Routine updated successfully:', response.data);
         set({ succesMessage: response.data.successMessage });
       } catch (error) {

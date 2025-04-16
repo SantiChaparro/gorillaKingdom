@@ -195,9 +195,12 @@ const updateRoutine = async(req,res) => {
 const removeExercise = async (req,res) => {
 
     const {routineId,exerciseId} = req.params;
+    const {dayId} = req.query;
+    console.log('desde handler removeexcercise',dayId);
+    
     
       try {
-        const removedExercise = await deleteExercise(routineId,exerciseId);
+        const removedExercise = await deleteExercise(routineId,exerciseId,dayId);
        console.log('ejercicio eliminado',removedExercise)
         if(removedExercise){
             res.status(200).json(removedExercise)
@@ -536,6 +539,9 @@ const removeUserActivity = async(req,res) => {
 
     const {dni} = req.params;
     const {ActivityId} = req.body;
+    console.log('dni desde removeuseractivity handler',dni);
+    console.log('activityId desde removeuseractivity handler',ActivityId);
+    
     
     try {
         const removedActivity = await deleteActivity(dni,ActivityId);

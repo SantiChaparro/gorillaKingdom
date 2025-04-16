@@ -1,61 +1,348 @@
+// import React, { useState, useEffect } from 'react';
+// import UserNavBar from '../../../Components/UserNavBar';
+// import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress,Card,CardMedia } from '@mui/material';
+// import { useRoutinesStore } from '../../../store/useRoutinesStore';
+// import Cookies from 'js-cookie';
+// import {jwtDecode} from "jwt-decode";
+// import Swal from 'sweetalert2';
+// import apiUrl from '../../../configUrl';
+// import trainingImage from '../../../assests/imagenes/womenLift.jpg';
+
+// const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
+//   const { getRoutine, modifyRoutine, routines } = useRoutinesStore();
+//   const [option, setOption] = useState("");
+//   const [selectedDayRoutine, setSelectedDayRoutine] = useState(null);
+//   const [routine, setRoutine] = useState({});
+//   const [updateData, setUpdateData] = useState({});
+//   const [dni,setDni] = useState("");
+//   const [tenant,setTenant] = useState("");
+//   const [openModal, setOpenModal] = useState(false);
+//   const [expirations, setExpirations] = useState([]);
+//   console.log('selectedtenant desde userroutine',selectedTenants);
+  
+//   console.log('tenantid',tenant);
+//   console.log('userdni',dni);
+//   console.log(routines);
+  
+  
+  
+
+
+
+//   //let dni = verifiedUser.dni;
+  
+//   console.log(routine);
+//   console.log(updateData);
+//   console.log(verifiedUser);
+  
+  
+//   useEffect(()=>{
+//     const token = Cookies.get("token")
+//     if(token){
+//       const decodedToken = jwtDecode(token);
+//       console.log(decodedToken.user.dni);
+//       console.log(decodedToken);
+      
+//       //const dni = decodedToken.user.dni;
+//       setDni(decodedToken.user.dni);
+//       setTenant(selectedTenants);
+//      // const tenant = decodedToken.tenantsData[0].id;
+//     }
+    
+//   },[])
+
+//   useEffect(() => {
+//     const fetchExpirations = async () => {
+//       const response = await axios.get(`${apiUrl}/users/activities-expirations`, {
+//         params: { dni, tenant }
+//       });
+  
+//       if (response.data.length > 0) {
+//         setOpenModal(true);
+//         setExpirations(response.data);
+//       }
+//     };
+  
+//     if (dni && tenant) fetchExpirations();
+//   }, [dni, tenant]);
+
+//   // modal para mostrar fechas de vencimiento de actividades
+  
+
+   
+//   useEffect(() => {
+//     if(dni && tenant){
+//       handleRoutine(dni,tenant);
+//     }
+    
+   
+//   }, [dni,tenant]);
+
+//   useEffect(() => {
+//     if (routine.message === "Pago pendiente") {
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Pago pendiente',
+//         text: routine.message,
+//         showConfirmButton: true,
+//       });
+//     }
+// }, [routine]);
+  
+//   useEffect(() => {
+//     const updateRoutineDetails = async () => {
+//       // Verificar si routine y routine.routine están definidos
+//       if (routine?.routine?.routineDetail?.length > 0) {
+//         console.log(routine.routine.routineDetail);
+
+//         const initialUpdateData = {};
+//         routine.routine.routineDetail.forEach(detail => {
+//           initialUpdateData[detail.id] = detail.weights;
+//           console.log(initialUpdateData);
+          
+//         });
+
+//         // Actualiza updateData con los detalles de rutina
+//         setUpdateData(prevState => ({
+//           ...prevState,
+//           ...initialUpdateData
+//         }));
+//       }
+//     };
+
+//     updateRoutineDetails();
+//   }, [routine]);
+
+//   const handleChange = (event) => {
+//     const selectedDay = event.target.value;
+//     setOption(selectedDay);
+  
+//     // Encuentra el día de la rutina seleccionado
+//     const dayRoutine = routine.routine.DayOfWeeks.find(day => day.id === selectedDay);
+    
+//     // Imprime el día de la rutina seleccionado
+ 
+//     if (dayRoutine) {
+//       // Obtén los IDs de los ejercicios filtrados
+//       const filteredExerciseIds = routine.filteredExercises.map(exercise => exercise.ExerciseId);
+        
+//       // Filtra los ejercicios de `dayRoutine` basándote en los IDs filtrados
+//       const filteredExercisesForDay = dayRoutine.Exercises.filter(exercise => 
+//         filteredExerciseIds.includes(exercise.id)
+//       );
+  
+//       // Actualiza el estado con los ejercicios filtrados
+//       setSelectedDayRoutine({
+//         ...dayRoutine,
+//         Exercises: filteredExercisesForDay
+//       });
+//     }
+//   };
+  
+
+//   const handleRoutine = async (dni,tenant) => {
+
+//     // aca hago la peticion para traer las fechas de vencimiento de las actividades del usuario en este tenant
+
+//    const response = await getRoutine(dni,tenant);
+//    console.log(response);
+   
+//     setRoutine(response)
+    
+//   };
+
+//   const getExerciseDetails = (exerciseId) => {
+//     const detail = routine.routine.routineDetail.find(detail => detail.id === exerciseId);
+//     console.log('detalle rutina',detail);
+
+//     return detail
+    
+//   };
+
+//   const handleTextFieldChange = (exerciseId, weekIndex, value) => {
+//     setUpdateData(prevState => ({
+//       ...prevState,
+//       [exerciseId]: {
+//         ...prevState[exerciseId],
+//         [`week${weekIndex + 1}`]: value
+//       }
+//     }));
+//   };
+
+//   const handleSaveChanges = async () => {
+    
+//     const updatedRoutine = {
+//       id: routine.routine.id, 
+//       updateData
+//     };
+
+//     const newRoutine = await modifyRoutine(updatedRoutine);
+
+//     if(newRoutine){
+//       Swal.fire({
+//           icon: 'success',
+//           title: 'Excelente!',
+//           text: 'Se guardaron tus cambios.',
+//           showConfirmButton: true,
+//          // timer: 2000
+//       });
+      
+//      }else{
+//       Swal.fire({
+//           icon: 'error',
+//           title: 'Upss!',
+//           text: 'Hubo un problema, intenta de nuevo.',
+//           showConfirmButton: true,
+//          // timer: 2000
+//       });
+//      }
+//   };
+//   console.log(selectedDayRoutine);
+  
+//   return (
+//     <MainContainer>
+//       <UserNavBar handleMenuClick={handleMenuClick} />
+//       <TitleContainer>
+//         <CustomTypography variant='h3'>¿Qué entrenamos hoy?</CustomTypography>
+//       </TitleContainer>
+//       <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
+//         <CustomInputLabel sx={{color:'black'}} id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
+//         <CustomSelect
+//           labelId="day-select-label"
+//           id="day-select"
+//           value={option}
+//           onChange={handleChange}
+//           label="¿Qué día vas a entrenar?"
+//           sx={textFieldStyles}
+  
+//         >
+//           {routine?.routine?.DayOfWeeks && routine.routine.DayOfWeeks.map((day) => (
+//             <MenuItem  key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
+//           ))}
+//         </CustomSelect>
+//       </FormControl>
+//       <ExerciseContainer>
+//         {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ? (
+//           selectedDayRoutine.Exercises.map((exercise, index) => {
+//             const details = getExerciseDetails(exercise.id);
+//             console.log(details);
+            
+//             return (
+//               <Exercise key={index}>
+//                 <ExcercieDescription>
+//                   <CustoTypografi variant='body1' color='white'>
+//                     {exercise.nombre}
+//                   </CustoTypografi>
+//                   {details && (
+//                     <CustoTypografi sx={{color:'gray'}}>
+//                       {details.setsAndReps}
+//                     </CustoTypografi>
+//                   )}
+//                 </ExcercieDescription>
+//                 <ExerciseLoad>
+//                   {Array.from({ length: 4 }).map((_, weekIndex) => (
+//                     <CustomTextField
+//                     key={weekIndex}
+//                     size="small"
+//                     variant="outlined"
+//                     value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ""}
+//                     onChange={(e) => handleTextFieldChange(exercise.id, weekIndex, e.target.value)}
+//                     sx={{
+//                       ...textFieldStyles,
+//                       maxWidth:'45px',
+//                       input: {
+//                         color: 'black', // Texto negro por defecto
+//                       },
+//                       '& .MuiOutlinedInput-root': {
+//                         '& fieldset': {
+//                           borderColor: 'black', // Borde negro por defecto
+//                         },
+//                         '&:hover fieldset': {
+//                           borderColor: '#C004FF', // Borde violeta en hover
+//                         },
+//                         '&.Mui-focused fieldset': {
+//                           borderColor: '#C004FF', // Borde violeta en focus
+//                         },
+//                         '&.Mui-focused input': {
+//                           color: 'black', // Texto negro en focus
+//                         }
+//                       }
+//                     }}
+//                   />
+//                   ))}
+//                 </ExerciseLoad>
+//               </Exercise>
+//             );
+//           })
+//         ) : (
+//           <Typography variant='body1' color='white'>No hay ejercicios para el día seleccionado</Typography>
+//         )}
+//       </ExerciseContainer>
+//       {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ?
+//       <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton> : null}
+//     </MainContainer>
+//   );
+// };
+
+// export default UserRoutine;
+
 import React, { useState, useEffect } from 'react';
 import UserNavBar from '../../../Components/UserNavBar';
-import { Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, TextField, Button, CircularProgress,Card,CardMedia } from '@mui/material';
+import { 
+  Box, Typography, styled, Select, MenuItem, FormControl, InputLabel, 
+  TextField, Button, CircularProgress, Card, CardMedia, Dialog, 
+  DialogTitle, DialogContent, DialogActions 
+} from '@mui/material';
 import { useRoutinesStore } from '../../../store/useRoutinesStore';
 import Cookies from 'js-cookie';
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Swal from 'sweetalert2';
+import axios from 'axios';
+import apiUrl from '../../../configUrl';
 import trainingImage from '../../../assests/imagenes/womenLift.jpg';
 
-const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
+// Estilos (agregá tus styled-components acá si no los importaste)
+
+const UserRoutine = ({ handleMenuClick, verifiedUser, selectedTenants }) => {
   const { getRoutine, modifyRoutine, routines } = useRoutinesStore();
   const [option, setOption] = useState("");
   const [selectedDayRoutine, setSelectedDayRoutine] = useState(null);
   const [routine, setRoutine] = useState({});
   const [updateData, setUpdateData] = useState({});
-  const [dni,setDni] = useState("");
-  const [tenant,setTenant] = useState("");
-  console.log('selectedtenant desde userroutine',selectedTenants);
-  
-  console.log('tenantid',tenant);
-  console.log('userdni',dni);
-  console.log(routines);
-  
-  
-  
+  const [dni, setDni] = useState("");
+  const [tenant, setTenant] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [expirations, setExpirations] = useState([]);
 
-
-
-  //let dni = verifiedUser.dni;
-  
-  console.log(routine);
-  console.log(updateData);
-  console.log(verifiedUser);
-  
-  
-  useEffect(()=>{
-    const token = Cookies.get("token")
-    if(token){
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
       const decodedToken = jwtDecode(token);
-      console.log(decodedToken.user.dni);
-      console.log(decodedToken);
-      
-      //const dni = decodedToken.user.dni;
       setDni(decodedToken.user.dni);
       setTenant(selectedTenants);
-     // const tenant = decodedToken.tenantsData[0].id;
     }
-    
-  },[])
+  }, []);
 
-   
   useEffect(() => {
-    if(dni && tenant){
-      handleRoutine(dni,tenant);
+    const fetchExpirations = async () => {
+      const response = await axios.get(`${apiUrl}/user/users/${dni}/tenant/${tenant}/due-dates`);
+      console.log(response.data);
+      
+
+      if (response.data.length > 0) {
+        setOpenModal(true);
+        setExpirations(response.data);
+      }
+    };
+
+    if (dni && tenant) fetchExpirations();
+  }, [dni, tenant]);
+
+  useEffect(() => {
+    if (dni && tenant) {
+      handleRoutine(dni, tenant);
     }
-    
-   
-  }, [dni,tenant]);
+  }, [dni, tenant]);
 
   useEffect(() => {
     if (routine.message === "Pago pendiente") {
@@ -66,22 +353,15 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
         showConfirmButton: true,
       });
     }
-}, [routine]);
-  
+  }, [routine]);
+
   useEffect(() => {
     const updateRoutineDetails = async () => {
-      // Verificar si routine y routine.routine están definidos
       if (routine?.routine?.routineDetail?.length > 0) {
-        console.log(routine.routine.routineDetail);
-
         const initialUpdateData = {};
         routine.routine.routineDetail.forEach(detail => {
           initialUpdateData[detail.id] = detail.weights;
-          console.log(initialUpdateData);
-          
         });
-
-        // Actualiza updateData con los detalles de rutina
         setUpdateData(prevState => ({
           ...prevState,
           ...initialUpdateData
@@ -95,44 +375,28 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
   const handleChange = (event) => {
     const selectedDay = event.target.value;
     setOption(selectedDay);
-  
-    // Encuentra el día de la rutina seleccionado
+
     const dayRoutine = routine.routine.DayOfWeeks.find(day => day.id === selectedDay);
-    
-    // Imprime el día de la rutina seleccionado
- 
+
     if (dayRoutine) {
-      // Obtén los IDs de los ejercicios filtrados
       const filteredExerciseIds = routine.filteredExercises.map(exercise => exercise.ExerciseId);
-        
-      // Filtra los ejercicios de `dayRoutine` basándote en los IDs filtrados
-      const filteredExercisesForDay = dayRoutine.Exercises.filter(exercise => 
+      const filteredExercisesForDay = dayRoutine.Exercises.filter(exercise =>
         filteredExerciseIds.includes(exercise.id)
       );
-  
-      // Actualiza el estado con los ejercicios filtrados
       setSelectedDayRoutine({
         ...dayRoutine,
         Exercises: filteredExercisesForDay
       });
     }
   };
-  
 
-  const handleRoutine = async (dni,tenant) => {
-   const response = await getRoutine(dni,tenant);
-   console.log(response);
-   
-    setRoutine(response)
-    
+  const handleRoutine = async (dni, tenant) => {
+    const response = await getRoutine(dni, tenant);
+    setRoutine(response);
   };
 
   const getExerciseDetails = (exerciseId) => {
-    const detail = routine.routine.routineDetail.find(detail => detail.id === exerciseId);
-    console.log('detalle rutina',detail);
-
-    return detail
-    
+    return routine.routine.routineDetail.find(detail => detail.id === exerciseId);
   };
 
   const handleTextFieldChange = (exerciseId, weekIndex, value) => {
@@ -146,35 +410,30 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
   };
 
   const handleSaveChanges = async () => {
-    
     const updatedRoutine = {
-      id: routine.routine.id, 
+      id: routine.routine.id,
       updateData
     };
 
     const newRoutine = await modifyRoutine(updatedRoutine);
 
-    if(newRoutine){
+    if (newRoutine) {
       Swal.fire({
-          icon: 'success',
-          title: 'Excelente!',
-          text: 'Se guardaron tus cambios.',
-          showConfirmButton: true,
-         // timer: 2000
+        icon: 'success',
+        title: 'Excelente!',
+        text: 'Se guardaron tus cambios.',
+        showConfirmButton: true,
       });
-      
-     }else{
+    } else {
       Swal.fire({
-          icon: 'error',
-          title: 'Upss!',
-          text: 'Hubo un problema, intenta de nuevo.',
-          showConfirmButton: true,
-         // timer: 2000
+        icon: 'error',
+        title: 'Upss!',
+        text: 'Hubo un problema, intenta de nuevo.',
+        showConfirmButton: true,
       });
-     }
+    }
   };
-  console.log(selectedDayRoutine);
-  
+
   return (
     <MainContainer>
       <UserNavBar handleMenuClick={handleMenuClick} />
@@ -182,7 +441,7 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
         <CustomTypography variant='h3'>¿Qué entrenamos hoy?</CustomTypography>
       </TitleContainer>
       <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-        <CustomInputLabel sx={{color:'black'}} id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
+        <CustomInputLabel sx={{ color: 'black' }} id="day-select-label">¿Qué día vas a entrenar?</CustomInputLabel>
         <CustomSelect
           labelId="day-select-label"
           id="day-select"
@@ -190,19 +449,16 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
           onChange={handleChange}
           label="¿Qué día vas a entrenar?"
           sx={textFieldStyles}
-  
         >
           {routine?.routine?.DayOfWeeks && routine.routine.DayOfWeeks.map((day) => (
-            <MenuItem  key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
+            <MenuItem key={day.id} value={day.id}>{`Día ${day.id}`}</MenuItem>
           ))}
         </CustomSelect>
       </FormControl>
       <ExerciseContainer>
-        {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ? (
+        {selectedDayRoutine && selectedDayRoutine.Exercises?.length > 0 ? (
           selectedDayRoutine.Exercises.map((exercise, index) => {
             const details = getExerciseDetails(exercise.id);
-            console.log(details);
-            
             return (
               <Exercise key={index}>
                 <ExcercieDescription>
@@ -210,7 +466,7 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
                     {exercise.nombre}
                   </CustoTypografi>
                   {details && (
-                    <CustoTypografi sx={{color:'gray'}}>
+                    <CustoTypografi sx={{ color: 'gray' }}>
                       {details.setsAndReps}
                     </CustoTypografi>
                   )}
@@ -218,33 +474,23 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
                 <ExerciseLoad>
                   {Array.from({ length: 4 }).map((_, weekIndex) => (
                     <CustomTextField
-                    key={weekIndex}
-                    size="small"
-                    variant="outlined"
-                    value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ""}
-                    onChange={(e) => handleTextFieldChange(exercise.id, weekIndex, e.target.value)}
-                    sx={{
-                      ...textFieldStyles,
-                      maxWidth:'45px',
-                      input: {
-                        color: 'black', // Texto negro por defecto
-                      },
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: 'black', // Borde negro por defecto
-                        },
-                        '&:hover fieldset': {
-                          borderColor: '#C004FF', // Borde violeta en hover
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#C004FF', // Borde violeta en focus
-                        },
-                        '&.Mui-focused input': {
-                          color: 'black', // Texto negro en focus
+                      key={weekIndex}
+                      size="small"
+                      variant="outlined"
+                      value={updateData[exercise.id]?.[`week${weekIndex + 1}`] || ""}
+                      onChange={(e) => handleTextFieldChange(exercise.id, weekIndex, e.target.value)}
+                      sx={{
+                        ...textFieldStyles,
+                        maxWidth: '45px',
+                        input: { color: 'black' },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { borderColor: 'black' },
+                          '&:hover fieldset': { borderColor: '#C004FF' },
+                          '&.Mui-focused fieldset': { borderColor: '#C004FF' },
+                          '&.Mui-focused input': { color: 'black' }
                         }
-                      }
-                    }}
-                  />
+                      }}
+                    />
                   ))}
                 </ExerciseLoad>
               </Exercise>
@@ -254,13 +500,47 @@ const UserRoutine = ({ handleMenuClick, verifiedUser,selectedTenants}) => {
           <Typography variant='body1' color='white'>No hay ejercicios para el día seleccionado</Typography>
         )}
       </ExerciseContainer>
-      {selectedDayRoutine && selectedDayRoutine.Exercises && selectedDayRoutine.Exercises.length > 0 ?
-      <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton> : null}
+      {selectedDayRoutine && selectedDayRoutine.Exercises?.length > 0 &&
+        <CustomButton onClick={handleSaveChanges}>GUARDAR CAMBIOS</CustomButton>
+      }
+
+      {/* Modal de vencimientos */}
+      <Dialog 
+      open={openModal} 
+      onClose={() => setOpenModal(false)}
+      PaperProps={{
+        sx: {
+          width: '90%',
+          maxWidth: '90%',
+          m: 0,
+          borderRadius: '5px',
+          boxShadow: 'none',
+          display:'flex',
+          flexDirection:'column',
+          alignItems:'center',
+        },
+      }}
+      >
+        <DialogTitle sx={{textAlign:'center'}}>Próximos vencimientos</DialogTitle>
+        <DialogContent>
+          {expirations.map((item) => (
+            <Typography key={item.ActivityId}>
+              {item.nombreActividad}: vence el {item.fechaVencimiento}
+            </Typography>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)}variant="contained"sx={{background: 'linear-gradient(45deg, #C004FF, #730399)',}}>Entendido</Button>
+        </DialogActions>
+      </Dialog>
     </MainContainer>
   );
 };
 
 export default UserRoutine;
+
+
+
 
 const MainContainer = styled(Box)(({ theme }) => ({
  // margin: 0,

@@ -1,4 +1,4 @@
-const {getRoutineByUserId,modifyRoutine} = require('../controllers/userControllers');
+const {getRoutineByUserId,modifyRoutine,getDuesDatesByUserId} = require('../controllers/userControllers');
 
 const getRoutineById = async (req,res)=>{
 
@@ -37,4 +37,17 @@ const updateRoutine = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
-module.exports = {getRoutineById,updateRoutine};
+
+const getDuesDates = async(req,res) => {
+    const {dni,tenantId} = req.params
+    console.log('dni desde el handler',dni)
+    console.log('tenantId desde el handler',tenantId)
+    try {
+        const duesDates = await getDuesDatesByUserId(dni,tenantId)
+        res.status(200).json(duesDates)
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+};
+
+module.exports = {getRoutineById,updateRoutine,getDuesDates};

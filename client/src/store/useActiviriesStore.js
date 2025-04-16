@@ -34,7 +34,9 @@ export const useActivitiesStore = create((set) => ({
     },
 
     deleteUserActivity: async(dni,activityId) => {
-        const response = await axios.patch(`${apiUrl}/removeUserActivity/${dni}`,{ ActivityId: activityId });
+        console.log('desde el store',dni,activityId);
+        
+        const response = await axios.patch(`${apiUrl}/master/removeUserActivity/${dni}`,{ ActivityId: activityId });
         console.log(response.data)
         return response.data
     },

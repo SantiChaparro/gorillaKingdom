@@ -77,8 +77,8 @@ const UpdateRoutine = () => {
               }
           }, []);
 
-    console.log(dayToRemove);
-    console.log(isAddingDays);
+  //  console.log(dayToRemove);
+  //  console.log(isAddingDays);
 
     const handleDetail = (event, exerciseId) => {
         const { value } = event.target;
@@ -91,8 +91,8 @@ const UpdateRoutine = () => {
 
     const showStoreState = () => {
         const state = useUsersStore.getState();
-        console.log('Estado completo del store:', state);
-        console.log('searchedUser:', state.searchedUser);
+       // console.log('Estado completo del store:', state);
+       // console.log('searchedUser:', state.searchedUser);
     };
 
     showStoreState();
@@ -234,11 +234,11 @@ const UpdateRoutine = () => {
         setEditingIndices({ dayIndex: null, exerciseIndex: null });
     };
 
-    const handleDelete = async (exerciseId) => {
+    const handleDelete = async (exerciseId,dayId) => {
         try {
             console.log('desde handledelete', user);
 
-            await removeExercise(user.routine.id, exerciseId);
+            await removeExercise(user.routine.id, exerciseId,dayId);
             console.log('a ver si llega aca?');
 
 
@@ -522,7 +522,7 @@ const UpdateRoutine = () => {
                                                     <ButtonContainer>
                                                         <Button onClick={() => handleEdit(dayIndex, exerciseIndex, exercise.id)} sx={{ background: 'linear-gradient(45deg, #C004FF, #730399)', color: 'white' }}>Editar</Button>
                                                         <Button sx={{ background: 'linear-gradient(90deg, #4d4d4d, #b3b3b3)', color: 'white' }}
-                                                            onClick={() => handleDelete(exercise.id)}
+                                                            onClick={() => handleDelete(exercise.id,day.id)}
                                                         >Eliminar</Button>
                                                     </ButtonContainer>
                                                 </>

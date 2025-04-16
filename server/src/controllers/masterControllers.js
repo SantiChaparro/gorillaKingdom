@@ -225,7 +225,7 @@ const newPayment = async (dni, fecha_pago, monto, medio_pago, subscriptions, ten
             const paymentActivity = await PaymentActivities.create({
                 PaymentId: payment.id,
                 ActivityId: activityId,
-                fecha_vencimiento: calcularFechaVencimiento(fecha_pago, subscription.duration) // Fecha calculada según la duración
+                fechaVencimiento: calcularFechaVencimiento(fecha_pago, subscription.duration) // Fecha calculada según la duración
             });
 
             // Asegurarse de que la actividad del usuario esté asociada y actualizada en UserActivities
@@ -414,8 +414,8 @@ const modifyUser = async (updatedData, dni) => {
 
 };
 const modifyRoutine = async (routineId, updateData) => {
-    // console.log('desde controller', routineId);
-    // console.log('updatedata desde controller', updateData);
+     console.log('desde controller', routineId);
+     console.log('updatedata desde controller', updateData);
 
     try {
 
@@ -447,7 +447,7 @@ const modifyRoutine = async (routineId, updateData) => {
             // console.log(`Detail with id ${exerciseIdNumber} not found, skipping update.`);
         }
 
-        // console.log('routineDetails actualizados:', routineDetails);
+         console.log('routineDetails actualizados:', routineDetails);
 
 
         await Routine.update(
@@ -463,16 +463,19 @@ const modifyRoutine = async (routineId, updateData) => {
     }
 };
 
-const deleteExercise = async (routineId, exerciseId) => {
+const deleteExercise = async (routineId, exerciseId,dayId) => {
 
     try {
         // console.log('desde controller id rutina',routineId);
         // console.log('desde controller id ehercicio',exerciseId);
+        console.log('desde controller id day',dayId);
+        
 
         const exercise = await ExerciseDayOfWeek.update({ activo: false }, {
             where: {
                 RoutineId: routineId,
-                ExerciseId: exerciseId
+                ExerciseId: exerciseId,
+                DayOfWeekId: dayId
             }
         })
         console.log('actualizacion exitosa desde controlador', exercise);
@@ -838,8 +841,8 @@ const findUserActivities = async (dni,TenantId) => {
 
 const deleteActivity = async (dni, activityId) => {
 
-    //console.log(dni);
-   // console.log(activityId);
+    console.log(dni);
+   console.log(activityId);
 
     try {
         const activity = await UserActivities.update({ activo: false }, {

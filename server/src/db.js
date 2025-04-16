@@ -105,16 +105,25 @@ Subscriptions.belongsToMany(Activity,{ through: 'ActivitySubscriptions'});
 // UserActivities.belongsTo(User, { foreignKey: 'UserDni' });
 // User.hasMany(UserActivities, { foreignKey: 'UserDni' });
 
-UserActivities.hasMany(PaymentActivities, {
-  foreignKey: 'ActivityId',
-  sourceKey: 'ActivityId',
-  as: 'paymentActivities'
-});
+// UserActivities.hasMany(PaymentActivities, {
+//   foreignKey: 'ActivityId',
+//   sourceKey: 'ActivityId',
+//   as: 'paymentActivities'
+// });
 
-PaymentActivities.belongsTo(UserActivities, {
+// PaymentActivities.belongsTo(UserActivities, {
+//   foreignKey: 'ActivityId',
+//   targetKey: 'ActivityId',
+//   as: 'userActivities'
+// });
+
+PaymentActivities.belongsTo(Activity,{
   foreignKey: 'ActivityId',
-  targetKey: 'ActivityId',
-  as: 'userActivities'
+  as: 'activity',
+});
+Activity.hasMany(PaymentActivities,{
+  foreignKey: 'ActivityId',
+  as: 'paymentActivities',
 });
 
 PaymentActivities.belongsTo(Payment, {
