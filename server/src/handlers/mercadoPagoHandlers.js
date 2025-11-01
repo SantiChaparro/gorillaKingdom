@@ -13,6 +13,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 //   ? process.env.MERCADO_PAGO_ACCESS_TOKEN 
 //   : process.env.MERCADO_TEST_TOKEN;
 
+console.log(isProduction);
+
+
 const BASE_URL = isProduction 
   ? process.env.DEPLOY_URL 
   : process.env.LOCAL_URL;
@@ -30,9 +33,12 @@ const client = new MercadoPagoConfig({
 });
 
 const createPreference = async(req,res) => {
-
+  console.log('es produccion',isProduction);
+  console.log('creando preferencia');
+  
+  
     const values = req.body;
-   // console.log(values);
+    console.log(values);
     
     
     const preferencesArray = [];

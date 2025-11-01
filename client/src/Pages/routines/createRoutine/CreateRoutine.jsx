@@ -184,7 +184,7 @@ const CreateRoutine = ({ handleMasterDrawer }) => {
         const { value } = event.target;
         setDetailValue(prevState => ({
             ...prevState,
-            [exerciseId]: { id: exerciseId, setsAndReps: value, weights: { week1: "", week2: "", week3: "", week4: "" } }
+            [exerciseId]: { id: exerciseId, setsAndReps: value, details: []}
         }));
     };
 

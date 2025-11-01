@@ -92,10 +92,9 @@ const getRoutineByUserId = async (dni, selectedTenant) => {
 
 
 
-const modifyRoutine = async (routineId, updateData) => {
-  //  console.log('desde controller', routineId);
-  //  console.log('updatedata desde controller', updateData);
+// 
 
+const modifyRoutine = async (routineId, updateData) => {
     try {
         const routine = await Routine.findByPk(routineId);
         if (!routine) {
@@ -103,58 +102,56 @@ const modifyRoutine = async (routineId, updateData) => {
         }
 
         let routineDetails = routine.routineDetail || [];
-       // console.log('routinedetail desde controller', routineDetails);
 
-        // Eliminar duplicados
+        // Eliminar duplicados por ID de ejercicio
         const uniqueDetails = [];
         const seenIds = new Set();
-
         for (const detail of routineDetails) {
             if (!seenIds.has(detail.id)) {
                 seenIds.add(detail.id);
                 uniqueDetails.push(detail);
             }
         }
-
         routineDetails = uniqueDetails;
 
-        // Actualizar los detalles de la rutina
         for (const exerciseId in updateData) {
             const exerciseUpdates = updateData[exerciseId];
-            const exerciseIdNumber = parseInt(exerciseId, 10); // Asegúrate de que sea un número
+            const exerciseIdNumber = parseInt(exerciseId, 10);
 
             const detailIndex = routineDetails.findIndex(detail => detail.id === exerciseIdNumber);
+
             if (detailIndex !== -1) {
-                // Si se encuentra el detalle, actualizarlo
-                const detail = routineDetails[detailIndex];
-                for (const weekIndex in exerciseUpdates) {
-                    const load = exerciseUpdates[weekIndex];
-                    detail.weights[weekIndex] = load;
-                }
+                // Ya existe este ejercicio, actualizamos setsAndReps y concatenamos details
+                const existingDetail = routineDetails[detailIndex];
+
+                existingDetail.setsAndReps = exerciseUpdates.setsAndReps;
+
+                // Concatenar los nuevos detalles
+                existingDetail.details = [
+                    ...(existingDetail.details || []),
+                    ...exerciseUpdates.details
+                ];
             } else {
-                // Agregar el nuevo ejercicio si no existe
+                // No existe, lo agregamos como nuevo
                 routineDetails.push({
                     id: exerciseIdNumber,
-                    weights: exerciseUpdates,
-                    setsAndReps: 'Default value' // O el valor por defecto que necesites
+                    setsAndReps: exerciseUpdates.setsAndReps,
+                    details: exerciseUpdates.details
                 });
             }
         }
 
-       // console.log('routineDetails actualizados:', routineDetails);
-
-        // Actualizar la rutina con los detalles actualizados
         await Routine.update(
             { routineDetail: routineDetails },
             { where: { id: routineId } }
         );
 
-        return await Routine.findByPk(routineId); // Devolver la rutina actualizada
+        return await Routine.findByPk(routineId);
     } catch (error) {
-        //console.error(`Failed to update routine: ${error.message}`);
         throw new Error(`Failed to update routine: ${error.message}`);
     }
 };
+
 
 const getDuesDatesByUserId = async (dni, tenantId) => {
     try {
